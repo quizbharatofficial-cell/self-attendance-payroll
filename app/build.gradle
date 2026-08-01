@@ -1,0 +1,19 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.abss.selfattendance'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.abss.selfattendance"
+        minSdk 23
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+    }
+}
+
+dependencies {
+}
