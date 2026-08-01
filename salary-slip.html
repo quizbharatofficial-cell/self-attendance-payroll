@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Salary Slip</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:14px;
+    font-family:Arial,sans-serif;
+    background:#eef2f6;
+    color:#111;
+}
+
+.toolbar{
+    max-width:850px;
+    margin:0 auto 12px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.toolbar button{
+    border:0;
+    padding:13px;
+    border-radius:9px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.back-btn{
+    background:#555;
+    color:white;
+}
+
+.pdf-btn{
+    background:#1565c0;
+    color:white;
+}
+
+.slip{
+    max-width:850px;
+    margin:auto;
+    background:white;
+    border:1px solid #777;
+    padding:20px;
+}
+
+.header{
+    text-align:center;
+    border-bottom:2px solid #111;
+    padding-bottom:12px;
+}
+
+.header h1{
+    margin:0;
+    font-size:21px;
+}
+
+.header h2{
+    margin:6px 0;
+    font-size:17px;
+}
+
+.header p{
+    margin:3px 0;
+    font-size:11px;
+}
+
+.profile-badge{
+    display:inline-block;
+    background:#e3f2fd;
+    color:#1565c0;
+    padding:5px 10px;
+    border-radius:15px;
+    font-size:9px;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+.salary-month{
+    margin-top:7px;
+    font-weight:bold;
+    font-size:12px;
+}
+
+.section-title{
+    margin-top:15px;
+    background:#333;
+    color:white;
+    padding:7px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.info-table td{
+    border:1px solid #777;
+    padding:7px;
+    font-size:10px;
+}
+
+.info-table td:nth-child(odd){
+    background:#f1f1f1;
+    font-weight:bold;
+    width:18%;
+}
+
+.attendance-table td{
+    border:1px solid #777;
+    text-align:center;
+    padding:7px 3px;
+    font-size:9px;
+}
+
+.attendance-table strong{
+    display:block;
+    font-size:13px;
+    margin-top:4px;
+}
+
+.shift-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+}
+
+.shift-box{
+    border:1px solid #777;
+    padding:9px;
+    text-align:center;
+    font-size:10px;
+}
+
+.shift-box strong{
+    display:block;
+    font-size:16px;
+    margin-top:4px;
+}
+
+.day{
+    background:#fff8e1;
+}
+
+.night{
+    background:#e8eaf6;
+}
+
+.salary-table th,
+.salary-table td{
+    border:1px solid #777;
+    padding:8px;
+    font-size:10px;
+}
+
+.salary-table th{
+    background:#e5e5e5;
+}
+
+.salary-table th:nth-child(2),
+.salary-table th:nth-child(4),
+.salary-table td:nth-child(2),
+.salary-table td:nth-child(4){
+    text-align:right;
+}
+
+.total-table td{
+    border:1px solid #777;
+    padding:9px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.total-table td:nth-child(2),
+.total-table td:nth-child(4){
+    text-align:right;
+}
+
+.net{
+    border:2px solid #111;
+    margin-top:12px;
+    padding:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:17px;
+    font-weight:bold;
+}
+
+.generated{
+    margin-top:9px;
+    text-align:right;
+    font-size:8px;
+    color:#777;
+}
+
+.footer{
+    margin-top:25px;
+    text-align:center;
+    font-size:9px;
+    color:#666;
+}
+
+.error-box{
+    max-width:600px;
+    margin:50px auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    text-align:center;
+    display:none;
+}
+
+.error-box button{
+    border:0;
+    background:#1565c0;
+    color:white;
+    padding:12px 18px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+@media(max-width:600px){
+
+    body{
+        padding:5px;
+    }
+
+    .slip{
+        padding:8px;
+    }
+
+    .header h1{
+        font-size:17px;
+    }
+
+    .header h2{
+        font-size:14px;
+    }
+
+    .info-table td{
+        font-size:8px;
+        padding:5px 2px;
+    }
+
+    .attendance-table td{
+        font-size:7px;
+        padding:5px 1px;
+    }
+
+    .attendance-table strong{
+        font-size:10px;
+    }
+
+    .salary-table th,
+    .salary-table td{
+        font-size:8px;
+        padding:5px 2px;
+    }
+
+    .net{
+        font-size:14px;
+    }
+}
+
+
+/* ==========================
+   PRINT / PDF
+========================== */
+
+@media print{
+
+    @page{
+        size:A4 portrait;
+        margin:8mm;
+    }
+
+    body{
+        padding:0;
+        background:white;
+    }
+
+    .toolbar,
+    .error-box{
+        display:none !important;
+    }
+
+    .slip{
+        border:0;
+        padding:0;
+        max-width:none;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+
+<!-- ==========================
+     TOOLBAR
+========================== -->
+
+<div
+id="toolbar"
+class="toolbar">
+
+<button
+class="back-btn"
+onclick="goBackToSalary()">
+
+← Back
+
+</button>
+
+
+<button
+class="pdf-btn"
+onclick="window.print()">
+
+Save / Print PDF
+
+</button>
+
+</div>
+
+
+
+<!-- ==========================
+     ERROR
+========================== -->
+
+<div
+id="errorBox"
+class="error-box">
+
+<h2>Salary Slip Not Found</h2>
+
+<p id="errorText">
+Please calculate salary first.
+</p>
+
+<button
+onclick="location.href='salary.html'">
+
+Go to Salary
+
+</button>
+
+</div>
+
+
+
+<!-- ==========================
+     SALARY SLIP
+========================== -->
+
+<div
+id="salarySlip"
+class="slip">
+
+
+<div class="header">
+
+<h1>
+SELF ATTENDANCE PAYROLL
+</h1>
+
+<h2>
+SALARY SLIP
+</h2>
+
+
+<p id="employeeHeader">
+Employee
+</p>
+
+
+<div
+id="profileBadge"
+class="profile-badge">
+
+Profile
+
+</div>
+
+
+<div
+id="salaryMonth"
+class="salary-month">
+
+Salary Month
+
+</div>
+
+</div>
+
+
+
+<!-- ==========================
+     EMPLOYEE
+========================== -->
+
+<div class="section-title">
+EMPLOYEE DETAILS
+</div>
+
+
+<table class="info-table">
+
+<tr>
+
+<td>Name</td>
+<td id="employeeName">-</td>
+
+<td>Employee ID</td>
+<td id="employeeId">-</td>
+
+</tr>
+
+
+<tr>
+
+<td>Designation</td>
+<td id="designation">-</td>
+
+<td>Department</td>
+<td id="department">-</td>
+
+</tr>
+
+
+<tr>
+
+<td>DOJ</td>
+<td id="doj">-</td>
+
+<td>Location</td>
+<td id="location">-</td>
+
+</tr>
+
+
+<tr>
+
+<td>Bank</td>
+<td id="bankName">-</td>
+
+<td>Account No.</td>
+<td id="accountNumber">-</td>
+
+</tr>
+
+
+<tr>
+
+<td>IFSC</td>
+<td id="ifsc">-</td>
+
+<td>PAN</td>
+<td id="pan">-</td>
+
+</tr>
+
+
+<tr>
+
+<td>UAN</td>
+<td id="uan">-</td>
+
+<td>ESIC No.</td>
+<td id="esicNumber">-</td>
+
+</tr>
+
+</table>
+
+
+
+<!-- ==========================
+     ATTENDANCE
+========================== -->
+
+<div class="section-title">
+ATTENDANCE SUMMARY
+</div>
+
+
+<table class="attendance-table">
+
+<tr>
+
+<td>
+Payable Days
+<strong id="payableDays">0</strong>
+</td>
+
+<td>
+Present
+<strong id="presentDays">0</strong>
+</td>
+
+<td>
+Half Day
+<strong id="halfDays">0</strong>
+</td>
+
+<td>
+Paid Leave
+<strong id="paidLeaves">0</strong>
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Weekly Off
+<strong id="weeklyOffs">0</strong>
+</td>
+
+<td>
+Unpaid Leave
+<strong id="unpaidLeaves">0</strong>
+</td>
+
+<td>
+Working Hours
+<strong id="workingHours">0</strong>
+</td>
+
+<td>
+OT Hours
+<strong id="otHours">0</strong>
+</td>
+
+</tr>
+
+</table>
+
+
+
+<!-- ==========================
+     SHIFT
+========================== -->
+
+<div class="section-title">
+SHIFT SUMMARY
+</div>
+
+
+<div class="shift-row">
+
+<div class="shift-box day">
+
+☀️ DAY SHIFT
+
+<strong id="dayShifts">
+0
+</strong>
+
+</div>
+
+
+<div class="shift-box night">
+
+🌙 NIGHT SHIFT
+
+<strong id="nightShifts">
+0
+</strong>
+
+</div>
+
+</div>
+
+
+<table class="info-table">
+
+<tr>
+
+<td>Day Duty</td>
+
+<td id="dayDutyHours">
+8 Hours
+</td>
+
+
+<td>Night Duty</td>
+
+<td id="nightDutyHours">
+8 Hours
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>OT Rate</td>
+
+<td id="otRate">
+₹0.00 / Hour
+</td>
+
+
+<td>Night Allowance</td>
+
+<td id="nightAllowanceRate">
+₹0.00 / Shift
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>Monthly Salary</td>
+
+<td id="monthlySalary">
+₹0.00
+</td>
+
+
+<td>Salary Division</td>
+
+<td id="salaryDays">
+26 Days
+</td>
+
+</tr>
+
+</table>
+
+
+
+<!-- ==========================
+     SALARY DETAILS
+========================== -->
+
+<div class="section-title">
+SALARY DETAILS
+</div>
+
+
+<table class="salary-table">
+
+<thead>
+
+<tr>
+
+<th>Earnings</th>
+<th>Amount ₹</th>
+
+<th>Deductions</th>
+<th>Amount ₹</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+
+<tr>
+
+<td>Earned Salary</td>
+
+<td id="earnedSalary">
+0.00
+</td>
+
+
+<td id="pfLabel">
+PF
+</td>
+
+<td id="pfAmount">
+0.00
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>Overtime</td>
+
+<td id="overtimeAmount">
+0.00
+</td>
+
+
+<td id="esicLabel">
+ESIC
+</td>
+
+<td id="esicAmount">
+0.00
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>Night Shift Allowance</td>
+
+<td id="nightAllowanceAmount">
+0.00
+</td>
+
+
+<td>Canteen / Lunch</td>
+
+<td id="canteenAmount">
+0.00
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>Bonus / Extra Allowance</td>
+
+<td id="bonus">
+0.00
+</td>
+
+
+<td id="otherLabel">Advance / Other</td>
+
+<td id="advance">
+0.00
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+
+
+<table class="total-table">
+
+<tr>
+
+<td>Gross Salary</td>
+
+<td id="grossSalary">
+₹0.00
+</td>
+
+
+<td>Total Deduction</td>
+
+<td id="totalDeduction">
+₹0.00
+</td>
+
+</tr>
+
+</table>
+
+
+
+<div class="net">
+
+<span>
+NET SALARY
+</span>
+
+<span id="netSalary">
+₹0.00
+</span>
+
+</div>
+
+
+<div
+id="generatedAt"
+class="generated">
+-
+</div>
+
+
+<div class="footer">
+
+This is a computer generated salary slip.
+
+<br>
+
+Generated from Self Attendance & Payroll records.
+
+</div>
+
+
+</div>
+
+
+
+<script src="app.js"></script>
+
+<script>
+
+/* ==========================================
+   HELPERS
+========================================== */
+
+function slipEl(id){
+
+    return document
+    .getElementById(id);
+}
+
+
+function setSlipText(
+    id,
+    value
+){
+
+    const element =
+        slipEl(id);
+
+
+    if(element){
+
+        element.textContent =
+            value;
+    }
+}
+
+
+function safe(value){
+
+    if(
+        value === undefined ||
+        value === null ||
+        value === ""
+    ){
+
+        return "-";
+    }
+
+
+    return value;
+}
+
+
+function money(value){
+
+    return "₹" +
+        Number(
+            value || 0
+        ).toFixed(2);
+}
+
+
+function plainMoney(value){
+
+    return Number(
+        value || 0
+    ).toFixed(2);
+}
+
+
+/* ==========================================
+   FIND SALARY PROFILE
+
+   IMPORTANT:
+   Active Profile par depend nahi karega.
+
+   Salary save karte waqt jo
+   selectedSalaryProfileId save hua tha,
+   wahi profile load hogi.
+========================================== */
+
+function getSalarySlipProfile(){
+
+    const profileId =
+        localStorage.getItem(
+            "selectedSalaryProfileId"
+        );
+
+
+    const profiles =
+        getProfiles();
+
+
+    /*
+      Preferred:
+      Salary generate karne wali
+      exact profile.
+    */
+
+    if(profileId){
+
+        const profile =
+            profiles.find(
+                item =>
+                    item.id ===
+                    profileId
+            );
+
+
+        if(profile){
+
+            return profile;
+        }
+    }
+
+
+    /*
+      Old compatibility:
+      selected profile ID absent ho
+      to Active Profile.
+    */
+
+    return getActiveProfile();
+}
+
+
+/* ==========================================
+   SHOW ERROR
+========================================== */
+
+function showSlipError(message){
+
+    slipEl(
+        "salarySlip"
+    ).style.display =
+        "none";
+
+
+    slipEl(
+        "toolbar"
+    ).style.display =
+        "none";
+
+
+    slipEl(
+        "errorBox"
+    ).style.display =
+        "block";
+
+
+    setSlipText(
+        "errorText",
+        message
+    );
+}
+
+
+/* ==========================================
+   LOAD SLIP
+========================================== */
+
+function loadSalarySlip(){
+
+    const month =
+        localStorage.getItem(
+            "selectedSalaryMonth"
+        );
+
+
+    if(!month){
+
+        showSlipError(
+            "Salary month is not selected."
+        );
+
+        return;
+    }
+
+
+    const profile =
+        getSalarySlipProfile();
+
+
+    if(!profile){
+
+        showSlipError(
+            "Salary profile could not be found."
+        );
+
+        return;
+    }
+
+
+    const salaries =
+        profile.salaries ||
+        {};
+
+
+    const salary =
+        salaries[month];
+
+
+    if(!salary){
+
+        showSlipError(
+            "No saved salary was found for " +
+            month +
+            " in this profile."
+        );
+
+        return;
+    }
+
+
+    /* ======================================
+       MONTH
+    ====================================== */
+
+    const monthDate =
+        new Date(
+            month +
+            "-01T00:00:00"
+        );
+
+
+    const monthName =
+        monthDate
+        .toLocaleDateString(
+            "en-IN",
+            {
+                month:"long",
+                year:"numeric"
+            }
+        );
+
+
+    setSlipText(
+        "salaryMonth",
+        "Salary Month: " +
+        monthName
+    );
+
+
+    /* ======================================
+       IMPORTANT SNAPSHOT RULE
+
+       First saved salary snapshot use hoga.
+       Missing field ho to profile fallback.
+    ====================================== */
+
+
+    const employeeName =
+        salary.employeeName ||
+        profile.employeeName ||
+        "Employee";
+
+
+    const profileName =
+        salary.profileName ||
+        profile.profileName ||
+        "Profile";
+
+
+    setSlipText(
+        "employeeHeader",
+        employeeName
+    );
+
+
+    setSlipText(
+        "profileBadge",
+        profileName
+    );
+
+
+    /* ======================================
+       EMPLOYEE
+    ====================================== */
+
+    setSlipText(
+        "employeeName",
+        safe(
+            salary.employeeName ??
+            profile.employeeName
+        )
+    );
+
+
+    setSlipText(
+        "employeeId",
+        safe(
+            salary.employeeId ??
+            profile.employeeId
+        )
+    );
+
+
+    setSlipText(
+        "designation",
+        safe(
+            salary.designation ??
+            profile.designation
+        )
+    );
+
+
+    setSlipText(
+        "department",
+        safe(
+            salary.department ??
+            profile.department
+        )
+    );
+
+
+    setSlipText(
+        "doj",
+        safe(
+            salary.doj ??
+            profile.doj
+        )
+    );
+
+
+    setSlipText(
+        "location",
+        safe(
+            salary.location ??
+            profile.location
+        )
+    );
+
+
+    setSlipText(
+        "bankName",
+        safe(
+            salary.bankName ??
+            profile.bankName
+        )
+    );
+
+
+    setSlipText(
+        "accountNumber",
+        safe(
+            salary.accountNumber ??
+            profile.accountNumber
+        )
+    );
+
+
+    setSlipText(
+        "ifsc",
+        safe(
+            salary.ifsc ??
+            profile.ifsc
+        )
+    );
+
+
+    setSlipText(
+        "pan",
+        safe(
+            salary.pan ??
+            profile.pan
+        )
+    );
+
+
+    setSlipText(
+        "uan",
+        safe(
+            salary.uan ??
+            profile.uan
+        )
+    );
+
+
+    setSlipText(
+        "esicNumber",
+        safe(
+            salary.esicNumber ??
+            profile.esicNumber
+        )
+    );
+
+
+    /* ======================================
+       ATTENDANCE
+    ====================================== */
+
+    setSlipText(
+        "payableDays",
+        salary.payableDays ??
+        0
+    );
+
+
+    setSlipText(
+        "presentDays",
+        salary.presentDays ??
+        0
+    );
+
+
+    setSlipText(
+        "halfDays",
+        salary.halfDays ??
+        0
+    );
+
+
+    setSlipText(
+        "paidLeaves",
+        salary.paidLeaves ??
+        0
+    );
+
+
+    setSlipText(
+        "weeklyOffs",
+        salary.weeklyOffs ??
+        0
+    );
+
+
+    setSlipText(
+        "unpaidLeaves",
+        salary.unpaidLeaves ??
+        0
+    );
+
+
+    setSlipText(
+        "workingHours",
+        salary.workingHours ??
+        0
+    );
+
+
+    setSlipText(
+        "otHours",
+        salary.otHours ??
+        0
+    );
+
+
+    /* ======================================
+       SHIFT
+    ====================================== */
+
+    setSlipText(
+        "dayShifts",
+        salary.dayShifts ??
+        0
+    );
+
+
+    setSlipText(
+        "nightShifts",
+        salary.nightShifts ??
+        0
+    );
+
+
+    setSlipText(
+        "dayDutyHours",
+
+        Number(
+            salary.dayDutyHours ??
+            profile.dayDutyHours ??
+            profile.dutyHours ??
+            8
+        ) +
+        " Hours"
+    );
+
+
+    setSlipText(
+        "nightDutyHours",
+
+        Number(
+            salary.nightDutyHours ??
+            profile.nightDutyHours ??
+            profile.dutyHours ??
+            8
+        ) +
+        " Hours"
+    );
+
+
+    setSlipText(
+        "otRate",
+
+        money(
+            salary.otRate ??
+            profile.otRate ??
+            0
+        ) +
+        " / Hour"
+    );
+
+
+    setSlipText(
+        "nightAllowanceRate",
+
+        money(
+            salary.nightAllowanceRate ??
+            profile.nightAllowance ??
+            0
+        ) +
+        " / Shift"
+    );
+
+
+    setSlipText(
+        "monthlySalary",
+
+        money(
+            salary.monthlySalary
+        )
+    );
+
+
+    setSlipText(
+        "salaryDays",
+
+        Number(
+            salary.salaryDays ||
+            26
+        ) +
+        " Days"
+    );
+
+
+    /* ======================================
+       EARNINGS
+    ====================================== */
+
+    setSlipText(
+        "earnedSalary",
+
+        plainMoney(
+            salary.earnedSalary
+        )
+    );
+
+
+    setSlipText(
+        "overtimeAmount",
+
+        plainMoney(
+            salary.overtimeAmount
+        )
+    );
+
+
+    setSlipText(
+        "nightAllowanceAmount",
+
+        plainMoney(
+            salary.nightAllowanceAmount
+        )
+    );
+
+
+    setSlipText(
+        "bonus",
+
+        plainMoney(
+            salary.bonus
+        )
+    );
+
+
+    /* ======================================
+       PF
+    ====================================== */
+
+    setSlipText(
+        "pfLabel",
+
+        "PF (" +
+        Number(
+            salary.pfPercent ??
+            profile.pfPercent ??
+            0
+        ) +
+        "%) - " +
+        (
+            (salary.pfDeductionMode ??
+             profile.pfDeductionMode ??
+             "salary") === "salary"
+            ? "Salary Se"
+            : "Upar Se"
+        )
+    );
+
+
+    setSlipText(
+        "pfAmount",
+
+        plainMoney(
+            salary.pfAmount
+        )
+    );
+
+
+    /* ======================================
+       ESIC
+    ====================================== */
+
+    setSlipText(
+        "esicLabel",
+
+        "ESIC (" +
+        Number(
+            salary.esicPercent ??
+            profile.esicPercent ??
+            0
+        ) +
+        "%) - " +
+        (
+            (salary.esicDeductionMode ??
+             profile.esicDeductionMode ??
+             "salary") === "salary"
+            ? "Salary Se"
+            : "Upar Se"
+        )
+    );
+
+
+    setSlipText(
+        "esicAmount",
+
+        plainMoney(
+            salary.esicAmount
+        )
+    );
+
+
+    /* ======================================
+       OTHER DEDUCTIONS
+    ====================================== */
+
+    setSlipText(
+        "canteenAmount",
+
+        plainMoney(
+            salary.canteenAmount
+        )
+    );
+
+
+    setSlipText(
+        "advance",
+
+        plainMoney(
+            salary.advance
+        )
+    );
+
+    setSlipText(
+        "otherLabel",
+        "Advance / Other - " +
+        (
+            (salary.otherDeductionMode ?? "salary") === "salary"
+            ? "Salary Se"
+            : "Upar Se"
+        )
+    );
+
+
+    /* ======================================
+       TOTAL
+    ====================================== */
+
+    setSlipText(
+        "grossSalary",
+
+        money(
+            salary.grossSalary
+        )
+    );
+
+
+    setSlipText(
+        "totalDeduction",
+
+        money(
+            salary.totalDeduction
+        )
+    );
+
+
+    setSlipText(
+        "netSalary",
+
+        money(
+            salary.netSalary
+        )
+    );
+
+
+    /* ======================================
+       GENERATED DATE
+    ====================================== */
+
+    if(
+        salary.generatedAt
+    ){
+
+        const generated =
+            new Date(
+                salary.generatedAt
+            );
+
+
+        setSlipText(
+            "generatedAt",
+
+            "Generated: " +
+            generated
+            .toLocaleString(
+                "en-IN"
+            )
+        );
+
+    }else{
+
+        setSlipText(
+            "generatedAt",
+            ""
+        );
+    }
+
+}
+
+
+/* ==========================================
+   BACK
+========================================== */
+
+function goBackToSalary(){
+
+    /*
+      Slip kisi aur profile ki ho sakti hai.
+
+      Back press par usi profile ko
+      activate kar denge.
+    */
+
+    const profile =
+        getSalarySlipProfile();
+
+
+    if(profile){
+
+        localStorage.setItem(
+            ACTIVE_PROFILE_KEY,
+            profile.id
+        );
+    }
+
+
+    location.href =
+        "salary.html";
+}
+
+
+/* ==========================================
+   START
+========================================== */
+
+loadSalarySlip();
+
+</script>
+
+</body>
+</html>

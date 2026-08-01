@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<meta
+name="theme-color"
+content="#1565c0">
+
+<title>Attendance</title>
+
+<link rel="stylesheet" href="./style.css">
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding-bottom:30px;
+}
+
+
+/* ==============================
+   HEADER
+============================== */
+
+.header-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.back-btn{
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    background:rgba(255,255,255,.18);
+    color:white;
+    border-radius:50%;
+    font-size:28px;
+}
+
+
+/* ==============================
+   PROFILE
+============================== */
+
+.profile-box{
+    background:#e3f2fd;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:15px;
+}
+
+.profile-box span{
+    display:block;
+    color:#777;
+    font-size:9px;
+}
+
+.profile-box strong{
+    display:block;
+    color:#1565c0;
+    margin-top:4px;
+    font-size:15px;
+}
+
+
+/* ==============================
+   MONTH
+============================== */
+
+.month-input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:9px;
+    background:white;
+    margin-top:6px;
+    font-size:14px;
+}
+
+
+/* ==============================
+   SUMMARY
+============================== */
+
+.summary-grid{
+    display:grid;
+    grid-template-columns:
+        repeat(3,1fr);
+    gap:8px;
+    margin-top:15px;
+}
+
+.summary-box{
+    background:#f5f7fa;
+    padding:12px 5px;
+    text-align:center;
+    border-radius:9px;
+}
+
+.summary-box strong{
+    display:block;
+    color:#1565c0;
+    font-size:18px;
+}
+
+.summary-box span{
+    display:block;
+    color:#777;
+    font-size:8px;
+    margin-top:4px;
+}
+
+
+/* ==============================
+   FORM
+============================== */
+
+.form-title-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:12px;
+}
+
+.form-title-row h3{
+    margin:0;
+}
+
+.edit-indicator{
+    display:none;
+    background:#fff3e0;
+    color:#e65100;
+    font-size:9px;
+    padding:5px 9px;
+    border-radius:20px;
+    font-weight:bold;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:
+        1fr 1fr;
+    gap:10px;
+}
+
+.form-group{
+    margin-bottom:10px;
+}
+
+.form-group label{
+    display:block;
+    font-size:9px;
+    color:#666;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.form-input{
+    width:100%;
+    padding:11px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    background:white;
+    font-size:13px;
+}
+
+.form-input:disabled{
+    background:#eee;
+    color:#999;
+}
+
+
+/* ==============================
+   LIVE EDIT WARNING
+============================== */
+
+.live-warning{
+    display:none;
+    padding:11px;
+    border-radius:9px;
+    margin-bottom:12px;
+    background:#fff8e1;
+    color:#e65100;
+    font-size:10px;
+    line-height:1.5;
+}
+
+
+/* ==============================
+   BUTTONS
+============================== */
+
+.save-btn{
+    width:100%;
+    border:0;
+    background:#1565c0;
+    color:white;
+    padding:13px;
+    border-radius:9px;
+    font-weight:bold;
+    margin-top:4px;
+}
+
+.cancel-btn{
+    display:none;
+    width:100%;
+    border:0;
+    background:#eceff1;
+    color:#455a64;
+    padding:12px;
+    border-radius:9px;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+
+/* ==============================
+   TABLE
+============================== */
+
+.table-wrap{
+    width:100%;
+    overflow-x:auto;
+    margin-top:12px;
+}
+
+.att-table{
+    width:100%;
+    min-width:760px;
+    border-collapse:collapse;
+    font-size:10px;
+}
+
+.att-table th{
+    background:#f5f7fa;
+    color:#555;
+    padding:10px 6px;
+    border-bottom:1px solid #ddd;
+    white-space:nowrap;
+}
+
+.att-table td{
+    padding:10px 6px;
+    border-bottom:1px solid #eee;
+    text-align:center;
+    white-space:nowrap;
+}
+
+
+/* ==============================
+   TAGS
+============================== */
+
+.status-tag{
+    display:inline-block;
+    background:#e8f5e9;
+    color:#2e7d32;
+    padding:4px 7px;
+    border-radius:12px;
+    font-size:8px;
+}
+
+.day-tag{
+    display:inline-block;
+    background:#fff8e1;
+    color:#e65100;
+    padding:4px 7px;
+    border-radius:12px;
+    font-size:8px;
+}
+
+.night-tag{
+    display:inline-block;
+    background:#e8eaf6;
+    color:#283593;
+    padding:4px 7px;
+    border-radius:12px;
+    font-size:8px;
+}
+
+.live-tag{
+    display:inline-block;
+    background:#e8f5e9;
+    color:#1b5e20;
+    padding:4px 7px;
+    border-radius:12px;
+    font-size:8px;
+    font-weight:bold;
+}
+
+
+/* ==============================
+   ACTION
+============================== */
+
+.action-btn{
+    border:0;
+    padding:6px 9px;
+    border-radius:6px;
+    font-size:9px;
+    font-weight:bold;
+    margin:2px;
+}
+
+.edit-btn{
+    background:#e3f2fd;
+    color:#1565c0;
+}
+
+.delete-btn{
+    background:#ffebee;
+    color:#c62828;
+}
+
+
+/* ==============================
+   EMPTY
+============================== */
+
+.empty{
+    text-align:center;
+    padding:25px;
+    color:#888;
+    font-size:11px;
+}
+
+
+/* ==============================
+   MOBILE
+============================== */
+
+@media(max-width:500px){
+
+    .form-grid{
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .summary-grid{
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==============================
+     HEADER
+============================== -->
+
+<header>
+
+<div class="header-row">
+
+<a
+href="index.html"
+class="back-btn">
+‹
+</a>
+
+<div>
+
+<h1>
+Attendance
+</h1>
+
+<p>
+Daily Attendance Records
+</p>
+
+</div>
+
+</div>
+
+</header>
+
+
+<main>
+
+
+<!-- ==============================
+     ACTIVE PROFILE + SUMMARY
+============================== -->
+
+<section class="card">
+
+<div class="profile-box">
+
+<span>
+ACTIVE PROFILE
+</span>
+
+<strong id="activeAttendanceProfile">
+-
+</strong>
+
+</div>
+
+
+<label
+style="
+font-size:10px;
+font-weight:bold;
+">
+Attendance Month
+</label>
+
+
+<input
+type="month"
+id="attendanceMonth"
+class="month-input"
+onchange="renderAttendance()">
+
+
+<div class="summary-grid">
+
+
+<div class="summary-box">
+
+<strong id="sumPresent">
+0
+</strong>
+
+<span>
+PRESENT
+</span>
+
+</div>
+
+
+<div class="summary-box">
+
+<strong id="sumDay">
+0
+</strong>
+
+<span>
+DAY SHIFT
+</span>
+
+</div>
+
+
+<div class="summary-box">
+
+<strong id="sumNight">
+0
+</strong>
+
+<span>
+NIGHT SHIFT
+</span>
+
+</div>
+
+
+<div class="summary-box">
+
+<strong id="sumHours">
+0
+</strong>
+
+<span>
+WORK HOURS
+</span>
+
+</div>
+
+
+<div class="summary-box">
+
+<strong id="sumOT">
+0
+</strong>
+
+<span>
+OT HOURS
+</span>
+
+</div>
+
+
+<div class="summary-box">
+
+<strong id="sumLeave">
+0
+</strong>
+
+<span>
+LEAVE
+</span>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+
+<!-- ==============================
+     MANUAL ADD / EDIT
+============================== -->
+
+<section class="card">
+
+
+<div class="form-title-row">
+
+<h3 id="formTitle">
+Add Attendance
+</h3>
+
+<span
+id="editIndicator"
+class="edit-indicator">
+
+EDIT MODE
+
+</span>
+
+</div>
+
+
+<div
+id="liveEditWarning"
+class="live-warning">
+
+⚠️ This is currently an active Punch record.
+Saving changes here will immediately change the
+live attendance shown on the Home page.
+
+</div>
+
+
+<div class="form-grid">
+
+
+<!-- DATE -->
+
+<div class="form-group">
+
+<label>
+Attendance Date
+</label>
+
+<input
+type="date"
+id="recordDate"
+class="form-input">
+
+</div>
+
+
+
+<!-- STATUS -->
+
+<div class="form-group">
+
+<label>
+Status
+</label>
+
+<select
+id="recordStatus"
+class="form-input"
+onchange="statusChanged()">
+
+<option value="present">
+Present
+</option>
+
+<option value="half-day">
+Half Day
+</option>
+
+<option value="paid-leave">
+Paid Leave
+</option>
+
+<option value="unpaid-leave">
+Unpaid Leave
+</option>
+
+<option value="weekly-off">
+Weekly Off
+</option>
+
+</select>
+
+</div>
+
+
+
+<!-- SHIFT -->
+
+<div class="form-group">
+
+<label>
+Shift
+</label>
+
+<select
+id="recordShift"
+class="form-input">
+
+<option value="day">
+☀️ Day Shift
+</option>
+
+<option value="night">
+🌙 Night Shift
+</option>
+
+</select>
+
+</div>
+
+
+
+<!-- PUNCH IN -->
+
+<div class="form-group">
+
+<label>
+Punch In
+</label>
+
+<input
+type="time"
+id="manualPunchIn"
+class="form-input">
+
+</div>
+
+
+
+<!-- PUNCH OUT -->
+
+<div class="form-group">
+
+<label>
+Punch Out
+</label>
+
+<input
+type="time"
+id="manualPunchOut"
+class="form-input">
+
+</div>
+
+
+</div>
+
+
+<button
+type="button"
+class="save-btn"
+onclick="saveManualAttendance()">
+
+Save Attendance
+
+</button>
+
+
+<button
+type="button"
+id="cancelEditBtn"
+class="cancel-btn"
+onclick="cancelEdit()">
+
+Cancel Edit
+
+</button>
+
+
+</section>
+
+
+
+<!-- ==============================
+     ATTENDANCE RECORDS
+============================== -->
+
+<section class="card">
+
+<h3>
+Attendance Records
+</h3>
+
+
+<div class="table-wrap">
+
+<table class="att-table">
+
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+
+<th>Status</th>
+
+<th>Shift</th>
+
+<th>In</th>
+
+<th>Out</th>
+
+<th>Hours</th>
+
+<th>OT</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="attendanceBody">
+
+</tbody>
+
+
+</table>
+
+</div>
+
+
+<div
+id="emptyMessage"
+class="empty"
+style="display:none;">
+
+No attendance records found.
+
+</div>
+
+</section>
+
+
+</main>
+
+
+<!-- Main application functions -->
+<script src="./app.js"></script>
+
+
+<script>
+
+/*
+=========================================================
+PART 2 JAVASCRIPT WILL CONTINUE FROM HERE
+=========================================================
+ge
+/* =====================================================
+   ATTENDANCE PAGE - PART 2
+===================================================== */
+
+let editingDate = null;
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function el(id){
+    return document.getElementById(id);
+}
+
+
+function formatHours(minutes){
+
+    minutes = Number(minutes || 0);
+
+    return (minutes / 60).toFixed(2);
+}
+
+
+function attendanceStatusName(status){
+
+    const names = {
+        "present":"Present",
+        "half-day":"Half Day",
+        "paid-leave":"Paid Leave",
+        "unpaid-leave":"Unpaid Leave",
+        "weekly-off":"Weekly Off"
+    };
+
+    return names[status] || status || "-";
+}
+
+
+function localTimeValue(dateValue){
+
+    if(!dateValue){
+        return "";
+    }
+
+    const d = new Date(dateValue);
+
+    if(isNaN(d.getTime())){
+        return "";
+    }
+
+    const h =
+        String(d.getHours())
+        .padStart(2,"0");
+
+    const m =
+        String(d.getMinutes())
+        .padStart(2,"0");
+
+    return h + ":" + m;
+}
+
+
+/* =====================================================
+   ACTIVE PROFILE
+===================================================== */
+
+function loadAttendanceProfile(){
+
+    const profile =
+        getActiveProfile();
+
+    if(!profile){
+
+        el("activeAttendanceProfile")
+            .textContent =
+            "No Profile";
+
+        return;
+    }
+
+    el("activeAttendanceProfile")
+        .textContent =
+        profile.profileName ||
+        profile.employeeName ||
+        "Profile";
+
+    el("recordShift").value =
+        profile.defaultShift ||
+        "day";
+}
+
+
+/* =====================================================
+   STATUS CHANGE
+===================================================== */
+
+function statusChanged(){
+
+    const status =
+        el("recordStatus").value;
+
+    const working =
+        status === "present" ||
+        status === "half-day";
+
+
+    el("recordShift").disabled =
+        !working;
+
+    el("manualPunchIn").disabled =
+        !working;
+
+    el("manualPunchOut").disabled =
+        !working;
+
+
+    if(!working){
+
+        el("manualPunchIn").value = "";
+
+        el("manualPunchOut").value = "";
+    }
+}
+
+
+/* =====================================================
+   CALCULATE ATTENDANCE TIMES
+===================================================== */
+
+function calculateManualTimes(
+    date,
+    shift,
+    inTime,
+    outTime
+){
+
+    let punchIn = null;
+    let punchOut = null;
+
+    let workingMinutes = 0;
+    let overtimeMinutes = 0;
+
+
+    /*
+      No times entered.
+    */
+
+    if(!inTime && !outTime){
+
+        return {
+            punchIn,
+            punchOut,
+            workingMinutes,
+            overtimeMinutes
+        };
+    }
+
+
+    /*
+      Punch Out without Punch In is invalid.
+    */
+
+    if(!inTime && outTime){
+
+        throw new Error(
+            "Punch In is required when Punch Out is entered."
+        );
+    }
+
+
+    const start =
+        new Date(
+            date +
+            "T" +
+            inTime +
+            ":00"
+        );
+
+
+    if(
+        isNaN(start.getTime())
+    ){
+
+        throw new Error(
+            "Invalid Punch In time."
+        );
+    }
+
+
+    punchIn =
+        start.toISOString();
+
+
+    /*
+      Punch In only = LIVE attendance.
+
+      Is case me Punch Out null rahega.
+    */
+
+    if(inTime && !outTime){
+
+        return {
+            punchIn,
+            punchOut:null,
+            workingMinutes:0,
+            overtimeMinutes:0
+        };
+    }
+
+
+    let end =
+        new Date(
+            date +
+            "T" +
+            outTime +
+            ":00"
+        );
+
+
+    if(
+        isNaN(end.getTime())
+    ){
+
+        throw new Error(
+            "Invalid Punch Out time."
+        );
+    }
+
+
+    /*
+      Midnight crossing.
+
+      Example:
+      20:00 -> 05:00
+
+      Punch Out automatically
+      next day maana jayega.
+    */
+
+    if(
+        end.getTime() <
+        start.getTime()
+    ){
+
+        end.setDate(
+            end.getDate() + 1
+        );
+    }
+
+
+    workingMinutes =
+        Math.max(
+            0,
+            Math.floor(
+                (
+                    end.getTime() -
+                    start.getTime()
+                ) / 60000
+            )
+        );
+
+
+    const dutyHours =
+        Number(
+            getDutyHours(
+                shift
+            ) || 0
+        );
+
+
+    overtimeMinutes =
+        Math.max(
+            0,
+            workingMinutes -
+            (
+                dutyHours * 60
+            )
+        );
+
+
+    punchOut =
+        end.toISOString();
+
+
+    return {
+        punchIn,
+        punchOut,
+        workingMinutes,
+        overtimeMinutes
+    };
+}
+
+
+/* =====================================================
+   SAVE MANUAL / EDIT ATTENDANCE
+===================================================== */
+
+function saveManualAttendance(){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+
+        alert(
+            "No active profile."
+        );
+
+        return;
+    }
+
+
+    const date =
+        el("recordDate").value;
+
+
+    const status =
+        el("recordStatus").value;
+
+
+    const shift =
+        el("recordShift").value ||
+        profile.defaultShift ||
+        "day";
+
+
+    const inTime =
+        el("manualPunchIn").value;
+
+
+    const outTime =
+        el("manualPunchOut").value;
+
+
+    if(!date){
+
+        alert(
+            "Please select attendance date."
+        );
+
+        return;
+    }
+
+
+    const records =
+        profile.attendance || {};
+
+
+    /*
+      If date is changed during Edit,
+      don't silently overwrite another record.
+    */
+
+    if(
+        editingDate &&
+        editingDate !== date &&
+        records[date]
+    ){
+
+        const replace =
+            confirm(
+                "Attendance already exists for " +
+                date +
+                ".\n\nReplace that record?"
+            );
+
+
+        if(!replace){
+            return;
+        }
+    }
+
+
+    /*
+      New manual record on an existing date.
+    */
+
+    if(
+        !editingDate &&
+        records[date]
+    ){
+
+        const replace =
+            confirm(
+                "Attendance already exists for " +
+                date +
+                ".\n\nDo you want to replace it?"
+            );
+
+
+        if(!replace){
+            return;
+        }
+    }
+
+
+    const isWorking =
+        status === "present" ||
+        status === "half-day";
+
+
+    let timeData = {
+        punchIn:null,
+        punchOut:null,
+        workingMinutes:0,
+        overtimeMinutes:0
+    };
+
+
+    if(isWorking){
+
+        try{
+
+            timeData =
+                calculateManualTimes(
+                    date,
+                    shift,
+                    inTime,
+                    outTime
+                );
+
+        }catch(error){
+
+            alert(
+                error.message
+            );
+
+            return;
+        }
+    }
+
+
+    /*
+      Safety backup before modification.
+    */
+
+    if(
+        typeof createAutoBackup ===
+        "function"
+    ){
+
+        createAutoBackup(
+            editingDate
+            ? "Before Attendance Edit"
+            : "Before Manual Attendance Add"
+        );
+    }
+
+
+    /*
+      Date changed while editing:
+      remove old key.
+    */
+
+    if(
+        editingDate &&
+        editingDate !== date
+    ){
+
+        delete records[
+            editingDate
+        ];
+    }
+
+
+    /*
+      Create updated record.
+    */
+
+    records[date] = {
+
+        date:date,
+
+        status:status,
+
+        shift:
+            isWorking
+            ? shift
+            : null,
+
+        punchIn:
+            isWorking
+            ? timeData.punchIn
+            : null,
+
+        punchOut:
+            isWorking
+            ? timeData.punchOut
+            : null,
+
+        workingMinutes:
+            isWorking
+            ? timeData.workingMinutes
+            : 0,
+
+        overtimeMinutes:
+            isWorking
+            ? timeData.overtimeMinutes
+            : 0,
+
+        manual:true,
+
+        updatedAt:
+            new Date()
+            .toISOString()
+    };
+
+
+    profile.attendance =
+        records;
+
+
+    const saved =
+        saveActiveProfile(
+            profile
+        );
+
+
+    if(saved === false){
+
+        alert(
+            "Attendance could not be saved."
+        );
+
+        return;
+    }
+
+
+    /*
+      Backup after successful save.
+    */
+
+    if(
+        typeof createAutoBackup ===
+        "function"
+    ){
+
+        createAutoBackup(
+            "Attendance Saved - " +
+            date
+        );
+    }
+
+
+    /*
+      Important:
+      Home dashboard reads the same
+      profile.attendance records.
+    */
+
+    if(
+        typeof updateDashboard ===
+        "function"
+    ){
+
+        updateDashboard();
+    }
+
+
+    const wasEditing =
+        editingDate !== null;
+
+
+    cancelEdit();
+
+    renderAttendance();
+
+
+    alert(
+        wasEditing
+        ? "Attendance updated successfully."
+        : "Attendance added successfully."
+    );
+}
+
+
+/* =====================================================
+   EDIT ANY ATTENDANCE
+===================================================== */
+
+function editAttendance(date){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+        return;
+    }
+
+
+    const record =
+        profile.attendance?.[date];
+
+
+    if(!record){
+
+        alert(
+            "Attendance record not found."
+        );
+
+        return;
+    }
+
+
+    /*
+      Active Punch is ALSO editable.
+      Old blocking logic has been removed.
+    */
+
+    editingDate =
+        date;
+
+
+    el("formTitle").textContent =
+        "Edit Attendance";
+
+
+    el("editIndicator").style.display =
+        "inline-block";
+
+
+    el("cancelEditBtn").style.display =
+        "block";
+
+
+    el("recordDate").value =
+        date;
+
+
+    el("recordStatus").value =
+        record.status ||
+        (
+            record.punchIn
+            ? "present"
+            : "present"
+        );
+
+
+    el("recordShift").value =
+        record.shift ||
+        profile.defaultShift ||
+        "day";
+
+
+    el("manualPunchIn").value =
+        localTimeValue(
+            record.punchIn
+        );
+
+
+    el("manualPunchOut").value =
+        localTimeValue(
+            record.punchOut
+        );
+
+
+    /*
+      Active live record warning.
+    */
+
+    const activeRecord =
+        Boolean(
+            record.punchIn &&
+            !record.punchOut
+        );
+
+
+    el("liveEditWarning")
+        .style.display =
+        activeRecord
+        ? "block"
+        : "none";
+
+
+    statusChanged();
+
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+}
+
+
+/* =====================================================
+   CANCEL EDIT
+===================================================== */
+
+function cancelEdit(){
+
+    const profile =
+        getActiveProfile();
+
+
+    editingDate =
+        null;
+
+
+    el("formTitle").textContent =
+        "Add Attendance";
+
+
+    el("editIndicator").style.display =
+        "none";
+
+
+    el("liveEditWarning").style.display =
+        "none";
+
+
+    el("cancelEditBtn").style.display =
+        "none";
+
+
+    el("recordDate").value =
+        getDateKey();
+
+
+    el("recordStatus").value =
+        "present";
+
+
+    el("recordShift").value =
+        profile?.defaultShift ||
+        "day";
+
+
+    el("manualPunchIn").value =
+        "";
+
+
+    el("manualPunchOut").value =
+        "";
+
+
+    statusChanged();
+}
+
+
+/* =====================================================
+   DELETE ANY ATTENDANCE
+===================================================== */
+
+function deleteAttendance(date){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+        return;
+    }
+
+
+    const records =
+        profile.attendance || {};
+
+
+    const record =
+        records[date];
+
+
+    if(!record){
+
+        alert(
+            "Attendance record not found."
+        );
+
+        return;
+    }
+
+
+    const activeRecord =
+        Boolean(
+            record.punchIn &&
+            !record.punchOut
+        );
+
+
+    let message =
+        "Delete attendance for " +
+        date +
+        "?";
+
+
+    if(activeRecord){
+
+        message =
+            "This attendance currently has an ACTIVE Punch In.\n\n" +
+            "Deleting it will also remove the live Punch from the Home page.\n\n" +
+            "Delete it?";
+    }
+
+
+    const yes =
+        confirm(
+            message
+        );
+
+
+    if(!yes){
+        return;
+    }
+
+
+    /*
+      Backup first.
+    */
+
+    if(
+        typeof createAutoBackup ===
+        "function"
+    ){
+
+        createAutoBackup(
+            "Before Attendance Delete"
+        );
+    }
+
+
+    delete records[
+        date
+    ];
+
+
+    profile.attendance =
+        records;
+
+
+    const saved =
+        saveActiveProfile(
+            profile
+        );
+
+
+    if(saved === false){
+
+        alert(
+            "Attendance could not be deleted."
+        );
+
+        return;
+    }
+
+
+    if(
+        typeof createAutoBackup ===
+        "function"
+    ){
+
+        createAutoBackup(
+            "Attendance Deleted - " +
+            date
+        );
+    }
+
+
+    /*
+      If currently editing same record,
+      close Edit mode.
+    */
+
+    if(
+        editingDate === date
+    ){
+
+        cancelEdit();
+    }
+
+
+    /*
+      Home live state refresh.
+    */
+
+    if(
+        typeof updateDashboard ===
+        "function"
+    ){
+
+        updateDashboard();
+    }
+
+
+    renderAttendance();
+
+
+    alert(
+        "Attendance deleted successfully."
+    );
+}
+
+
+/* =====================================================
+   RENDER ATTENDANCE
+===================================================== */
+
+function renderAttendance(){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+
+        el("attendanceBody")
+            .innerHTML = "";
+
+        el("emptyMessage")
+            .style.display =
+            "block";
+
+        return;
+    }
+
+
+    const month =
+        el("attendanceMonth")
+        .value;
+
+
+    const records =
+        profile.attendance || {};
+
+
+    const body =
+        el("attendanceBody");
+
+
+    body.innerHTML =
+        "";
+
+
+    let present = 0;
+
+    let day = 0;
+
+    let night = 0;
+
+    let leave = 0;
+
+    let workingMinutes = 0;
+
+    let overtimeMinutes = 0;
+
+
+    const dates =
+        Object.keys(records)
+        .filter(
+            date =>
+                !month ||
+                date.startsWith(month)
+        )
+        .sort()
+        .reverse();
+
+
+    dates.forEach(date => {
+
+        const record =
+            records[date];
+
+
+        if(!record){
+            return;
+        }
+
+
+        const status =
+            record.status ||
+            (
+                record.punchIn
+                ? "present"
+                : ""
+            );
+
+
+        const shift =
+            record.shift ||
+            "day";
+
+
+        const isWorking =
+            status === "present" ||
+            status === "half-day";
+
+
+        const isLive =
+            Boolean(
+                record.punchIn &&
+                !record.punchOut
+            );
+
+
+        /*
+          Summary.
+        */
+
+        if(status === "present"){
+
+            present++;
+        }
+
+
+        if(
+            status === "paid-leave" ||
+            status === "unpaid-leave"
+        ){
+
+            leave++;
+        }
+
+
+        if(isWorking){
+
+            if(
+                shift === "night"
+            ){
+
+                night++;
+
+            }else{
+
+                day++;
+            }
+        }
+
+
+        workingMinutes +=
+            Number(
+                record.workingMinutes ||
+                0
+            );
+
+
+        overtimeMinutes +=
+            Number(
+                record.overtimeMinutes ||
+                0
+            );
+
+
+        /*
+          Shift label.
+        */
+
+        let shiftHTML = "-";
+
+
+        if(isWorking){
+
+            shiftHTML =
+                shift === "night"
+                ? '<span class="night-tag">🌙 Night</span>'
+                : '<span class="day-tag">☀️ Day</span>';
+        }
+
+
+        /*
+          Punch Out / LIVE.
+        */
+
+        const outHTML =
+            isLive
+            ? '<span class="live-tag">● LIVE</span>'
+            : formatTime(
+                record.punchOut
+            );
+
+
+        const row =
+            document.createElement(
+                "tr"
+            );
+
+
+        row.innerHTML = `
+
+            <td>
+                ${date}
+            </td>
+
+            <td>
+                <span class="status-tag">
+                    ${attendanceStatusName(status)}
+                </span>
+            </td>
+
+            <td>
+                ${shiftHTML}
+            </td>
+
+            <td>
+                ${formatTime(record.punchIn)}
+            </td>
+
+            <td>
+                ${outHTML}
+            </td>
+
+            <td>
+                ${formatHours(
+                    record.workingMinutes
+                )}
+            </td>
+
+            <td>
+                ${formatHours(
+                    record.overtimeMinutes
+                )}
+            </td>
+
+            <td>
+
+                <button
+                type="button"
+                class="action-btn edit-btn"
+                onclick="editAttendance('${date}')">
+                    Edit
+                </button>
+
+                <button
+                type="button"
+                class="action-btn delete-btn"
+                onclick="deleteAttendance('${date}')">
+                    Delete
+                </button>
+
+            </td>
+        `;
+
+
+        body.appendChild(
+            row
+        );
+    });
+
+
+    el("emptyMessage")
+        .style.display =
+        dates.length
+        ? "none"
+        : "block";
+
+
+    /*
+      Summary display.
+    */
+
+    el("sumPresent").textContent =
+        present;
+
+
+    el("sumDay").textContent =
+        day;
+
+
+    el("sumNight").textContent =
+        night;
+
+
+    el("sumHours").textContent =
+        (
+            workingMinutes /
+            60
+        ).toFixed(1);
+
+
+    el("sumOT").textContent =
+        (
+            overtimeMinutes /
+            60
+        ).toFixed(1);
+
+
+    el("sumLeave").textContent =
+        leave;
+}
+
+
+/* =====================================================
+   REFRESH IF PROFILE CHANGES
+===================================================== */
+
+window.addEventListener(
+    "storage",
+    function(event){
+
+        if(
+            event.key ===
+            "selfPayrollProfiles" ||
+            event.key ===
+            "selfPayrollActiveProfile"
+        ){
+
+            loadAttendanceProfile();
+
+            renderAttendance();
+        }
+    }
+);
+
+
+/* =====================================================
+   START ATTENDANCE PAGE
+===================================================== */
+
+function startAttendancePage(){
+
+    el("attendanceMonth").value =
+        getMonthKey();
+
+
+    el("recordDate").value =
+        getDateKey();
+
+
+    loadAttendanceProfile();
+
+    statusChanged();
+
+    renderAttendance();
+}
+
+
+if(
+    document.readyState ===
+    "loading"
+){
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        startAttendancePage
+    );
+
+}else{
+
+    startAttendancePage();
+}
+
+</script>
+
+</body>
+</html>.
+*/

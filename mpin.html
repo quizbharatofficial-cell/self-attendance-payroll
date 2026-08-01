@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<meta name="theme-color" content="#1565c0">
+
+<title>MPIN - Self Attendance</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:#f4f6f8;
+    font-family:Arial,sans-serif;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:390px;
+}
+
+.logo{
+    width:78px;
+    height:78px;
+
+    margin:0 auto 15px;
+
+    border-radius:22px;
+
+    background:#1565c0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:38px;
+}
+
+.title{
+    text-align:center;
+    margin-bottom:22px;
+}
+
+.title h1{
+    margin:0;
+    color:#1565c0;
+    font-size:26px;
+}
+
+.title p{
+    margin:7px 0 0;
+    color:#777;
+    font-size:12px;
+}
+
+.card{
+    background:white;
+
+    padding:24px;
+
+    border-radius:18px;
+
+    box-shadow:
+        0 4px 20px
+        rgba(0,0,0,.08);
+
+    text-align:center;
+}
+
+.card h2{
+    margin:0 0 6px;
+}
+
+.subtitle{
+    margin:0 0 20px;
+
+    color:#777;
+
+    font-size:11px;
+
+    line-height:1.5;
+}
+
+.username{
+    display:inline-block;
+
+    margin-bottom:18px;
+
+    padding:7px 14px;
+
+    background:#e3f2fd;
+
+    color:#1565c0;
+
+    border-radius:20px;
+
+    font-size:11px;
+
+    font-weight:bold;
+}
+
+
+/* ===============================
+   PIN DISPLAY
+=============================== */
+
+.pin-dots{
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+    margin:10px 0 25px;
+}
+
+.pin-dot{
+    width:17px;
+    height:17px;
+
+    border:2px solid #1565c0;
+
+    border-radius:50%;
+
+    background:white;
+}
+
+.pin-dot.active{
+    background:#1565c0;
+}
+
+
+/* ===============================
+   KEYPAD
+=============================== */
+
+.keypad{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:12px;
+
+    max-width:280px;
+
+    margin:auto;
+}
+
+.key{
+    height:64px;
+
+    border:0;
+
+    border-radius:50%;
+
+    background:#f1f4f8;
+
+    color:#263238;
+
+    font-size:22px;
+
+    font-weight:bold;
+}
+
+.key:active{
+    background:#dce8f5;
+}
+
+.delete-key{
+    color:#c62828;
+}
+
+
+/* ===============================
+   MESSAGE
+=============================== */
+
+.message{
+    display:none;
+
+    margin-bottom:15px;
+
+    padding:10px;
+
+    border-radius:9px;
+
+    font-size:11px;
+}
+
+.message.error{
+    display:block;
+
+    background:#ffebee;
+
+    color:#c62828;
+}
+
+
+/* ===============================
+   LINKS
+=============================== */
+
+.forgot-btn{
+    margin-top:22px;
+
+    border:0;
+
+    background:transparent;
+
+    color:#1565c0;
+
+    font-size:11px;
+
+    font-weight:bold;
+}
+
+.full-login{
+    margin-top:15px;
+
+    font-size:10px;
+
+    color:#888;
+}
+
+.full-login a{
+    color:#1565c0;
+
+    text-decoration:none;
+
+    font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<div class="container">
+
+
+<div class="logo">
+🔐
+</div>
+
+
+<div class="title">
+
+<h1>
+Self Attendance
+</h1>
+
+<p>
+Quick MPIN Login
+</p>
+
+</div>
+
+
+<div class="card">
+
+
+<h2>
+Enter MPIN
+</h2>
+
+
+<p class="subtitle">
+Enter your 4-digit MPIN to unlock the app
+</p>
+
+
+<div
+id="username"
+class="username">
+User
+</div>
+
+
+<div
+id="message"
+class="message">
+</div>
+
+
+<!-- PIN DOTS -->
+
+<div class="pin-dots">
+
+<div
+id="dot1"
+class="pin-dot">
+</div>
+
+<div
+id="dot2"
+class="pin-dot">
+</div>
+
+<div
+id="dot3"
+class="pin-dot">
+</div>
+
+<div
+id="dot4"
+class="pin-dot">
+</div>
+
+</div>
+
+
+<!-- KEYPAD -->
+
+<div class="keypad">
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('1')">
+1
+</button>
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('2')">
+2
+</button>
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('3')">
+3
+</button>
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('4')">
+4
+</button>
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('5')">
+5
+</button>
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('6')">
+6
+</button>
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('7')">
+7
+</button>
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('8')">
+8
+</button>
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('9')">
+9
+</button>
+
+
+<button
+type="button"
+class="key delete-key"
+onclick="clearPin()">
+C
+</button>
+
+
+<button
+type="button"
+class="key"
+onclick="addNumber('0')">
+0
+</button>
+
+
+<button
+type="button"
+class="key delete-key"
+onclick="deleteNumber()">
+⌫
+</button>
+
+
+</div>
+
+
+<button
+type="button"
+class="forgot-btn"
+onclick="forgotMpin()">
+
+Forgot MPIN?
+
+</button>
+
+
+<div class="full-login">
+
+Use username & password instead?
+
+<a href="./login.html">
+Login
+</a>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   STORAGE KEYS
+===================================================== */
+
+const AUTH_USER_KEY =
+    "selfAttendanceOfflineUser";
+
+const AUTH_SESSION_KEY =
+    "selfAttendanceLoginSession";
+
+const MPIN_KEY =
+    "selfAttendanceMpin";
+
+
+/* =====================================================
+   CURRENT PIN
+===================================================== */
+
+let enteredPin = "";
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+function showMessage(text){
+
+    const box =
+        document.getElementById(
+            "message"
+        );
+
+    box.textContent =
+        text;
+
+    box.className =
+        "message error";
+}
+
+
+function hideMessage(){
+
+    const box =
+        document.getElementById(
+            "message"
+        );
+
+    box.textContent = "";
+
+    box.className =
+        "message";
+}
+
+
+/* =====================================================
+   UPDATE DOTS
+===================================================== */
+
+function updateDots(){
+
+    for(
+        let i = 1;
+        i <= 4;
+        i++
+    ){
+
+        const dot =
+            document.getElementById(
+                "dot" + i
+            );
+
+
+        if(
+            i <= enteredPin.length
+        ){
+
+            dot.classList.add(
+                "active"
+            );
+
+        }else{
+
+            dot.classList.remove(
+                "active"
+            );
+        }
+    }
+}
+
+
+/* =====================================================
+   NUMBER
+===================================================== */
+
+function addNumber(number){
+
+    hideMessage();
+
+
+    if(
+        enteredPin.length >= 4
+    ){
+        return;
+    }
+
+
+    enteredPin += number;
+
+
+    updateDots();
+
+
+    if(
+        enteredPin.length === 4
+    ){
+
+        verifyMpin();
+    }
+}
+
+
+/* =====================================================
+   DELETE
+===================================================== */
+
+function deleteNumber(){
+
+    if(
+        enteredPin.length === 0
+    ){
+        return;
+    }
+
+
+    enteredPin =
+        enteredPin.slice(
+            0,
+            -1
+        );
+
+
+    updateDots();
+
+    hideMessage();
+}
+
+
+/* =====================================================
+   CLEAR
+===================================================== */
+
+function clearPin(){
+
+    enteredPin = "";
+
+    updateDots();
+
+    hideMessage();
+}
+
+
+/* =====================================================
+   HASH MPIN
+===================================================== */
+
+async function hashMpin(mpin){
+
+    const data =
+        new TextEncoder()
+        .encode(mpin);
+
+
+    const buffer =
+        await crypto.subtle.digest(
+            "SHA-256",
+            data
+        );
+
+
+    return Array.from(
+        new Uint8Array(buffer)
+    )
+    .map(
+        byte =>
+            byte
+            .toString(16)
+            .padStart(2,"0")
+    )
+    .join("");
+}
+
+
+/* =====================================================
+   VERIFY MPIN
+===================================================== */
+
+async function verifyMpin(){
+
+    const stored =
+        localStorage.getItem(
+            MPIN_KEY
+        );
+
+
+    if(!stored){
+
+        /*
+          MPIN not configured.
+          Full login required first.
+        */
+
+        location.replace(
+            "./login.html"
+        );
+
+        return;
+    }
+
+
+    try{
+
+        const mpinData =
+            JSON.parse(stored);
+
+
+        const enteredHash =
+            await hashMpin(
+                enteredPin
+            );
+
+
+        if(
+            enteredHash !==
+            mpinData.mpinHash
+        ){
+
+            enteredPin = "";
+
+            updateDots();
+
+
+            showMessage(
+                "Incorrect MPIN. Please try again."
+            );
+
+
+            return;
+        }
+
+
+        /*
+          MPIN correct.
+
+          Create normal login session so
+          app.js protection allows all pages.
+        */
+
+        const accountRaw =
+            localStorage.getItem(
+                AUTH_USER_KEY
+            );
+
+
+        if(!accountRaw){
+
+            location.replace(
+                "./signup.html"
+            );
+
+            return;
+        }
+
+
+        const account =
+            JSON.parse(
+                accountRaw
+            );
+
+
+        sessionStorage.setItem(
+            AUTH_SESSION_KEY,
+            JSON.stringify({
+
+                loggedIn:true,
+
+                username:
+                    account.username,
+
+                loginMethod:
+                    "mpin",
+
+                loginAt:
+                    new Date()
+                    .toISOString()
+
+            })
+        );
+
+
+        location.replace(
+            "./index.html"
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        enteredPin = "";
+
+        updateDots();
+
+
+        showMessage(
+            "MPIN could not be verified."
+        );
+    }
+}
+
+
+/* =====================================================
+   FORGOT MPIN
+===================================================== */
+
+function forgotMpin(){
+
+    /*
+      Remove only current app session.
+
+      Account, Attendance, Profiles,
+      Salary etc. remain untouched.
+    */
+
+    sessionStorage.removeItem(
+        AUTH_SESSION_KEY
+    );
+
+
+    /*
+      Flag tells login.html that
+      password login is being used
+      to reset MPIN.
+    */
+
+    sessionStorage.setItem(
+        "selfAttendanceResetMpin",
+        "true"
+    );
+
+
+    location.replace(
+        "./login.html"
+    );
+}
+
+
+/* =====================================================
+   SHOW USERNAME
+===================================================== */
+
+function showUsername(){
+
+    const stored =
+        localStorage.getItem(
+            AUTH_USER_KEY
+        );
+
+
+    if(!stored){
+
+        location.replace(
+            "./signup.html"
+        );
+
+        return;
+    }
+
+
+    try{
+
+        const account =
+            JSON.parse(stored);
+
+
+        document
+        .getElementById(
+            "username"
+        )
+        .textContent =
+            account.username ||
+            "User";
+
+
+    }catch(error){
+
+        location.replace(
+            "./signup.html"
+        );
+    }
+}
+
+
+/* =====================================================
+   START PAGE
+===================================================== */
+
+function startMpinPage(){
+
+    const account =
+        localStorage.getItem(
+            AUTH_USER_KEY
+        );
+
+
+    if(!account){
+
+        location.replace(
+            "./signup.html"
+        );
+
+        return;
+    }
+
+
+    const mpin =
+        localStorage.getItem(
+            MPIN_KEY
+        );
+
+
+    /*
+      Account exists but MPIN hasn't
+      been configured yet.
+
+      Full password login is needed.
+    */
+
+    if(!mpin){
+
+        location.replace(
+            "./login.html"
+        );
+
+        return;
+    }
+
+
+    showUsername();
+
+    clearPin();
+}
+
+
+startMpinPage();
+
+</script>
+
+
+</body>
+</html>

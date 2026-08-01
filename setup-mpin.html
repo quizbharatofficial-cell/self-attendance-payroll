@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<meta name="theme-color" content="#1565c0">
+
+<title>Setup MPIN</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:#f4f6f8;
+    font-family:Arial,sans-serif;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:390px;
+}
+
+.logo{
+    width:75px;
+    height:75px;
+
+    margin:0 auto 15px;
+
+    border-radius:20px;
+
+    background:#1565c0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:35px;
+}
+
+.title{
+    text-align:center;
+    margin-bottom:22px;
+}
+
+.title h1{
+    margin:0;
+    color:#1565c0;
+    font-size:25px;
+}
+
+.title p{
+    margin:7px 0 0;
+    color:#777;
+    font-size:12px;
+}
+
+.card{
+    background:white;
+
+    padding:22px;
+
+    border-radius:17px;
+
+    box-shadow:
+    0 4px 20px
+    rgba(0,0,0,.08);
+}
+
+.card h2{
+    margin:0 0 5px;
+}
+
+.subtitle{
+    margin:0 0 20px;
+
+    color:#777;
+
+    font-size:11px;
+
+    line-height:1.5;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
+    display:block;
+
+    margin-bottom:6px;
+
+    color:#555;
+
+    font-size:10px;
+
+    font-weight:bold;
+}
+
+.pin-input{
+    width:100%;
+
+    padding:15px;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    outline:none;
+
+    text-align:center;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    letter-spacing:12px;
+}
+
+.pin-input:focus{
+    border-color:#1565c0;
+}
+
+.save-btn{
+    width:100%;
+
+    padding:14px;
+
+    border:0;
+
+    border-radius:10px;
+
+    background:#1565c0;
+
+    color:white;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    margin-top:5px;
+}
+
+.message{
+    display:none;
+
+    padding:11px;
+
+    border-radius:9px;
+
+    margin-bottom:15px;
+
+    font-size:11px;
+
+    line-height:1.5;
+}
+
+.message.error{
+    display:block;
+
+    background:#ffebee;
+
+    color:#c62828;
+}
+
+.message.success{
+    display:block;
+
+    background:#e8f5e9;
+
+    color:#2e7d32;
+}
+
+.security-info{
+    margin-top:15px;
+
+    padding:11px;
+
+    background:#e3f2fd;
+
+    color:#1565c0;
+
+    border-radius:9px;
+
+    font-size:10px;
+
+    line-height:1.5;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<div class="container">
+
+
+<div class="logo">
+🔢
+</div>
+
+
+<div class="title">
+
+<h1>
+Setup MPIN
+</h1>
+
+<p>
+Create your quick offline login PIN
+</p>
+
+</div>
+
+
+<div class="card">
+
+
+<h2>
+Create 4-Digit MPIN
+</h2>
+
+
+<p class="subtitle">
+After setup, you can unlock Self Attendance
+using this MPIN instead of entering your
+username and password every time.
+</p>
+
+
+<div
+id="message"
+class="message">
+</div>
+
+
+<div class="form-group">
+
+<label>
+NEW MPIN
+</label>
+
+<input
+type="password"
+id="mpin"
+class="pin-input"
+inputmode="numeric"
+maxlength="4"
+placeholder="••••">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+CONFIRM MPIN
+</label>
+
+<input
+type="password"
+id="confirmMpin"
+class="pin-input"
+inputmode="numeric"
+maxlength="4"
+placeholder="••••">
+
+</div>
+
+
+<button
+type="button"
+class="save-btn"
+onclick="saveMpin()">
+
+Save MPIN
+
+</button>
+
+
+<div class="security-info">
+
+🔒 Your MPIN stays on this device.
+If you forget it, your username and password
+can be used to set a new MPIN.
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+
+/* =====================================================
+   STORAGE KEYS
+===================================================== */
+
+const AUTH_USER_KEY =
+    "selfAttendanceOfflineUser";
+
+const AUTH_SESSION_KEY =
+    "selfAttendanceLoginSession";
+
+const MPIN_KEY =
+    "selfAttendanceMpin";
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+function showMessage(
+    text,
+    type
+){
+
+    const box =
+        document.getElementById(
+            "message"
+        );
+
+    box.textContent =
+        text;
+
+    box.className =
+        "message " + type;
+}
+
+
+/* =====================================================
+   HASH
+===================================================== */
+
+async function hashMpin(mpin){
+
+    const data =
+        new TextEncoder()
+        .encode(mpin);
+
+
+    const buffer =
+        await crypto.subtle.digest(
+            "SHA-256",
+            data
+        );
+
+
+    return Array.from(
+        new Uint8Array(buffer)
+    )
+    .map(
+        byte =>
+            byte
+            .toString(16)
+            .padStart(2,"0")
+    )
+    .join("");
+}
+
+
+/* =====================================================
+   ALLOW NUMBERS ONLY
+===================================================== */
+
+function numbersOnly(input){
+
+    input.value =
+        input.value
+        .replace(/\D/g,"")
+        .slice(0,4);
+}
+
+
+document
+.getElementById("mpin")
+.addEventListener(
+    "input",
+    function(){
+
+        numbersOnly(this);
+    }
+);
+
+
+document
+.getElementById("confirmMpin")
+.addEventListener(
+    "input",
+    function(){
+
+        numbersOnly(this);
+    }
+);
+
+
+/* =====================================================
+   CHECK PASSWORD LOGIN SESSION
+===================================================== */
+
+function checkLogin(){
+
+    const account =
+        localStorage.getItem(
+            AUTH_USER_KEY
+        );
+
+
+    if(!account){
+
+        location.replace(
+            "./signup.html"
+        );
+
+        return false;
+    }
+
+
+    const session =
+        sessionStorage.getItem(
+            AUTH_SESSION_KEY
+        );
+
+
+    if(!session){
+
+        location.replace(
+            "./login.html"
+        );
+
+        return false;
+    }
+
+
+    try{
+
+        const data =
+            JSON.parse(session);
+
+
+        if(
+            data.loggedIn !== true
+        ){
+
+            location.replace(
+                "./login.html"
+            );
+
+            return false;
+        }
+
+
+    }catch(error){
+
+        sessionStorage.removeItem(
+            AUTH_SESSION_KEY
+        );
+
+
+        location.replace(
+            "./login.html"
+        );
+
+
+        return false;
+    }
+
+
+    return true;
+}
+
+
+/* =====================================================
+   SAVE MPIN
+===================================================== */
+
+async function saveMpin(){
+
+    if(!checkLogin()){
+        return;
+    }
+
+
+    const mpin =
+        document
+        .getElementById(
+            "mpin"
+        )
+        .value;
+
+
+    const confirmMpin =
+        document
+        .getElementById(
+            "confirmMpin"
+        )
+        .value;
+
+
+    if(
+        !/^\d{4}$/.test(mpin)
+    ){
+
+        showMessage(
+            "MPIN must contain exactly 4 numbers.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if(
+        mpin !== confirmMpin
+    ){
+
+        showMessage(
+            "MPIN does not match.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    try{
+
+        const mpinHash =
+            await hashMpin(
+                mpin
+            );
+
+
+        const data = {
+
+            mpinHash:
+                mpinHash,
+
+            createdAt:
+                new Date()
+                .toISOString()
+        };
+
+
+        localStorage.setItem(
+            MPIN_KEY,
+            JSON.stringify(data)
+        );
+
+
+        document
+        .getElementById(
+            "mpin"
+        )
+        .value = "";
+
+
+        document
+        .getElementById(
+            "confirmMpin"
+        )
+        .value = "";
+
+
+        showMessage(
+            "MPIN created successfully.",
+            "success"
+        );
+
+
+        setTimeout(
+            function(){
+
+                location.replace(
+                    "./index.html"
+                );
+
+            },
+            700
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        showMessage(
+            "MPIN could not be saved.",
+            "error"
+        );
+    }
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+checkLogin();
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Backup & Restore</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+*{box-sizing:border-box}
+
+.header-row{
+    display:flex;
+    align-items:center;
+}
+
+.back-btn{
+    color:white;
+    text-decoration:none;
+    font-size:27px;
+    margin-right:10px;
+}
+
+.info-box{
+    background:#e3f2fd;
+    padding:13px;
+    border-radius:10px;
+    font-size:10px;
+    line-height:1.6;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:12px;
+}
+
+.stat{
+    background:#f5f7fa;
+    padding:12px 4px;
+    border-radius:9px;
+    text-align:center;
+}
+
+.stat strong{
+    display:block;
+    font-size:18px;
+    color:#1565c0;
+}
+
+.stat span{
+    display:block;
+    margin-top:3px;
+    font-size:8px;
+    color:#777;
+}
+
+.action-btn{
+    width:100%;
+    border:0;
+    border-radius:9px;
+    padding:14px;
+    margin-top:9px;
+    font-weight:bold;
+    font-size:13px;
+}
+
+.download-btn{
+    background:#1565c0;
+    color:white;
+}
+
+.restore-btn{
+    background:#2e7d32;
+    color:white;
+}
+
+.drive-btn{
+    background:#0f9d58;
+    color:white;
+}
+
+.auto-btn{
+    background:#6a1b9a;
+    color:white;
+}
+
+.file-input{
+    display:none;
+}
+
+.warning{
+    background:#fff8e1;
+    padding:11px;
+    border-radius:9px;
+    font-size:9px;
+    line-height:1.5;
+    margin-top:10px;
+}
+
+.backup-item{
+    border:1px solid #eee;
+    border-radius:10px;
+    padding:11px;
+    margin-top:9px;
+}
+
+.backup-item strong{
+    display:block;
+    font-size:11px;
+}
+
+.backup-item span{
+    display:block;
+    color:#777;
+    font-size:8px;
+    margin-top:4px;
+}
+
+.backup-item button{
+    border:0;
+    background:#e3f2fd;
+    color:#1565c0;
+    padding:7px 12px;
+    border-radius:7px;
+    margin-top:8px;
+    font-size:9px;
+    font-weight:bold;
+}
+
+.empty{
+    padding:20px;
+    text-align:center;
+    color:#777;
+    font-size:10px;
+}
+
+.last-backup{
+    margin-top:10px;
+    font-size:9px;
+    color:#666;
+    text-align:center;
+}
+
+.profile-list{
+    margin-top:12px;
+}
+
+.profile-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding:9px;
+    border-bottom:1px solid #eee;
+    font-size:10px;
+}
+
+.profile-row:last-child{
+    border-bottom:0;
+}
+
+.profile-row small{
+    color:#777;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="header-row">
+
+<a href="index.html" class="back-btn">‹</a>
+
+<div>
+<h1>Backup & Restore</h1>
+<p>Offline Data Protection</p>
+</div>
+
+</div>
+</header>
+
+<main>
+
+<section class="card">
+
+<div class="info-box">
+<strong>Complete Multi-Profile Backup</strong><br>
+Backup me sabhi Profiles, Employee Settings, Attendance aur saved Salary records include honge.
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<strong id="profileCount">0</strong>
+<span>PROFILES</span>
+</div>
+
+<div class="stat">
+<strong id="attendanceCount">0</strong>
+<span>ATTENDANCE</span>
+</div>
+
+<div class="stat">
+<strong id="salaryCount">0</strong>
+<span>SALARY SLIPS</span>
+</div>
+
+</div>
+
+<div id="profileList" class="profile-list"></div>
+
+</section>
+
+
+<section class="card">
+
+<h3>Manual Backup</h3>
+
+<button
+class="action-btn download-btn"
+onclick="downloadBackup()">
+⬇ Download Complete Backup
+</button>
+
+<button
+class="action-btn drive-btn"
+onclick="saveBackupToDrive()">
+☁ Save / Share Backup to Google Drive
+</button>
+
+<p class="last-backup" id="backupFileInfo">
+Backup is stored as a JSON file.
+</p>
+
+</section>
+
+
+<section class="card">
+
+<h3>Restore From File</h3>
+
+<button
+class="action-btn restore-btn"
+onclick="document.getElementById('restoreFile').click()">
+⬆ Select Backup File
+</button>
+
+<input
+id="restoreFile"
+class="file-input"
+type="file"
+accept=".json,application/json"
+onchange="restoreFromFile(event)">
+
+<div class="warning">
+⚠️ Restore karne par current Profiles, Attendance aur Salary records backup file ke data se replace ho jayenge. Restore se pehle current data ka automatic safety backup banega.
+</div>
+
+</section>
+
+
+<section class="card">
+
+<h3>Automatic Backups</h3>
+
+<p style="font-size:9px;color:#777">
+App latest automatic safety backups offline browser storage me rakhta hai.
+</p>
+
+<button
+class="action-btn auto-btn"
+onclick="createManualAutoBackup()">
+＋ Create Backup Now
+</button>
+
+<div id="autoBackupList"></div>
+
+</section>
+
+</main>
+
+
+<script src="app.js"></script>
+
+<script>
+
+/* ==========================================
+   HELPERS
+========================================== */
+
+function bEl(id){
+    return document.getElementById(id);
+}
+
+
+function escapeHTML(value){
+
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+
+/* ==========================================
+   STATISTICS
+========================================== */
+
+function loadBackupStats(){
+
+    const profiles =
+        getProfiles();
+
+    let attendanceCount = 0;
+    let salaryCount = 0;
+
+    profiles.forEach(profile => {
+
+        attendanceCount +=
+            Object.keys(
+                profile.attendance || {}
+            ).length;
+
+        salaryCount +=
+            Object.keys(
+                profile.salaries || {}
+            ).length;
+    });
+
+
+    bEl("profileCount").textContent =
+        profiles.length;
+
+    bEl("attendanceCount").textContent =
+        attendanceCount;
+
+    bEl("salaryCount").textContent =
+        salaryCount;
+
+
+    const list =
+        bEl("profileList");
+
+    list.innerHTML = "";
+
+
+    profiles.forEach(profile => {
+
+        const attendance =
+            Object.keys(
+                profile.attendance || {}
+            ).length;
+
+        const salaries =
+            Object.keys(
+                profile.salaries || {}
+            ).length;
+
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "profile-row";
+
+
+        const name =
+            escapeHTML(
+                profile.profileName ||
+                profile.employeeName ||
+                "Profile"
+            );
+
+
+        row.innerHTML = `
+            <div>
+                <strong>${name}</strong>
+                <br>
+                <small>
+                    ${escapeHTML(profile.employeeName || "No employee name")}
+                </small>
+            </div>
+
+            <div style="text-align:right">
+                ${attendance} Attendance
+                <br>
+                <small>
+                    ${salaries} Salary
+                </small>
+            </div>
+        `;
+
+
+        list.appendChild(row);
+    });
+}
+
+
+/* ==========================================
+   DOWNLOAD BACKUP
+========================================== */
+
+async function downloadBackup(){
+
+    createAutoBackup(
+        "Before Manual Backup Download"
+    );
+
+    const data =
+        collectAppData();
+
+    data.backupType =
+        "SELF_ATTENDANCE_MULTI_PROFILE_BACKUP";
+
+    data.backupVersion =
+        4;
+
+    const json =
+        JSON.stringify(
+            data,
+            null,
+            2
+        );
+
+    const now =
+        new Date();
+
+    const date =
+        getDateKey(now);
+
+    const time =
+        String(now.getHours()).padStart(2,"0") +
+        "-" +
+        String(now.getMinutes()).padStart(2,"0");
+
+    const fileName =
+        "Self-Attendance-Backup-" +
+        date +
+        "-" +
+        time +
+        ".json";
+
+    const file =
+        new File(
+            [json],
+            fileName,
+            {type:"application/json"}
+        );
+
+    if(
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({files:[file]})
+    ){
+        try{
+            await navigator.share({
+                title:"Self Attendance Backup",
+                text:"Save this backup file to Files or Google Drive.",
+                files:[file]
+            });
+
+            bEl("backupFileInfo").textContent =
+                "Backup shared/saved: " + fileName;
+
+            renderAutoBackups();
+            return;
+
+        }catch(error){
+            if(error.name === "AbortError"){
+                return;
+            }
+            console.error(error);
+        }
+    }
+
+    bEl("backupFileInfo").textContent =
+        "This browser cannot export backup files safely.";
+
+    alert(
+        "Acode browser cannot safely download this backup file. Open the app in Chrome / installed PWA and use this button there."
+    );
+}
+
+
+/* ==========================================
+   SAVE / SHARE BACKUP TO GOOGLE DRIVE
+========================================== */
+
+async function saveBackupToDrive(){
+
+    createAutoBackup(
+        "Before Google Drive Backup"
+    );
+
+    const data =
+        collectAppData();
+
+    data.backupType =
+        "SELF_ATTENDANCE_MULTI_PROFILE_BACKUP";
+
+    data.backupVersion =
+        4;
+
+    const json =
+        JSON.stringify(
+            data,
+            null,
+            2
+        );
+
+    const now =
+        new Date();
+
+    const date =
+        getDateKey(now);
+
+    const time =
+        String(now.getHours()).padStart(2,"0") +
+        "-" +
+        String(now.getMinutes()).padStart(2,"0");
+
+    const fileName =
+        "Self-Attendance-Backup-" +
+        date +
+        "-" +
+        time +
+        ".json";
+
+    const file =
+        new File(
+            [json],
+            fileName,
+            {type:"application/json"}
+        );
+
+    if(
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({files:[file]})
+    ){
+        try{
+            await navigator.share({
+                title:"Self Attendance Backup",
+                text:"Choose Google Drive to save this backup.",
+                files:[file]
+            });
+
+            bEl("backupFileInfo").textContent =
+                "Backup shared: " + fileName;
+
+            renderAutoBackups();
+            return;
+
+        }catch(error){
+            if(error.name === "AbortError"){
+                return;
+            }
+            console.error(error);
+        }
+    }
+
+    bEl("backupFileInfo").textContent =
+        "Google Drive sharing is not supported in this browser.";
+
+    alert(
+        "Acode browser does not support safe file sharing here. Open the app in Chrome / installed PWA, then choose Google Drive from the Share menu."
+    );
+}
+
+
+/* ==========================================
+   VALIDATE BACKUP
+========================================== */
+
+function validateBackup(data){
+
+    if(
+        !data ||
+        typeof data !== "object"
+    ){
+
+        return {
+            valid:false,
+            message:"Invalid backup file."
+        };
+    }
+
+
+    if(
+        !Array.isArray(
+            data.profiles
+        )
+    ){
+
+        return {
+            valid:false,
+            message:
+                "This file does not contain Multi-Profile backup data."
+        };
+    }
+
+
+    if(
+        data.profiles.length === 0
+    ){
+
+        return {
+            valid:false,
+            message:
+                "Backup contains no profiles."
+        };
+    }
+
+
+    /*
+      Basic profile validation.
+    */
+
+    for(
+        const profile of
+        data.profiles
+    ){
+
+        if(
+            !profile ||
+            typeof profile !==
+            "object"
+        ){
+
+            return {
+                valid:false,
+                message:
+                    "Backup contains an invalid profile."
+            };
+        }
+
+
+        if(!profile.id){
+
+            return {
+                valid:false,
+                message:
+                    "A profile in this backup has no Profile ID."
+            };
+        }
+    }
+
+
+    return {
+        valid:true
+    };
+}
+
+
+/* ==========================================
+   RESTORE FILE
+========================================== */
+
+function restoreFromFile(event){
+
+    const input =
+        event.target;
+
+
+    const file =
+        input.files?.[0];
+
+
+    if(!file){
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+    function(){
+
+        try{
+
+            const data =
+                JSON.parse(
+                    reader.result
+                );
+
+
+            const validation =
+                validateBackup(
+                    data
+                );
+
+
+            if(
+                !validation.valid
+            ){
+
+                alert(
+                    validation.message
+                );
+
+                input.value = "";
+
+                return;
+            }
+
+
+            const profileTotal =
+                data.profiles.length;
+
+
+            let attendanceTotal = 0;
+
+            let salaryTotal = 0;
+
+
+            data.profiles
+            .forEach(profile => {
+
+                attendanceTotal +=
+                    Object.keys(
+                        profile.attendance ||
+                        {}
+                    ).length;
+
+
+                salaryTotal +=
+                    Object.keys(
+                        profile.salaries ||
+                        {}
+                    ).length;
+            });
+
+
+            const yes =
+                confirm(
+                    "Restore this backup?\n\n" +
+
+                    "Profiles: " +
+                    profileTotal +
+                    "\n" +
+
+                    "Attendance Records: " +
+                    attendanceTotal +
+                    "\n" +
+
+                    "Salary Records: " +
+                    salaryTotal +
+                    "\n\n" +
+
+                    "Current app data will be replaced."
+                );
+
+
+            if(!yes){
+
+                input.value = "";
+
+                return;
+            }
+
+
+            /*
+              IMPORTANT:
+              Existing current data ka
+              safety backup first.
+            */
+
+            createAutoBackup(
+                "Before File Restore"
+            );
+
+
+            /*
+              Restore profiles.
+            */
+
+            saveProfiles(
+                data.profiles
+            );
+
+
+            /*
+              Restore Active Profile.
+            */
+
+            const activeExists =
+                data.profiles
+                .some(
+                    profile =>
+                        profile.id ===
+                        data.activeProfileId
+                );
+
+
+            if(
+                data.activeProfileId &&
+                activeExists
+            ){
+
+                localStorage.setItem(
+                    ACTIVE_PROFILE_KEY,
+                    data.activeProfileId
+                );
+
+            }else{
+
+                localStorage.setItem(
+                    ACTIVE_PROFILE_KEY,
+                    data.profiles[0].id
+                );
+            }
+
+
+            /*
+              Selected salary month.
+            */
+
+            if(
+                data.selectedSalaryMonth
+            ){
+
+                localStorage.setItem(
+                    "selectedSalaryMonth",
+                    data.selectedSalaryMonth
+                );
+
+            }else{
+
+                localStorage.removeItem(
+                    "selectedSalaryMonth"
+                );
+            }
+
+
+            /*
+              Salary profile selection
+              reset because old selected ID
+              may not exist.
+            */
+
+            localStorage.removeItem(
+                "selectedSalaryProfileId"
+            );
+
+
+            createAutoBackup(
+                "File Restore Completed"
+            );
+
+
+            alert(
+                "Backup restored successfully."
+            );
+
+
+            location.href =
+                "index.html";
+
+
+        }catch(error){
+
+            console.error(error);
+
+            alert(
+                "Backup file could not be read. Please select a valid JSON backup file."
+            );
+
+            input.value = "";
+        }
+    };
+
+
+    reader.onerror =
+    function(){
+
+        alert(
+            "Backup file could not be opened."
+        );
+
+        input.value = "";
+    };
+
+
+    reader.readAsText(
+        file
+    );
+}
+
+
+/* ==========================================
+   CREATE AUTO BACKUP NOW
+========================================== */
+
+function createManualAutoBackup(){
+
+    const success =
+        createAutoBackup(
+            "Manual Safety Backup"
+        );
+
+
+    if(success){
+
+        renderAutoBackups();
+
+        alert(
+            "Safety backup created successfully."
+        );
+
+    }else{
+
+        alert(
+            "Backup could not be created."
+        );
+    }
+}
+
+
+/* ==========================================
+   FORMAT DATE
+========================================== */
+
+function formatBackupDate(value){
+
+    if(!value){
+        return "-";
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return value;
+    }
+
+
+    return date.toLocaleString(
+        "en-IN"
+    );
+}
+
+
+/* ==========================================
+   AUTO BACKUPS
+========================================== */
+
+function renderAutoBackups(){
+
+    const backups =
+        getAutoBackups();
+
+
+    const container =
+        bEl(
+            "autoBackupList"
+        );
+
+
+    container.innerHTML = "";
+
+
+    if(
+        backups.length === 0
+    ){
+
+        container.innerHTML =
+            '<div class="empty">No automatic backup found.</div>';
+
+        return;
+    }
+
+
+    backups.forEach(
+        backup => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "backup-item";
+
+
+            const reason =
+                escapeHTML(
+                    backup.reason ||
+                    "Automatic Backup"
+                );
+
+
+            const date =
+                escapeHTML(
+                    formatBackupDate(
+                        backup.createdAt
+                    )
+                );
+
+
+            const profileCount =
+                Array.isArray(
+                    backup.data?.profiles
+                )
+                ? backup.data.profiles.length
+                : 0;
+
+
+            item.innerHTML = `
+
+                <strong>
+                    ${reason}
+                </strong>
+
+                <span>
+                    ${date}
+                </span>
+
+                <span>
+                    ${profileCount} Profile(s)
+                </span>
+
+                <button
+                onclick="restoreBackupById('${backup.id}')">
+                    Restore
+                </button>
+            `;
+
+
+            container.appendChild(
+                item
+            );
+        }
+    );
+}
+
+
+/* ==========================================
+   RESTORE INTERNAL BACKUP
+========================================== */
+
+function restoreBackupById(id){
+
+    restoreAutoBackup(
+        id
+    );
+}
+
+
+/* ==========================================
+   START
+========================================== */
+
+loadBackupStats();
+
+renderAutoBackups();
+
+</script>
+
+</body>
+</html>

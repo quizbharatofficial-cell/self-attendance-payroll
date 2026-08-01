@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<meta name="theme-color" content="#1565c0">
+
+<title>Create Account</title>
+
+<link rel="stylesheet" href="./style.css">
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:#f4f6f8;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    font-family:Arial,sans-serif;
+}
+
+.auth-container{
+    width:100%;
+    max-width:400px;
+}
+
+.logo-box{
+    text-align:center;
+    margin-bottom:22px;
+}
+
+.logo{
+    width:75px;
+    height:75px;
+    margin:auto;
+    border-radius:20px;
+    background:#1565c0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+}
+
+.logo-box h1{
+    margin:12px 0 4px;
+    color:#1565c0;
+    font-size:25px;
+}
+
+.logo-box p{
+    margin:0;
+    color:#777;
+    font-size:12px;
+}
+
+.auth-card{
+    background:white;
+    padding:22px;
+    border-radius:16px;
+    box-shadow:0 4px 20px rgba(0,0,0,.08);
+}
+
+.auth-card h2{
+    margin:0 0 5px;
+}
+
+.subtitle{
+    color:#777;
+    font-size:11px;
+    margin:0 0 20px;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
+    display:block;
+    font-size:10px;
+    font-weight:bold;
+    margin-bottom:6px;
+    color:#555;
+}
+
+.form-input{
+    width:100%;
+    padding:13px;
+    border:1px solid #ddd;
+    border-radius:9px;
+    font-size:14px;
+    outline:none;
+}
+
+.form-input:focus{
+    border-color:#1565c0;
+}
+
+.password-wrap{
+    position:relative;
+}
+
+.password-wrap input{
+    padding-right:55px;
+}
+
+.show-btn{
+    position:absolute;
+    right:8px;
+    top:50%;
+    transform:translateY(-50%);
+    border:0;
+    background:transparent;
+    color:#1565c0;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.signup-btn{
+    width:100%;
+    padding:14px;
+    border:0;
+    border-radius:9px;
+    background:#1565c0;
+    color:white;
+    font-weight:bold;
+    font-size:14px;
+    margin-top:5px;
+}
+
+.message{
+    display:none;
+    padding:10px;
+    margin-bottom:15px;
+    border-radius:8px;
+    font-size:11px;
+    line-height:1.5;
+}
+
+.message.error{
+    display:block;
+    background:#ffebee;
+    color:#c62828;
+}
+
+.message.success{
+    display:block;
+    background:#e8f5e9;
+    color:#2e7d32;
+}
+
+.login-link{
+    text-align:center;
+    margin-top:18px;
+    font-size:11px;
+    color:#666;
+}
+
+.login-link a{
+    color:#1565c0;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.offline-info{
+    text-align:center;
+    margin-top:15px;
+    color:#888;
+    font-size:9px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <div class="logo-box">
+
+        <div class="logo">
+            👤
+        </div>
+
+        <h1>
+            Self Attendance
+        </h1>
+
+        <p>
+            Offline Attendance & Payroll
+        </p>
+
+    </div>
+
+
+    <div class="auth-card">
+
+        <h2>
+            Create Account
+        </h2>
+
+        <p class="subtitle">
+            Create your offline login account
+        </p>
+
+
+        <div
+        id="message"
+        class="message">
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                USERNAME
+            </label>
+
+            <input
+            type="text"
+            id="username"
+            class="form-input"
+            placeholder="Create username"
+            autocomplete="username">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                PASSWORD
+            </label>
+
+            <div class="password-wrap">
+
+                <input
+                type="password"
+                id="password"
+                class="form-input"
+                placeholder="Create password"
+                autocomplete="new-password">
+
+                <button
+                type="button"
+                class="show-btn"
+                onclick="togglePassword('password',this)">
+                    SHOW
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                CONFIRM PASSWORD
+            </label>
+
+            <div class="password-wrap">
+
+                <input
+                type="password"
+                id="confirmPassword"
+                class="form-input"
+                placeholder="Enter password again"
+                autocomplete="new-password">
+
+                <button
+                type="button"
+                class="show-btn"
+                onclick="togglePassword('confirmPassword',this)">
+                    SHOW
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <button
+        type="button"
+        class="signup-btn"
+        onclick="createAccount()">
+
+            Create Account
+
+        </button>
+
+
+        <div class="login-link">
+
+            Already have an account?
+
+            <a href="./login.html">
+                Login
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="offline-info">
+        🔒 Account is stored only on this device
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   STORAGE KEY
+========================================= */
+
+const AUTH_USER_KEY =
+    "selfAttendanceOfflineUser";
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+function showMessage(text,type){
+
+    const box =
+        document.getElementById(
+            "message"
+        );
+
+    box.textContent =
+        text;
+
+    box.className =
+        "message " + type;
+}
+
+
+/* =========================================
+   SHOW / HIDE PASSWORD
+========================================= */
+
+function togglePassword(id,button){
+
+    const input =
+        document.getElementById(id);
+
+    if(
+        input.type ===
+        "password"
+    ){
+
+        input.type =
+            "text";
+
+        button.textContent =
+            "HIDE";
+
+    }else{
+
+        input.type =
+            "password";
+
+        button.textContent =
+            "SHOW";
+    }
+}
+
+
+/* =========================================
+   PASSWORD HASH
+
+   Web Crypto API
+========================================= */
+
+async function hashPassword(password){
+
+    const data =
+        new TextEncoder()
+        .encode(password);
+
+    const hashBuffer =
+        await crypto.subtle.digest(
+            "SHA-256",
+            data
+        );
+
+    const hashArray =
+        Array.from(
+            new Uint8Array(
+                hashBuffer
+            )
+        );
+
+    return hashArray
+        .map(
+            byte =>
+                byte
+                .toString(16)
+                .padStart(2,"0")
+        )
+        .join("");
+}
+
+
+/* =========================================
+   CREATE ACCOUNT
+========================================= */
+
+async function createAccount(){
+
+    const username =
+        document
+        .getElementById(
+            "username"
+        )
+        .value
+        .trim();
+
+
+    const password =
+        document
+        .getElementById(
+            "password"
+        )
+        .value;
+
+
+    const confirmPassword =
+        document
+        .getElementById(
+            "confirmPassword"
+        )
+        .value;
+
+
+    if(
+        !username ||
+        !password ||
+        !confirmPassword
+    ){
+
+        showMessage(
+            "Please fill all fields.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if(
+        username.length < 3
+    ){
+
+        showMessage(
+            "Username must be at least 3 characters.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if(
+        password.length < 6
+    ){
+
+        showMessage(
+            "Password must be at least 6 characters.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if(
+        password !==
+        confirmPassword
+    ){
+
+        showMessage(
+            "Passwords do not match.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    /*
+      Check existing account.
+    */
+
+    const existing =
+        localStorage.getItem(
+            AUTH_USER_KEY
+        );
+
+
+    if(existing){
+
+        showMessage(
+            "An account already exists on this device. Please login.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    try{
+
+        const passwordHash =
+            await hashPassword(
+                password
+            );
+
+
+        const account = {
+
+            username:
+                username,
+
+            passwordHash:
+                passwordHash,
+
+            createdAt:
+                new Date()
+                .toISOString()
+        };
+
+
+        localStorage.setItem(
+            AUTH_USER_KEY,
+            JSON.stringify(
+                account
+            )
+        );
+
+
+        showMessage(
+            "Account created successfully. Opening login...",
+            "success"
+        );
+
+
+        /*
+          Password fields clear.
+        */
+
+        document
+        .getElementById(
+            "password"
+        )
+        .value = "";
+
+
+        document
+        .getElementById(
+            "confirmPassword"
+        )
+        .value = "";
+
+
+        setTimeout(
+            function(){
+
+                location.replace(
+                    "./login.html"
+                );
+
+            },
+            1000
+        );
+
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+
+        showMessage(
+            "Account could not be created.",
+            "error"
+        );
+    }
+}
+
+
+/* =========================================
+   ENTER KEY
+========================================= */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key ===
+            "Enter"
+        ){
+
+            createAccount();
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>

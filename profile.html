@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Profiles</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+*{box-sizing:border-box}
+
+.header-row{
+    display:flex;
+    align-items:center;
+}
+
+.back-btn{
+    color:white;
+    text-decoration:none;
+    font-size:27px;
+    margin-right:10px;
+}
+
+.profile-manager{
+    background:#e3f2fd;
+    padding:14px;
+    border-radius:12px;
+}
+
+.profile-manager label{
+    display:block;
+    font-size:11px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.profile-select{
+    width:100%;
+    padding:12px;
+    border:1px solid #bbb;
+    border-radius:9px;
+    background:white;
+    font-size:14px;
+}
+
+.profile-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-top:10px;
+}
+
+.profile-actions button{
+    border:0;
+    padding:11px 5px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.add-profile{
+    background:#2e7d32;
+    color:white;
+}
+
+.delete-profile{
+    background:#ffebee;
+    color:#c62828;
+}
+
+.active-profile-box{
+    margin-top:10px;
+    background:white;
+    border-radius:8px;
+    padding:10px;
+    font-size:11px;
+}
+
+.active-profile-box strong{
+    color:#1565c0;
+}
+
+.section-heading{
+    margin-top:23px;
+    padding-bottom:7px;
+    border-bottom:2px solid #1565c0;
+    color:#1565c0;
+}
+
+.profile-form label{
+    display:block;
+    font-size:11px;
+    font-weight:bold;
+    margin:13px 0 5px;
+}
+
+.profile-form input,
+.profile-form select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:9px;
+    background:white;
+    font-size:14px;
+}
+
+.two-column{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.shift-info{
+    margin-top:12px;
+    padding:11px;
+    background:#f5f7fa;
+    border-radius:9px;
+    font-size:10px;
+    line-height:1.5;
+}
+
+.save-btn{
+    width:100%;
+    border:0;
+    background:#1565c0;
+    color:white;
+    padding:15px;
+    border-radius:10px;
+    margin-top:22px;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.data-warning{
+    margin-top:10px;
+    padding:10px;
+    background:#fff8e1;
+    border-radius:8px;
+    font-size:10px;
+    line-height:1.5;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="header-row">
+
+<a href="index.html" class="back-btn">‹</a>
+
+<div>
+<h1>Profiles</h1>
+<p>Manage Job / Employee Profiles</p>
+</div>
+
+</div>
+</header>
+
+
+<main>
+
+<!-- PROFILE MANAGER -->
+
+<section class="card">
+
+<div class="profile-manager">
+
+<label>Active Profile</label>
+
+<select
+id="profileSelector"
+class="profile-select"
+onchange="changeProfile()">
+</select>
+
+
+<div class="profile-actions">
+
+<button
+type="button"
+class="add-profile"
+onclick="createProfile()">
++ Add Profile
+</button>
+
+<button
+type="button"
+class="delete-profile"
+onclick="removeCurrentProfile()">
+Delete Profile
+</button>
+
+</div>
+
+
+<div class="active-profile-box">
+
+Active:
+<strong id="currentProfileLabel">-</strong>
+
+</div>
+
+</div>
+
+
+<div class="data-warning">
+हर profile का Attendance और Salary data अलग रहेगा।
+Profile switch करने पर Home, Punch, Attendance और Salary उसी selected profile के records इस्तेमाल करेंगे।
+</div>
+
+</section>
+
+
+<!-- PROFILE FORM -->
+
+<section class="card">
+
+<form
+id="profileForm"
+class="profile-form">
+
+
+<h3 class="section-heading">
+Profile
+</h3>
+
+<label>Profile Name</label>
+
+<input
+id="profileName"
+type="text"
+placeholder="Example: ABSS Job">
+
+
+<h3 class="section-heading">
+Employee Details
+</h3>
+
+<label>Employee Name</label>
+
+<input
+id="employeeNameInput"
+type="text"
+placeholder="Employee Name">
+
+
+<div class="two-column">
+
+<div>
+<label>Employee ID</label>
+
+<input
+id="employeeId"
+type="text"
+placeholder="Employee ID">
+</div>
+
+
+<div>
+<label>Designation</label>
+
+<input
+id="designation"
+type="text"
+placeholder="Designation">
+</div>
+
+</div>
+
+
+<label>Department</label>
+
+<input
+id="department"
+type="text"
+placeholder="Department">
+
+
+<label>Date of Joining</label>
+
+<input
+id="doj"
+type="date">
+
+
+<label>Work Location</label>
+
+<input
+id="location"
+type="text"
+placeholder="Work Location">
+
+
+
+<h3 class="section-heading">
+Shift Settings
+</h3>
+
+
+<label>Default Shift</label>
+
+<select id="defaultShift">
+
+<option value="day">
+☀️ Day Shift
+</option>
+
+<option value="night">
+🌙 Night Shift
+</option>
+
+</select>
+
+
+<div class="two-column">
+
+<div>
+
+<label>Day Duty Hours</label>
+
+<input
+id="dayDutyHours"
+type="number"
+min="1"
+step="0.5"
+value="8">
+
+</div>
+
+
+<div>
+
+<label>Night Duty Hours</label>
+
+<input
+id="nightDutyHours"
+type="number"
+min="1"
+step="0.5"
+value="8">
+
+</div>
+
+</div>
+
+
+<label>Night Shift Allowance ₹ / Shift</label>
+
+<input
+id="nightAllowance"
+type="number"
+min="0"
+step="0.01"
+value="0">
+
+
+<div class="shift-info">
+Default Shift Home के Punch In पर automatically इस्तेमाल होगी। Manual Attendance में Day/Night अलग से चुना जा सकेगा।
+</div>
+
+
+
+<h3 class="section-heading">
+Salary Settings
+</h3>
+
+
+<label>Monthly Salary ₹</label>
+
+<input
+id="monthlySalary"
+type="number"
+min="0"
+step="0.01"
+placeholder="Example: 20000">
+
+
+<div class="two-column">
+
+<div>
+
+<label>Salary Division Days</label>
+
+<input
+id="salaryDays"
+type="number"
+min="1"
+value="26">
+
+</div>
+
+
+<div>
+
+<label>OT Rate ₹ / Hour</label>
+
+<input
+id="otRate"
+type="number"
+min="0"
+step="0.01"
+value="0">
+
+</div>
+
+</div>
+
+
+<div class="two-column">
+
+<div>
+
+<label>PF %</label>
+
+<input
+id="pfPercent"
+type="number"
+min="0"
+step="0.01"
+value="12">
+
+</div>
+
+
+<div>
+
+<label>ESIC %</label>
+
+<input
+id="esicPercent"
+type="number"
+min="0"
+step="0.01"
+value="0.75">
+
+</div>
+
+</div>
+
+
+<div class="two-column">
+<div>
+<label>PF Deduction Type</label>
+<select id="pfDeductionMode">
+<option value="salary">Salary Se Katega</option>
+<option value="extra">Upar Se / Extra</option>
+</select>
+</div>
+<div>
+<label>ESIC Deduction Type</label>
+<select id="esicDeductionMode">
+<option value="salary">Salary Se Katega</option>
+<option value="extra">Upar Se / Extra</option>
+</select>
+</div>
+</div>
+
+<label>Canteen / Lunch ₹ Per Working Day</label>
+
+<input
+id="canteenPerDay"
+type="number"
+min="0"
+step="0.01"
+value="0">
+
+
+
+<h3 class="section-heading">
+Bank / Statutory Details
+</h3>
+
+
+<label>Bank Name</label>
+
+<input
+id="bankName"
+type="text"
+placeholder="Bank Name">
+
+
+<label>Bank Account Number</label>
+
+<input
+id="accountNumber"
+type="text"
+inputmode="numeric"
+placeholder="Account Number">
+
+
+<label>IFSC Code</label>
+
+<input
+id="ifsc"
+type="text"
+placeholder="IFSC Code">
+
+
+<label>UAN Number</label>
+
+<input
+id="uan"
+type="text"
+inputmode="numeric"
+placeholder="UAN Number">
+
+
+<label>ESIC Number</label>
+
+<input
+id="esicNumber"
+type="text"
+inputmode="numeric"
+placeholder="ESIC Number">
+
+
+<label>PAN Number</label>
+
+<input
+id="pan"
+type="text"
+placeholder="PAN Number">
+
+
+<button
+type="submit"
+class="save-btn">
+Save Current Profile
+</button>
+
+</form>
+
+</section>
+
+</main>
+
+
+<script src="app.js"></script>
+
+<script>
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function field(id){
+
+    return document
+    .getElementById(id);
+}
+
+
+function textValue(id){
+
+    return field(id)
+    .value
+    .trim();
+}
+
+
+function numberValue(
+    id,
+    fallback = 0
+){
+
+    const value =
+        Number(
+            field(id).value
+        );
+
+
+    return Number.isFinite(value)
+        ? value
+        : fallback;
+}
+
+
+/* =========================================
+   PROFILE SELECTOR
+========================================= */
+
+function loadProfileSelector(){
+
+    const profiles =
+        getProfiles();
+
+
+    const activeId =
+        getActiveProfileId();
+
+
+    const selector =
+        field(
+            "profileSelector"
+        );
+
+
+    selector.innerHTML = "";
+
+
+    profiles.forEach(profile => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            profile.id;
+
+
+        option.textContent =
+            profile.profileName ||
+            profile.employeeName ||
+            "Profile";
+
+
+        if(
+            profile.id ===
+            activeId
+        ){
+
+            option.selected =
+                true;
+        }
+
+
+        selector.appendChild(
+            option
+        );
+    });
+
+
+    updateProfileLabel();
+}
+
+
+/* =========================================
+   LABEL
+========================================= */
+
+function updateProfileLabel(){
+
+    const profile =
+        getActiveProfile();
+
+
+    field(
+        "currentProfileLabel"
+    ).textContent =
+        profile
+        ? (
+            profile.profileName ||
+            profile.employeeName ||
+            "Profile"
+        )
+        : "-";
+}
+
+
+/* =========================================
+   LOAD FORM
+========================================= */
+
+function loadCurrentProfile(){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+        return;
+    }
+
+
+    field("profileName").value =
+        profile.profileName || "";
+
+
+    field("employeeNameInput").value =
+        profile.employeeName || "";
+
+
+    field("employeeId").value =
+        profile.employeeId || "";
+
+
+    field("designation").value =
+        profile.designation || "";
+
+
+    field("department").value =
+        profile.department || "";
+
+
+    field("doj").value =
+        profile.doj || "";
+
+
+    field("location").value =
+        profile.location || "";
+
+
+    /* SHIFT */
+
+    field("defaultShift").value =
+        profile.defaultShift ||
+        "day";
+
+
+    field("dayDutyHours").value =
+        profile.dayDutyHours ??
+        profile.dutyHours ??
+        8;
+
+
+    field("nightDutyHours").value =
+        profile.nightDutyHours ??
+        profile.dutyHours ??
+        8;
+
+
+    field("nightAllowance").value =
+        profile.nightAllowance ??
+        0;
+
+
+    /* SALARY */
+
+    field("monthlySalary").value =
+        profile.monthlySalary ??
+        0;
+
+
+    field("salaryDays").value =
+        profile.salaryDays ??
+        26;
+
+
+    field("otRate").value =
+        profile.otRate ??
+        0;
+
+
+    field("pfPercent").value =
+        profile.pfPercent ??
+        12;
+
+
+    field("esicPercent").value =
+        profile.esicPercent ??
+        0.75;
+
+
+    field("pfDeductionMode").value =
+        profile.pfDeductionMode || "salary";
+
+    field("esicDeductionMode").value =
+        profile.esicDeductionMode || "salary";
+
+    field("canteenPerDay").value =
+        profile.canteenPerDay ??
+        0;
+
+
+    /* BANK */
+
+    field("bankName").value =
+        profile.bankName || "";
+
+
+    field("accountNumber").value =
+        profile.accountNumber || "";
+
+
+    field("ifsc").value =
+        profile.ifsc || "";
+
+
+    field("uan").value =
+        profile.uan || "";
+
+
+    field("esicNumber").value =
+        profile.esicNumber || "";
+
+
+    field("pan").value =
+        profile.pan || "";
+
+
+    updateProfileLabel();
+}
+
+
+/* =========================================
+   SWITCH PROFILE
+========================================= */
+
+function changeProfile(){
+
+    const id =
+        field(
+            "profileSelector"
+        ).value;
+
+
+    if(!id){
+        return;
+    }
+
+
+    switchProfile(id);
+
+
+    loadCurrentProfile();
+
+
+    loadProfileSelector();
+}
+
+
+/* =========================================
+   CREATE PROFILE
+========================================= */
+
+function createProfile(){
+
+    const name =
+        prompt(
+            "New Profile Name\n\nExample: ABSS Job"
+        );
+
+
+    if(name === null){
+        return;
+    }
+
+
+    const cleanName =
+        name.trim();
+
+
+    if(!cleanName){
+
+        alert(
+            "Please enter Profile Name."
+        );
+
+        return;
+    }
+
+
+    const profile =
+        addNewProfile(
+            cleanName
+        );
+
+
+    if(!profile){
+        return;
+    }
+
+
+    /*
+      New profile automatically
+      active ho chuki hai.
+    */
+
+    loadProfileSelector();
+
+    loadCurrentProfile();
+
+
+    alert(
+        cleanName +
+        " created successfully."
+    );
+}
+
+
+/* =========================================
+   DELETE PROFILE
+========================================= */
+
+function removeCurrentProfile(){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+        return;
+    }
+
+
+    const deleted =
+        deleteProfile(
+            profile.id
+        );
+
+
+    if(!deleted){
+        return;
+    }
+
+
+    loadProfileSelector();
+
+    loadCurrentProfile();
+}
+
+
+/* =========================================
+   SAVE PROFILE
+========================================= */
+
+function saveProfileForm(){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+
+        alert(
+            "No active profile."
+        );
+
+        return;
+    }
+
+
+    const profileName =
+        textValue(
+            "profileName"
+        );
+
+
+    if(!profileName){
+
+        alert(
+            "Please enter Profile Name."
+        );
+
+        return;
+    }
+
+
+    createAutoBackup(
+        "Before Profile Update"
+    );
+
+
+    /*
+      IMPORTANT:
+      Attendance & Salaries ko touch
+      nahi kar rahe.
+    */
+
+    profile.profileName =
+        profileName;
+
+
+    profile.employeeName =
+        textValue(
+            "employeeNameInput"
+        );
+
+
+    profile.employeeId =
+        textValue(
+            "employeeId"
+        );
+
+
+    profile.designation =
+        textValue(
+            "designation"
+        );
+
+
+    profile.department =
+        textValue(
+            "department"
+        );
+
+
+    profile.doj =
+        field(
+            "doj"
+        ).value;
+
+
+    profile.location =
+        textValue(
+            "location"
+        );
+
+
+    /* SHIFT */
+
+    profile.defaultShift =
+        field(
+            "defaultShift"
+        ).value;
+
+
+    profile.dayDutyHours =
+        numberValue(
+            "dayDutyHours",
+            8
+        );
+
+
+    profile.nightDutyHours =
+        numberValue(
+            "nightDutyHours",
+            8
+        );
+
+
+    profile.nightAllowance =
+        numberValue(
+            "nightAllowance",
+            0
+        );
+
+
+    /*
+      Old compatibility.
+    */
+
+    profile.dutyHours =
+        profile.defaultShift ===
+        "night"
+
+        ? profile.nightDutyHours
+        : profile.dayDutyHours;
+
+
+    /* SALARY */
+
+    profile.monthlySalary =
+        numberValue(
+            "monthlySalary",
+            0
+        );
+
+
+    profile.salaryDays =
+        numberValue(
+            "salaryDays",
+            26
+        );
+
+
+    profile.otRate =
+        numberValue(
+            "otRate",
+            0
+        );
+
+
+    profile.pfPercent =
+        numberValue(
+            "pfPercent",
+            0
+        );
+
+
+    profile.esicPercent =
+        numberValue(
+            "esicPercent",
+            0
+        );
+
+
+    profile.pfDeductionMode =
+        field("pfDeductionMode").value;
+
+    profile.esicDeductionMode =
+        field("esicDeductionMode").value;
+
+    profile.canteenPerDay =
+        numberValue(
+            "canteenPerDay",
+            0
+        );
+
+
+    /* BANK */
+
+    profile.bankName =
+        textValue(
+            "bankName"
+        );
+
+
+    profile.accountNumber =
+        textValue(
+            "accountNumber"
+        );
+
+
+    profile.ifsc =
+        textValue(
+            "ifsc"
+        ).toUpperCase();
+
+
+    profile.uan =
+        textValue(
+            "uan"
+        );
+
+
+    profile.esicNumber =
+        textValue(
+            "esicNumber"
+        );
+
+
+    profile.pan =
+        textValue(
+            "pan"
+        ).toUpperCase();
+
+
+    const saved =
+        saveActiveProfile(
+            profile
+        );
+
+
+    if(!saved){
+
+        alert(
+            "Profile could not be saved."
+        );
+
+        return;
+    }
+
+
+    createAutoBackup(
+        "Profile Updated - " +
+        profileName
+    );
+
+
+    loadProfileSelector();
+
+    loadCurrentProfile();
+
+
+    alert(
+        "Profile saved successfully."
+    );
+}
+
+
+/* =========================================
+   FORM SUBMIT
+========================================= */
+
+field(
+    "profileForm"
+)
+.addEventListener(
+    "submit",
+    function(event){
+
+        event.preventDefault();
+
+        saveProfileForm();
+    }
+);
+
+
+/* =========================================
+   START
+========================================= */
+
+loadProfileSelector();
+
+loadCurrentProfile();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<meta
+name="theme-color"
+content="#1565c0">
+
+<meta
+name="mobile-web-app-capable"
+content="yes">
+
+<meta
+name="apple-mobile-web-app-capable"
+content="yes">
+
+<meta
+name="apple-mobile-web-app-status-bar-style"
+content="default">
+
+<title>Self Attendance</title>
+
+<!-- ==============================
+     PWA
+============================== -->
+
+<link
+rel="manifest"
+href="./manifest.json">
+
+<link
+rel="icon"
+type="image/png"
+sizes="192x192"
+href="./icons/icon-192.png">
+
+<link
+rel="icon"
+type="image/png"
+sizes="512x512"
+href="./icons/icon-512.png">
+
+<link
+rel="apple-touch-icon"
+href="./icons/icon-192.png">
+
+<link
+rel="stylesheet"
+href="./style.css">
+
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+
+/* ==============================
+   PROFILE SWITCHER
+============================== */
+
+.profile-switcher{
+    background:white;
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.profile-switcher label{
+    display:block;
+    font-size:10px;
+    color:#777;
+    margin-bottom:6px;
+}
+
+.profile-row{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:8px;
+}
+
+.profile-select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:9px;
+    background:white;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.profile-settings{
+    border:0;
+    min-width:55px;
+    border-radius:9px;
+    background:#e3f2fd;
+    font-size:20px;
+    cursor:pointer;
+}
+
+
+/* ==============================
+   CONNECTION
+============================== */
+
+.connection-status{
+    display:none;
+    padding:9px;
+    margin-bottom:12px;
+    border-radius:8px;
+    text-align:center;
+    font-size:9px;
+    font-weight:bold;
+}
+
+.connection-status.offline{
+    display:block;
+    background:#fff3e0;
+    color:#e65100;
+}
+
+
+/* ==============================
+   WELCOME
+============================== */
+
+.welcome-card{
+    background:linear-gradient(
+        135deg,
+        #1565c0,
+        #0d47a1
+    );
+    color:white;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:14px;
+}
+
+.welcome-card p{
+    margin:0;
+    font-size:11px;
+    opacity:.8;
+}
+
+.welcome-card h2{
+    margin:5px 0;
+    font-size:25px;
+}
+
+.profile-label{
+    display:inline-block;
+    background:rgba(255,255,255,.18);
+    padding:5px 10px;
+    border-radius:15px;
+    font-size:9px;
+}
+
+.live-time{
+    margin-top:15px;
+    font-size:22px;
+    font-weight:bold;
+}
+
+
+/* ==============================
+   ATTENDANCE
+============================== */
+
+.section-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.section-title h3{
+    margin:0;
+}
+
+.status{
+    background:#eee;
+    padding:5px 9px;
+    border-radius:15px;
+    font-size:9px;
+    white-space:nowrap;
+}
+
+.status.working{
+    background:#e8f5e9;
+    color:#2e7d32;
+}
+
+.status.completed{
+    background:#e3f2fd;
+    color:#1565c0;
+}
+
+
+/* ==============================
+   SHIFT
+============================== */
+
+.shift-indicator{
+    margin-top:12px;
+    padding:10px;
+    border-radius:9px;
+    text-align:center;
+    font-size:10px;
+    font-weight:bold;
+}
+
+.shift-day{
+    background:#fff8e1;
+    color:#e65100;
+}
+
+.shift-night{
+    background:#e8eaf6;
+    color:#283593;
+}
+
+
+/* ==============================
+   PUNCH TIME
+============================== */
+
+.punch-times{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:15px;
+}
+
+.punch-times div{
+    background:#f5f7fa;
+    padding:13px;
+    border-radius:9px;
+}
+
+.punch-times span{
+    display:block;
+    color:#777;
+    font-size:9px;
+}
+
+.punch-times strong{
+    display:block;
+    margin-top:5px;
+    font-size:17px;
+}
+
+
+/* ==============================
+   PUNCH BUTTONS
+============================== */
+
+.punch-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:12px;
+}
+
+.punch-buttons button{
+    border:0;
+    padding:14px;
+    border-radius:9px;
+    font-weight:bold;
+    font-size:13px;
+}
+
+.punch-in{
+    background:#2e7d32;
+    color:white;
+}
+
+.punch-out{
+    background:#c62828;
+    color:white;
+}
+
+.punch-buttons button:disabled{
+    opacity:.4;
+}
+
+
+/* ==============================
+   LIVE WORK
+============================== */
+
+.live-working{
+    display:none;
+    margin-top:10px;
+    padding:10px;
+    background:#e8f5e9;
+    color:#2e7d32;
+    border-radius:9px;
+    text-align:center;
+    font-size:11px;
+    font-weight:bold;
+}
+
+
+/* ==============================
+   SUMMARY
+============================== */
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:12px;
+}
+
+.summary div{
+    background:#f5f7fa;
+    padding:13px 5px;
+    border-radius:9px;
+    text-align:center;
+}
+
+.summary strong{
+    display:block;
+    color:#1565c0;
+    font-size:20px;
+}
+
+.summary span{
+    display:block;
+    margin-top:3px;
+    color:#777;
+    font-size:9px;
+}
+
+
+/* ==============================
+   QUICK MENU
+============================== */
+
+.quick-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:11px;
+    margin-bottom:14px;
+}
+
+.quick-card{
+    background:white;
+    padding:18px 8px;
+    border-radius:13px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.07);
+    cursor:pointer;
+}
+
+.quick-card .icon{
+    display:block;
+    font-size:27px;
+    margin-bottom:7px;
+}
+
+.quick-card h3{
+    margin:0;
+    font-size:13px;
+}
+
+.quick-card p{
+    margin:4px 0 0;
+    color:#777;
+    font-size:9px;
+}
+
+
+/* ==============================
+   INSTALL
+============================== */
+
+.install-card{
+    display:none;
+    background:linear-gradient(
+        135deg,
+        #283593,
+        #1565c0
+    );
+    color:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:14px;
+}
+
+.install-card h3{
+    margin:0 0 5px;
+}
+
+.install-card p{
+    margin:0;
+    font-size:9px;
+    opacity:.85;
+}
+
+.install-card button{
+    width:100%;
+    border:0;
+    background:white;
+    color:#1565c0;
+    padding:11px;
+    border-radius:8px;
+    margin-top:10px;
+    font-weight:bold;
+}
+
+
+/* ==============================
+   UPDATE
+============================== */
+
+.update-box{
+    display:none;
+    position:fixed;
+    left:10px;
+    right:10px;
+    bottom:75px;
+    z-index:999;
+    background:#263238;
+    color:white;
+    padding:12px;
+    border-radius:10px;
+    box-shadow:0 3px 15px rgba(0,0,0,.3);
+    font-size:10px;
+}
+
+.update-box button{
+    float:right;
+    border:0;
+    background:white;
+    color:#263238;
+    padding:6px 10px;
+    border-radius:6px;
+    font-weight:bold;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==============================
+     HEADER
+============================== -->
+
+<header>
+
+<div>
+
+<h1>
+Self Attendance
+</h1>
+
+<p>
+Attendance & Payroll
+</p>
+
+</div>
+
+
+<div class="date-box">
+
+<span id="currentDate">
+--
+</span>
+
+</div>
+
+  <button
+type="button"
+onclick="lockApp()"
+style="
+border:0;
+background:#c62828;
+color:white;
+padding:8px 11px;
+border-radius:8px;
+font-size:10px;
+font-weight:bold;
+">
+🔒 Lock
+  </button>
+
+</header>
+
+
+
+<main>
+
+
+<!-- ==============================
+     OFFLINE
+============================== -->
+
+<div
+id="connectionStatus"
+class="connection-status">
+
+📴 Offline Mode
+
+</div>
+
+
+
+<!-- ==============================
+     PROFILE
+============================== -->
+
+<div class="profile-switcher">
+
+<label>
+ACTIVE PROFILE
+</label>
+
+
+<div class="profile-row">
+
+<select
+id="homeProfileSelector"
+class="profile-select"
+onchange="homeSwitchProfile()">
+
+</select>
+
+
+<button
+type="button"
+class="profile-settings"
+onclick="location.href='profile.html'">
+
+⚙️
+
+</button>
+
+</div>
+
+</div>
+
+
+
+<!-- ==============================
+     WELCOME
+============================== -->
+
+<section class="welcome-card">
+
+<p>
+Welcome
+</p>
+
+<h2 id="employeeName">
+Employee
+</h2>
+
+<span
+id="activeProfileName"
+class="profile-label">
+
+Profile
+
+</span>
+
+<div
+id="liveTime"
+class="live-time">
+
+--:--:--
+
+</div>
+
+</section>
+
+
+
+<!-- ==============================
+     TODAY ATTENDANCE
+============================== -->
+
+<section class="card">
+
+
+<div class="section-title">
+
+<h3>
+Today's Attendance
+</h3>
+
+
+<span
+id="attendanceStatus"
+class="status">
+
+Not Punched
+
+</span>
+
+</div>
+
+
+<div
+id="defaultShiftIndicator"
+class="shift-indicator shift-day">
+
+☀️ Day Shift
+
+</div>
+
+
+
+<div class="punch-times">
+
+
+<div>
+
+<span>
+Punch In
+</span>
+
+<strong id="punchInTime">
+--:--
+</strong>
+
+</div>
+
+
+<div>
+
+<span>
+Punch Out
+</span>
+
+<strong id="punchOutTime">
+--:--
+</strong>
+
+</div>
+
+
+</div>
+
+
+
+<div class="punch-buttons">
+
+
+<button
+id="punchInBtn"
+class="punch-in"
+onclick="punchIn()">
+
+Punch In
+
+</button>
+
+
+<button
+id="punchOutBtn"
+class="punch-out"
+onclick="punchOut()">
+
+Punch Out
+
+</button>
+
+
+</div>
+
+
+
+<div
+id="liveWorkingBox"
+class="live-working">
+
+Working:
+
+<span id="liveWorkingTime">
+0h 0m
+</span>
+
+</div>
+
+
+</section>
+
+
+
+<!-- ==============================
+     MONTH SUMMARY
+============================== -->
+
+<section class="card">
+
+<h3>
+This Month
+</h3>
+
+
+<div class="summary">
+
+
+<div>
+
+<strong id="presentDays">
+0
+</strong>
+
+<span>
+Present
+</span>
+
+</div>
+
+
+<div>
+
+<strong id="totalHours">
+0
+</strong>
+
+<span>
+Hours
+</span>
+
+</div>
+
+
+<div>
+
+<strong id="overtime">
+0
+</strong>
+
+<span>
+OT Hours
+</span>
+
+</div>
+
+
+</div>
+
+</section>
+
+
+
+<!-- ==============================
+     PWA INSTALL
+============================== -->
+
+<section
+id="installCard"
+class="install-card">
+
+<h3>
+📱 Install App
+</h3>
+
+<p>
+Install Self Attendance on your phone for offline use.
+</p>
+
+<button
+type="button"
+onclick="installPWA()">
+
+Install App
+
+</button>
+
+</section>
+
+
+
+<!-- ==============================
+     QUICK MENU
+============================== -->
+
+<section class="quick-grid">
+
+
+<div
+class="quick-card"
+onclick="location.href='attendance.html'">
+
+<span class="icon">
+📅
+</span>
+
+<h3>
+Attendance
+</h3>
+
+<p>
+View / Edit Records
+</p>
+
+</div>
+
+
+
+<div
+class="quick-card"
+onclick="location.href='salary.html'">
+
+<span class="icon">
+₹
+</span>
+
+<h3>
+Salary
+</h3>
+
+<p>
+Calculate Salary
+</p>
+
+</div>
+
+
+
+<div
+class="quick-card"
+onclick="openSalarySlip()">
+
+<span class="icon">
+📄
+</span>
+
+<h3>
+Salary Slip
+</h3>
+
+<p>
+View / PDF
+</p>
+
+</div>
+
+
+
+<div
+class="quick-card"
+onclick="location.href='profile.html'">
+
+<span class="icon">
+👤
+</span>
+
+<h3>
+Profiles
+</h3>
+
+<p>
+Add / Switch Profile
+</p>
+
+</div>
+
+  <div
+class="quick-card"
+onclick="location.href='account.html'">
+
+<span class="icon">
+⚙️
+</span>
+
+<h3>
+Account
+</h3>
+
+<p>
+Login & Security
+</p>
+
+  </div>
+
+</section>
+
+
+
+<!-- ==============================
+     BACKUP
+============================== -->
+
+<section
+class="card"
+onclick="location.href='backup.html'"
+style="cursor:pointer">
+
+<h3>
+💾 Backup & Restore
+</h3>
+
+<p
+style="
+font-size:10px;
+color:#777;
+margin-top:5px;
+">
+
+All Profiles • Attendance • Salary
+
+</p>
+
+</section>
+
+
+</main>
+
+
+
+<!-- ==============================
+     BOTTOM NAVIGATION
+============================== -->
+
+<nav class="bottom-nav">
+
+
+<button class="active">
+
+🏠
+
+<span>
+Home
+</span>
+
+</button>
+
+
+<button
+onclick="location.href='attendance.html'">
+
+📅
+
+<span>
+Attendance
+</span>
+
+</button>
+
+
+<button
+onclick="location.href='salary.html'">
+
+₹
+
+<span>
+Salary
+</span>
+
+</button>
+
+
+<button
+onclick="location.href='profile.html'">
+
+👤
+
+<span>
+Profiles
+</span>
+
+</button>
+
+
+</nav>
+
+
+
+<!-- ==============================
+     UPDATE
+============================== -->
+
+<div
+id="updateBox"
+class="update-box">
+
+New app version available.
+
+<button onclick="reloadApp()">
+Update
+</button>
+
+</div>
+
+
+
+<!-- ==============================
+     MAIN APP JS
+============================== -->
+
+<script src="./app.js"></script>
+
+
+<script>
+
+/* ========================================
+   PROFILE LIST
+======================================== */
+
+function loadHomeProfiles(){
+
+    const selector =
+        document.getElementById(
+            "homeProfileSelector"
+        );
+
+
+    const profiles =
+        getProfiles();
+
+
+    const activeId =
+        getActiveProfileId();
+
+
+    selector.innerHTML = "";
+
+
+    if(
+        !profiles ||
+        profiles.length === 0
+    ){
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.textContent =
+            "Create Profile";
+
+
+        option.value = "";
+
+
+        selector.appendChild(
+            option
+        );
+
+
+        return;
+    }
+
+
+    profiles.forEach(profile => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            profile.id;
+
+
+        option.textContent =
+            profile.profileName ||
+            profile.employeeName ||
+            "Profile";
+
+
+        if(
+            profile.id ===
+            activeId
+        ){
+
+            option.selected =
+                true;
+        }
+
+
+        selector.appendChild(
+            option
+        );
+
+    });
+
+
+    updateShiftIndicator();
+
+}
+
+
+
+/* ========================================
+   SWITCH PROFILE
+======================================== */
+
+function homeSwitchProfile(){
+
+    const selector =
+        document.getElementById(
+            "homeProfileSelector"
+        );
+
+
+    const profileId =
+        selector.value;
+
+
+    if(!profileId){
+
+        location.href =
+            "profile.html";
+
+        return;
+    }
+
+
+    const oldProfileId =
+        getActiveProfileId();
+
+
+    const activePunch =
+        findActivePunch();
+
+
+    if(
+        activePunch &&
+        profileId !==
+        oldProfileId
+    ){
+
+        alert(
+            "Current profile has an active Punch In.\n\nPlease Punch Out before switching profile."
+        );
+
+
+        selector.value =
+            oldProfileId;
+
+
+        return;
+    }
+
+
+    const success =
+        switchProfile(
+            profileId
+        );
+
+
+    if(!success){
+
+        selector.value =
+            oldProfileId;
+
+        return;
+    }
+
+
+    updateDashboard();
+
+    updateShiftIndicator();
+
+}
+
+
+
+/* ========================================
+   SHIFT
+======================================== */
+
+function updateShiftIndicator(){
+
+    const profile =
+        getActiveProfile();
+
+
+    const indicator =
+        document.getElementById(
+            "defaultShiftIndicator"
+        );
+
+
+    if(
+        !profile ||
+        !indicator
+    ){
+
+        return;
+    }
+
+
+    const activePunch =
+        findActivePunch();
+
+
+    let shift;
+
+
+    if(activePunch){
+
+        shift =
+            activePunch.record.shift ||
+            "day";
+
+    }else{
+
+        shift =
+            profile.defaultShift ||
+            "day";
+    }
+
+
+    if(
+        shift === "night"
+    ){
+
+        indicator.textContent =
+            "🌙 Night Shift";
+
+
+        indicator.className =
+            "shift-indicator shift-night";
+
+    }else{
+
+        indicator.textContent =
+            "☀️ Day Shift";
+
+
+        indicator.className =
+            "shift-indicator shift-day";
+    }
+
+}
+
+
+
+/* ========================================
+   CONNECTION STATUS
+======================================== */
+
+function updateConnectionStatus(){
+
+    const box =
+        document.getElementById(
+            "connectionStatus"
+        );
+
+
+    if(
+        navigator.onLine
+    ){
+
+        box.classList.remove(
+            "offline"
+        );
+
+
+        box.textContent =
+            "Online";
+
+    }else{
+
+        box.classList.add(
+            "offline"
+        );
+
+
+        box.textContent =
+            "📴 Offline Mode • Data is saved on this device";
+    }
+
+}
+
+
+window.addEventListener(
+    "online",
+    updateConnectionStatus
+);
+
+
+window.addEventListener(
+    "offline",
+    updateConnectionStatus
+);
+
+
+
+/* ========================================
+   PWA INSTALL
+======================================== */
+
+let deferredInstallPrompt =
+    null;
+
+
+window.addEventListener(
+    "beforeinstallprompt",
+    event => {
+
+        event.preventDefault();
+
+
+        deferredInstallPrompt =
+            event;
+
+
+        document
+        .getElementById(
+            "installCard"
+        )
+        .style.display =
+            "block";
+
+    }
+);
+
+
+
+async function installPWA(){
+
+    if(
+        !deferredInstallPrompt
+    ){
+
+        alert(
+            "Install option is not available yet.\n\nUse Chrome menu → Add to Home screen / Install app."
+        );
+
+        return;
+    }
+
+
+    deferredInstallPrompt
+        .prompt();
+
+
+    await deferredInstallPrompt
+        .userChoice;
+
+
+    deferredInstallPrompt =
+        null;
+
+
+    document
+    .getElementById(
+        "installCard"
+    )
+    .style.display =
+        "none";
+
+}
+
+
+
+window.addEventListener(
+    "appinstalled",
+    () => {
+
+        deferredInstallPrompt =
+            null;
+
+
+        const card =
+            document.getElementById(
+                "installCard"
+            );
+
+
+        if(card){
+
+            card.style.display =
+                "none";
+        }
+
+    }
+);
+
+
+
+/* ========================================
+   SERVICE WORKER
+======================================== */
+
+if(
+    "serviceWorker"
+    in navigator
+){
+
+    window.addEventListener(
+        "load",
+        async () => {
+
+            try{
+
+                const registration =
+                    await navigator
+                    .serviceWorker
+                    .register(
+                        "./service-worker.js"
+                    );
+
+
+                console.log(
+                    "Service Worker registered:",
+                    registration.scope
+                );
+
+
+                /*
+                  Latest service worker
+                  check.
+                */
+
+                registration.update();
+
+
+                registration.addEventListener(
+                    "updatefound",
+                    () => {
+
+                        const worker =
+                            registration
+                            .installing;
+
+
+                        if(!worker){
+                            return;
+                        }
+
+
+                        worker.addEventListener(
+                            "statechange",
+                            () => {
+
+                                if(
+                                    worker.state ===
+                                    "installed" &&
+                                    navigator
+                                    .serviceWorker
+                                    .controller
+                                ){
+
+                                    const box =
+                                        document
+                                        .getElementById(
+                                            "updateBox"
+                                        );
+
+
+                                    if(box){
+
+                                        box.style.display =
+                                            "block";
+                                    }
+
+                                }
+
+                            }
+                        );
+
+                    }
+                );
+
+
+            }catch(error){
+
+                console.error(
+                    "Service Worker Error:",
+                    error
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+
+/* ========================================
+   UPDATE APP
+======================================== */
+
+function reloadApp(){
+
+    location.reload();
+
+}
+
+
+
+/* ========================================
+   SHIFT REFRESH AFTER PUNCH
+======================================== */
+
+if(
+    typeof window.punchIn ===
+    "function"
+){
+
+    const originalPunchIn =
+        window.punchIn;
+
+
+    window.punchIn =
+    function(){
+
+        originalPunchIn();
+
+        updateShiftIndicator();
+
+    };
+
+}
+
+
+
+if(
+    typeof window.punchOut ===
+    "function"
+){
+
+    const originalPunchOut =
+        window.punchOut;
+
+
+    window.punchOut =
+    function(){
+
+        originalPunchOut();
+
+        updateShiftIndicator();
+
+    };
+
+}
+
+
+
+/* ========================================
+   START
+======================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadHomeProfiles();
+
+        updateShiftIndicator();
+
+        updateConnectionStatus();
+
+    }
+);
+
+</script>
+
+
+</body>
+</html>

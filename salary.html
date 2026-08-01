@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Salary</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+.header-row{
+    display:flex;
+    align-items:center;
+}
+
+.back-btn{
+    color:white;
+    text-decoration:none;
+    font-size:27px;
+    margin-right:10px;
+}
+
+.profile-box{
+    background:#e3f2fd;
+    padding:13px;
+    border-radius:11px;
+    margin-bottom:13px;
+}
+
+.profile-box span{
+    display:block;
+    font-size:9px;
+    color:#666;
+}
+
+.profile-box strong{
+    display:block;
+    color:#1565c0;
+    font-size:16px;
+    margin-top:4px;
+}
+
+.month-input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:9px;
+    background:white;
+    margin-top:6px;
+}
+
+.summary-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-top:13px;
+}
+
+.summary-box{
+    background:#f5f7fa;
+    padding:11px;
+    border-radius:9px;
+}
+
+.summary-box span{
+    display:block;
+    font-size:9px;
+    color:#777;
+}
+
+.summary-box strong{
+    display:block;
+    margin-top:4px;
+    font-size:16px;
+}
+
+.shift-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-top:10px;
+}
+
+.shift-box{
+    text-align:center;
+    padding:12px;
+    border-radius:9px;
+}
+
+.day-box{
+    background:#fff8e1;
+    color:#e65100;
+}
+
+.night-box{
+    background:#e8eaf6;
+    color:#283593;
+}
+
+.shift-box strong{
+    display:block;
+    font-size:20px;
+}
+
+.shift-box span{
+    font-size:9px;
+}
+
+.attendance-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    margin-top:10px;
+}
+
+.attendance-box{
+    background:#f5f7fa;
+    text-align:center;
+    padding:9px 3px;
+    border-radius:8px;
+}
+
+.attendance-box strong{
+    display:block;
+    color:#1565c0;
+    font-size:16px;
+}
+
+.attendance-box span{
+    font-size:8px;
+    color:#777;
+}
+
+.salary-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.salary-table td{
+    padding:10px 4px;
+    border-bottom:1px solid #eee;
+    font-size:12px;
+}
+
+.salary-table td:last-child{
+    text-align:right;
+    font-weight:bold;
+}
+
+.salary-table .total td{
+    border-top:2px solid #aaa;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.adjustment label{
+    display:block;
+    font-size:10px;
+    font-weight:bold;
+    margin:11px 0 5px;
+}
+
+.adjustment input,
+.adjustment select{
+    width:100%;
+    padding:11px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+.net-box{
+    background:#e8f5e9;
+    padding:18px;
+    text-align:center;
+    border-radius:12px;
+    margin-bottom:12px;
+}
+
+.net-box span{
+    display:block;
+    color:#2e7d32;
+    font-size:10px;
+}
+
+.net-box strong{
+    display:block;
+    color:#1b5e20;
+    font-size:29px;
+    margin-top:4px;
+}
+
+.save-btn{
+    width:100%;
+    border:0;
+    padding:15px;
+    border-radius:10px;
+    background:#1565c0;
+    color:white;
+    font-weight:bold;
+    font-size:14px;
+}
+
+.saved-note{
+    display:none;
+    margin-top:10px;
+    padding:10px;
+    background:#e8f5e9;
+    color:#2e7d32;
+    border-radius:8px;
+    text-align:center;
+    font-size:10px;
+}
+
+.warning{
+    background:#fff8e1;
+    padding:10px;
+    border-radius:8px;
+    font-size:9px;
+    line-height:1.5;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="header-row">
+
+<a href="index.html" class="back-btn">
+‹
+</a>
+
+<div>
+<h1>Salary</h1>
+<p>Monthly Salary Calculation</p>
+</div>
+
+</div>
+
+</header>
+
+
+<main>
+
+<section class="card">
+
+<div class="profile-box">
+
+<span>ACTIVE PROFILE</span>
+
+<strong id="salaryProfileName">
+-
+</strong>
+
+</div>
+
+
+<label style="font-size:10px;font-weight:bold">
+Salary Month
+</label>
+
+<input
+type="month"
+id="salaryMonth"
+class="month-input"
+onchange="monthChanged()">
+
+
+<div class="summary-grid">
+
+<div class="summary-box">
+<span>Monthly Salary</span>
+<strong id="monthlySalary">₹0.00</strong>
+</div>
+
+<div class="summary-box">
+<span>Salary Division</span>
+<strong id="salaryDays">26 Days</strong>
+</div>
+
+<div class="summary-box">
+<span>Payable Days</span>
+<strong id="payableDays">0</strong>
+</div>
+
+<div class="summary-box">
+<span>Per Day Salary</span>
+<strong id="perDaySalary">₹0.00</strong>
+</div>
+
+<div class="summary-box">
+<span>Working Hours</span>
+<strong id="workingHours">0</strong>
+</div>
+
+<div class="summary-box">
+<span>OT Hours</span>
+<strong id="otHours">0</strong>
+</div>
+
+</div>
+
+
+<div class="shift-grid">
+
+<div class="shift-box day-box">
+<strong id="dayShiftCount">0</strong>
+<span>☀️ DAY SHIFTS</span>
+</div>
+
+<div class="shift-box night-box">
+<strong id="nightShiftCount">0</strong>
+<span>🌙 NIGHT SHIFTS</span>
+</div>
+
+</div>
+
+
+<div class="attendance-grid">
+
+<div class="attendance-box">
+<strong id="presentCount">0</strong>
+<span>Present</span>
+</div>
+
+<div class="attendance-box">
+<strong id="halfDayCount">0</strong>
+<span>Half Day</span>
+</div>
+
+<div class="attendance-box">
+<strong id="paidLeaveCount">0</strong>
+<span>Paid Leave</span>
+</div>
+
+<div class="attendance-box">
+<strong id="weeklyOffCount">0</strong>
+<span>Weekly Off</span>
+</div>
+
+<div class="attendance-box">
+<strong id="unpaidLeaveCount">0</strong>
+<span>Unpaid Leave</span>
+</div>
+
+<div class="attendance-box">
+<strong id="nightRateDisplay">₹0</strong>
+<span>Night / Shift</span>
+</div>
+
+</div>
+
+
+<div class="warning">
+Salary calculation sirf upar dikh rahe Active Profile ke Attendance aur Salary Settings se hogi.
+</div>
+
+</section>
+
+
+<section class="card">
+
+<h3>Earnings</h3>
+
+<table class="salary-table">
+
+<tr>
+<td>Earned Salary</td>
+<td id="earnedSalary">₹0.00</td>
+</tr>
+
+<tr>
+<td>Overtime</td>
+<td id="otAmount">₹0.00</td>
+</tr>
+
+<tr>
+<td>Night Shift Allowance</td>
+<td id="nightAllowanceAmount">₹0.00</td>
+</tr>
+
+<tr>
+<td>Bonus / Extra Allowance</td>
+<td id="bonusDisplay">₹0.00</td>
+</tr>
+
+<tr class="total">
+<td>Gross Salary</td>
+<td id="grossSalary">₹0.00</td>
+</tr>
+
+</table>
+
+</section>
+
+
+<section class="card">
+
+<h3>Deductions</h3>
+
+<table class="salary-table">
+
+<tr>
+<td id="pfLabel">PF</td>
+<td id="pfAmount">₹0.00</td>
+</tr>
+
+<tr>
+<td id="esicLabel">ESIC</td>
+<td id="esicAmount">₹0.00</td>
+</tr>
+
+<tr>
+<td>Canteen / Lunch</td>
+<td id="canteenAmount">₹0.00</td>
+</tr>
+
+<tr>
+<td id="otherLabel">Advance / Other</td>
+<td id="advanceDisplay">₹0.00</td>
+</tr>
+
+<tr class="total">
+<td>Total Deduction</td>
+<td id="totalDeduction">₹0.00</td>
+</tr>
+
+</table>
+
+</section>
+
+
+<section class="card adjustment">
+
+<h3>Monthly Adjustment</h3>
+
+<label>Bonus / Extra Allowance ₹</label>
+
+<input
+type="number"
+id="bonus"
+value="0"
+min="0"
+step="0.01"
+oninput="calculateSalary()">
+
+
+<label>Advance / Other Deduction ₹</label>
+
+<input
+type="number"
+id="advance"
+value="0"
+min="0"
+step="0.01"
+oninput="calculateSalary()">
+
+<label>Advance / Other Deduction Type</label>
+<select id="otherDeductionMode" onchange="calculateSalary()">
+<option value="salary">Salary Se Katega</option>
+<option value="extra">Upar Se / Extra</option>
+</select>
+
+</section>
+
+
+<div class="net-box">
+
+<span>NET SALARY</span>
+
+<strong id="netSalary">
+₹0.00
+</strong>
+
+</div>
+
+
+<button
+class="save-btn"
+onclick="saveCurrentSalary()">
+
+Save Salary & Generate Slip
+
+</button>
+
+
+<div
+id="savedNote"
+class="saved-note">
+
+Saved salary adjustments loaded.
+
+</div>
+
+</main>
+
+
+<script src="app.js"></script>
+
+<script>
+
+/* ==========================================
+   HELPERS
+========================================== */
+
+function sEl(id){
+
+    return document.getElementById(id);
+}
+
+
+function money(value){
+
+    return "₹" +
+        Number(value || 0)
+        .toFixed(2);
+}
+
+
+function numberInput(id){
+
+    return Number(
+        sEl(id).value || 0
+    );
+}
+
+
+/* ==========================================
+   ACTIVE PROFILE
+========================================== */
+
+function loadSalaryProfile(){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+
+        alert(
+            "No active profile found."
+        );
+
+        location.href =
+            "profile.html";
+
+        return;
+    }
+
+
+    sEl(
+        "salaryProfileName"
+    ).textContent =
+        profile.profileName ||
+        profile.employeeName ||
+        "Profile";
+}
+
+
+/* ==========================================
+   LOAD SAVED MONTH ADJUSTMENTS
+========================================== */
+
+function loadSavedAdjustments(){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+        return;
+    }
+
+
+    const month =
+        sEl(
+            "salaryMonth"
+        ).value;
+
+
+    const saved =
+        profile.salaries?.[
+            month
+        ];
+
+
+    if(saved){
+
+        sEl("bonus").value =
+            Number(
+                saved.bonus || 0
+            );
+
+
+        sEl("advance").value =
+            Number(
+                saved.advance || 0
+            );
+
+        sEl("otherDeductionMode").value =
+            saved.otherDeductionMode || "salary";
+
+
+        sEl(
+            "savedNote"
+        ).style.display =
+            "block";
+
+    }else{
+
+        sEl("bonus").value = 0;
+
+        sEl("advance").value = 0;
+        sEl("otherDeductionMode").value = "salary";
+
+        sEl(
+            "savedNote"
+        ).style.display =
+            "none";
+    }
+}
+
+
+/* ==========================================
+   MONTH CHANGE
+========================================== */
+
+function monthChanged(){
+
+    loadSavedAdjustments();
+
+    calculateSalary();
+}
+
+
+/* ==========================================
+   CALCULATE
+========================================== */
+
+function calculateSalary(){
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+        return null;
+    }
+
+
+    const month =
+        sEl(
+            "salaryMonth"
+        ).value;
+
+
+    if(!month){
+        return null;
+    }
+
+
+    const attendance =
+        profile.attendance ||
+        {};
+
+
+    const monthlySalary =
+        Number(
+            profile.monthlySalary ||
+            0
+        );
+
+
+    const salaryDays =
+        Number(
+            profile.salaryDays ||
+            26
+        );
+
+
+    const otRate =
+        Number(
+            profile.otRate ||
+            0
+        );
+
+
+    const nightAllowanceRate =
+        Number(
+            profile.nightAllowance ||
+            0
+        );
+
+
+    const pfPercent =
+        Number(
+            profile.pfPercent ||
+            0
+        );
+
+
+    const esicPercent =
+        Number(
+            profile.esicPercent ||
+            0
+        );
+
+
+    const pfDeductionMode =
+        profile.pfDeductionMode || "salary";
+
+    const esicDeductionMode =
+        profile.esicDeductionMode || "salary";
+
+    const otherDeductionMode =
+        sEl("otherDeductionMode").value || "salary";
+
+
+    const canteenPerDay =
+        Number(
+            profile.canteenPerDay ||
+            0
+        );
+
+
+    let present = 0;
+
+    let halfDay = 0;
+
+    let paidLeave = 0;
+
+    let unpaidLeave = 0;
+
+    let weeklyOff = 0;
+
+    let dayShifts = 0;
+
+    let nightShifts = 0;
+
+    let workingMinutes = 0;
+
+    let overtimeMinutes = 0;
+
+
+    Object.keys(
+        attendance
+    )
+    .forEach(date => {
+
+        if(
+            !date.startsWith(
+                month
+            )
+        ){
+            return;
+        }
+
+
+        const record =
+            attendance[date];
+
+
+        const status =
+            record.status ||
+            (
+                record.punchIn
+                ? "present"
+                : "unpaid-leave"
+            );
+
+
+        const shift =
+            record.shift ||
+            "day";
+
+
+        if(
+            status === "present"
+        ){
+
+            present++;
+
+        }else if(
+            status === "half-day"
+        ){
+
+            halfDay++;
+
+        }else if(
+            status === "paid-leave"
+        ){
+
+            paidLeave++;
+
+        }else if(
+            status === "unpaid-leave"
+        ){
+
+            unpaidLeave++;
+
+        }else if(
+            status === "weekly-off"
+        ){
+
+            weeklyOff++;
+        }
+
+
+        /*
+          Day/Night shift count only
+          actual worked records.
+        */
+
+        if(
+            status === "present" ||
+            status === "half-day"
+        ){
+
+            if(
+                shift === "night"
+            ){
+
+                nightShifts++;
+
+            }else{
+
+                dayShifts++;
+            }
+        }
+
+
+        workingMinutes +=
+            Number(
+                record.workingMinutes ||
+                0
+            );
+
+
+        overtimeMinutes +=
+            Number(
+                record.overtimeMinutes ||
+                0
+            );
+    });
+
+
+    /*
+      PAYABLE DAYS
+
+      Present = 1
+      Half Day = 0.5
+      Paid Leave = 1
+      Weekly Off = 1
+      Unpaid Leave = 0
+    */
+
+    const payableDays =
+        present +
+        (
+            halfDay *
+            0.5
+        ) +
+        paidLeave +
+        weeklyOff;
+
+
+    const perDaySalary =
+        salaryDays > 0
+        ? monthlySalary /
+          salaryDays
+        : 0;
+
+
+    /*
+      Monthly basic salary
+      salaryDays se zyada
+      nahi hogi.
+    */
+
+    const paidDays =
+        Math.min(
+            payableDays,
+            salaryDays
+        );
+
+
+    const earnedSalary =
+        perDaySalary *
+        paidDays;
+
+
+    const workingHours =
+        workingMinutes /
+        60;
+
+
+    const otHours =
+        overtimeMinutes /
+        60;
+
+
+    const overtimeAmount =
+        otHours *
+        otRate;
+
+
+    const nightAllowanceAmount =
+        nightShifts *
+        nightAllowanceRate;
+
+
+    const bonus =
+        numberInput(
+            "bonus"
+        );
+
+
+    const advance =
+        numberInput(
+            "advance"
+        );
+
+
+    const grossSalary =
+        earnedSalary +
+        overtimeAmount +
+        nightAllowanceAmount +
+        bonus;
+
+
+    /*
+      PF on earned salary.
+    */
+
+    const pfAmount =
+        earnedSalary *
+        (
+            pfPercent /
+            100
+        );
+
+
+    /*
+      ESIC on gross.
+    */
+
+    const esicAmount =
+        grossSalary *
+        (
+            esicPercent /
+            100
+        );
+
+
+    /*
+      Canteen on worked attendance.
+    */
+
+    const canteenDays =
+        present +
+        halfDay;
+
+
+    const canteenAmount =
+        canteenDays *
+        canteenPerDay;
+
+
+    const salaryPfDeduction =
+        pfDeductionMode === "salary" ? pfAmount : 0;
+
+    const salaryEsicDeduction =
+        esicDeductionMode === "salary" ? esicAmount : 0;
+
+    const salaryOtherDeduction =
+        otherDeductionMode === "salary" ? advance : 0;
+
+    const totalDeduction =
+        salaryPfDeduction +
+        salaryEsicDeduction +
+        canteenAmount +
+        salaryOtherDeduction;
+
+    const extraDeduction =
+        (pfDeductionMode === "extra" ? pfAmount : 0) +
+        (esicDeductionMode === "extra" ? esicAmount : 0) +
+        (otherDeductionMode === "extra" ? advance : 0);
+
+    const netSalary =
+        grossSalary -
+        totalDeduction;
+
+
+    /* ==================================
+       DISPLAY
+    ================================== */
+
+
+    sEl(
+        "monthlySalary"
+    ).textContent =
+        money(
+            monthlySalary
+        );
+
+
+    sEl(
+        "salaryDays"
+    ).textContent =
+        salaryDays +
+        " Days";
+
+
+    sEl(
+        "payableDays"
+    ).textContent =
+        payableDays
+        .toFixed(1);
+
+
+    sEl(
+        "perDaySalary"
+    ).textContent =
+        money(
+            perDaySalary
+        );
+
+
+    sEl(
+        "workingHours"
+    ).textContent =
+        workingHours
+        .toFixed(2);
+
+
+    sEl(
+        "otHours"
+    ).textContent =
+        otHours
+        .toFixed(2);
+
+
+    sEl(
+        "dayShiftCount"
+    ).textContent =
+        dayShifts;
+
+
+    sEl(
+        "nightShiftCount"
+    ).textContent =
+        nightShifts;
+
+
+    sEl(
+        "presentCount"
+    ).textContent =
+        present;
+
+
+    sEl(
+        "halfDayCount"
+    ).textContent =
+        halfDay;
+
+
+    sEl(
+        "paidLeaveCount"
+    ).textContent =
+        paidLeave;
+
+
+    sEl(
+        "weeklyOffCount"
+    ).textContent =
+        weeklyOff;
+
+
+    sEl(
+        "unpaidLeaveCount"
+    ).textContent =
+        unpaidLeave;
+
+
+    sEl(
+        "nightRateDisplay"
+    ).textContent =
+        money(
+            nightAllowanceRate
+        );
+
+
+    sEl(
+        "earnedSalary"
+    ).textContent =
+        money(
+            earnedSalary
+        );
+
+
+    sEl(
+        "otAmount"
+    ).textContent =
+        money(
+            overtimeAmount
+        );
+
+
+    sEl(
+        "nightAllowanceAmount"
+    ).textContent =
+        money(
+            nightAllowanceAmount
+        );
+
+
+    sEl(
+        "bonusDisplay"
+    ).textContent =
+        money(
+            bonus
+        );
+
+
+    sEl(
+        "grossSalary"
+    ).textContent =
+        money(
+            grossSalary
+        );
+
+
+    sEl(
+        "pfLabel"
+    ).textContent =
+        "PF (" +
+        pfPercent +
+        "%) - " +
+        (pfDeductionMode === "salary" ? "Salary Se" : "Upar Se");
+
+
+    sEl(
+        "pfAmount"
+    ).textContent =
+        money(
+            pfAmount
+        );
+
+
+    sEl(
+        "esicLabel"
+    ).textContent =
+        "ESIC (" +
+        esicPercent +
+        "%) - " +
+        (esicDeductionMode === "salary" ? "Salary Se" : "Upar Se");
+
+
+    sEl(
+        "esicAmount"
+    ).textContent =
+        money(
+            esicAmount
+        );
+
+
+    sEl(
+        "canteenAmount"
+    ).textContent =
+        money(
+            canteenAmount
+        );
+
+
+    sEl(
+        "advanceDisplay"
+    ).textContent =
+        money(
+            advance
+        );
+
+    sEl("otherLabel").textContent =
+        "Advance / Other - " +
+        (otherDeductionMode === "salary" ? "Salary Se" : "Upar Se");
+
+
+    sEl(
+        "totalDeduction"
+    ).textContent =
+        money(
+            totalDeduction
+        );
+
+
+    sEl(
+        "netSalary"
+    ).textContent =
+        money(
+            netSalary
+        );
+
+
+    /*
+      Complete snapshot.
+      Salary Slip saved month ki
+      values use karegi.
+    */
+
+    return {
+
+        profileId:
+            profile.id,
+
+        profileName:
+            profile.profileName ||
+            "",
+
+        employeeName:
+            profile.employeeName ||
+            "",
+
+        employeeId:
+            profile.employeeId ||
+            "",
+
+        month:month,
+
+
+        /* SALARY SETTINGS */
+
+        monthlySalary:
+            monthlySalary,
+
+        salaryDays:
+            salaryDays,
+
+        perDaySalary:
+            perDaySalary,
+
+
+        /* ATTENDANCE */
+
+        presentDays:
+            present,
+
+        halfDays:
+            halfDay,
+
+        paidLeaves:
+            paidLeave,
+
+        unpaidLeaves:
+            unpaidLeave,
+
+        weeklyOffs:
+            weeklyOff,
+
+        payableDays:
+            Number(
+                payableDays
+                .toFixed(1)
+            ),
+
+
+        /* SHIFTS */
+
+        dayShifts:
+            dayShifts,
+
+        nightShifts:
+            nightShifts,
+
+        dayDutyHours:
+            Number(
+                profile.dayDutyHours ||
+                profile.dutyHours ||
+                8
+            ),
+
+        nightDutyHours:
+            Number(
+                profile.nightDutyHours ||
+                profile.dutyHours ||
+                8
+            ),
+
+        nightAllowanceRate:
+            nightAllowanceRate,
+
+        nightAllowanceAmount:
+            nightAllowanceAmount,
+
+
+        /* WORK */
+
+        workingHours:
+            Number(
+                workingHours
+                .toFixed(2)
+            ),
+
+        otHours:
+            Number(
+                otHours
+                .toFixed(2)
+            ),
+
+        otRate:
+            otRate,
+
+        overtimeAmount:
+            overtimeAmount,
+
+
+        /* EARNINGS */
+
+        earnedSalary:
+            earnedSalary,
+
+        bonus:
+            bonus,
+
+        grossSalary:
+            grossSalary,
+
+
+        /* PF */
+
+        pfPercent:
+            pfPercent,
+
+        pfAmount:
+            pfAmount,
+
+        pfDeductionMode:
+            pfDeductionMode,
+
+
+        /* ESIC */
+
+        esicPercent:
+            esicPercent,
+
+        esicAmount:
+            esicAmount,
+
+        esicDeductionMode:
+            esicDeductionMode,
+
+
+        /* CANTEEN */
+
+        canteenPerDay:
+            canteenPerDay,
+
+        canteenDays:
+            canteenDays,
+
+        canteenAmount:
+            canteenAmount,
+
+
+        /* OTHER */
+
+        advance:
+            advance,
+
+        otherDeductionMode:
+            otherDeductionMode,
+
+        extraDeduction:
+            extraDeduction,
+
+        totalDeduction:
+            totalDeduction,
+
+        netSalary:
+            netSalary,
+
+
+        /* EMPLOYEE SNAPSHOT */
+
+        designation:
+            profile.designation ||
+            "",
+
+        department:
+            profile.department ||
+            "",
+
+        doj:
+            profile.doj ||
+            "",
+
+        location:
+            profile.location ||
+            "",
+
+        bankName:
+            profile.bankName ||
+            "",
+
+        accountNumber:
+            profile.accountNumber ||
+            "",
+
+        ifsc:
+            profile.ifsc ||
+            "",
+
+        uan:
+            profile.uan ||
+            "",
+
+        esicNumber:
+            profile.esicNumber ||
+            "",
+
+        pan:
+            profile.pan ||
+            "",
+
+
+        generatedAt:
+            new Date()
+            .toISOString()
+    };
+}
+
+
+/* ==========================================
+   SAVE SALARY
+========================================== */
+
+function saveCurrentSalary(){
+
+    const salary =
+        calculateSalary();
+
+
+    if(!salary){
+
+        alert(
+            "Salary could not be calculated."
+        );
+
+        return;
+    }
+
+
+    const profile =
+        getActiveProfile();
+
+
+    if(!profile){
+
+        return;
+    }
+
+
+    if(!salary.month){
+
+        alert(
+            "Please select salary month."
+        );
+
+        return;
+    }
+
+
+    /*
+      Existing saved salary protection.
+    */
+
+    if(
+        profile.salaries &&
+        profile.salaries[
+            salary.month
+        ]
+    ){
+
+        const yes =
+            confirm(
+                "Salary for " +
+                salary.month +
+                " is already saved for this profile.\n\nReplace it?"
+            );
+
+
+        if(!yes){
+
+            return;
+        }
+    }
+
+
+    createAutoBackup(
+        "Before Salary Save"
+    );
+
+
+    profile.salaries =
+        profile.salaries ||
+        {};
+
+
+    profile.salaries[
+        salary.month
+    ] = salary;
+
+
+    const saved =
+        saveActiveProfile(
+            profile
+        );
+
+
+    if(!saved){
+
+        alert(
+            "Salary could not be saved."
+        );
+
+        return;
+    }
+
+
+    /*
+      Salary slip ko pata chalega
+      kaunsi profile + month open karna hai.
+    */
+
+    localStorage.setItem(
+        "selectedSalaryMonth",
+        salary.month
+    );
+
+
+    localStorage.setItem(
+        "selectedSalaryProfileId",
+        profile.id
+    );
+
+
+    createAutoBackup(
+        "Salary Saved - " +
+        salary.month
+    );
+
+
+    location.href =
+        "salary-slip.html";
+}
+
+
+/* ==========================================
+   START
+========================================== */
+
+sEl(
+    "salaryMonth"
+).value =
+    getMonthKey();
+
+
+loadSalaryProfile();
+
+loadSavedAdjustments();
+
+calculateSalary();
+
+</script>
+
+</body>
+</html>

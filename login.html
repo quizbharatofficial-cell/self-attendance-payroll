@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<meta name="theme-color" content="#1565c0">
+
+<title>Login - Self Attendance</title>
+
+<link rel="stylesheet" href="./style.css">
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:#f4f6f8;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    font-family:Arial,sans-serif;
+}
+
+.auth-container{
+    width:100%;
+    max-width:400px;
+}
+
+.logo-box{
+    text-align:center;
+    margin-bottom:22px;
+}
+
+.logo{
+    width:75px;
+    height:75px;
+    margin:auto;
+    border-radius:20px;
+    background:#1565c0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:36px;
+}
+
+.logo-box h1{
+    margin:12px 0 4px;
+    color:#1565c0;
+    font-size:25px;
+}
+
+.logo-box p{
+    margin:0;
+    color:#777;
+    font-size:12px;
+}
+
+.auth-card{
+    background:white;
+    padding:22px;
+    border-radius:16px;
+    box-shadow:0 4px 20px rgba(0,0,0,.08);
+}
+
+.auth-card h2{
+    margin:0 0 5px;
+}
+
+.subtitle{
+    color:#777;
+    font-size:11px;
+    margin:0 0 20px;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
+    display:block;
+    font-size:10px;
+    font-weight:bold;
+    margin-bottom:6px;
+    color:#555;
+}
+
+.form-input{
+    width:100%;
+    padding:13px;
+    border:1px solid #ddd;
+    border-radius:9px;
+    font-size:14px;
+    outline:none;
+}
+
+.form-input:focus{
+    border-color:#1565c0;
+}
+
+.password-wrap{
+    position:relative;
+}
+
+.password-wrap input{
+    padding-right:55px;
+}
+
+.show-btn{
+    position:absolute;
+    right:8px;
+    top:50%;
+    transform:translateY(-50%);
+    border:0;
+    background:transparent;
+    color:#1565c0;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.login-btn{
+    width:100%;
+    padding:14px;
+    border:0;
+    border-radius:9px;
+    background:#1565c0;
+    color:white;
+    font-weight:bold;
+    font-size:14px;
+    margin-top:5px;
+}
+
+.message{
+    display:none;
+    padding:10px;
+    margin-bottom:15px;
+    border-radius:8px;
+    font-size:11px;
+}
+
+.message.error{
+    display:block;
+    background:#ffebee;
+    color:#c62828;
+}
+
+.signup-link{
+    text-align:center;
+    margin-top:18px;
+    font-size:11px;
+    color:#666;
+}
+
+.signup-link a{
+    color:#1565c0;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.offline-info{
+    text-align:center;
+    margin-top:15px;
+    color:#888;
+    font-size:9px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="auth-container">
+
+<div class="logo-box">
+
+<div class="logo">
+🔐
+</div>
+
+<h1>
+Self Attendance
+</h1>
+
+<p>
+Attendance & Payroll
+</p>
+
+</div>
+
+
+<div class="auth-card">
+
+<h2>
+Login
+</h2>
+
+<p class="subtitle">
+Login to your offline account
+</p>
+
+
+<div
+id="message"
+class="message">
+</div>
+
+
+<div class="form-group">
+
+<label>
+USERNAME
+</label>
+
+<input
+type="text"
+id="username"
+class="form-input"
+placeholder="Enter username"
+autocomplete="username">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+PASSWORD
+</label>
+
+<div class="password-wrap">
+
+<input
+type="password"
+id="password"
+class="form-input"
+placeholder="Enter password"
+autocomplete="current-password">
+
+<button
+type="button"
+class="show-btn"
+onclick="togglePassword()">
+SHOW
+</button>
+
+</div>
+
+</div>
+
+
+<button
+type="button"
+class="login-btn"
+onclick="loginUser()">
+
+Login
+
+</button>
+
+
+<div class="signup-link">
+
+Don't have an account?
+
+<a href="./signup.html">
+Create Account
+</a>
+
+</div>
+
+</div>
+
+
+<div class="offline-info">
+🔒 100% Offline Login
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   STORAGE
+========================================= */
+
+const AUTH_USER_KEY =
+    "selfAttendanceOfflineUser";
+
+const AUTH_SESSION_KEY =
+    "selfAttendanceLoginSession";
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+function showMessage(text){
+
+    const box =
+        document.getElementById(
+            "message"
+        );
+
+    box.textContent =
+        text;
+
+    box.className =
+        "message error";
+}
+
+
+/* =========================================
+   PASSWORD SHOW / HIDE
+========================================= */
+
+function togglePassword(){
+
+    const input =
+        document.getElementById(
+            "password"
+        );
+
+    const button =
+        document.querySelector(
+            ".show-btn"
+        );
+
+
+    if(
+        input.type ===
+        "password"
+    ){
+
+        input.type =
+            "text";
+
+        button.textContent =
+            "HIDE";
+
+    }else{
+
+        input.type =
+            "password";
+
+        button.textContent =
+            "SHOW";
+    }
+}
+
+
+/* =========================================
+   PASSWORD HASH
+========================================= */
+
+async function hashPassword(password){
+
+    const data =
+        new TextEncoder()
+        .encode(password);
+
+
+    const hashBuffer =
+        await crypto.subtle.digest(
+            "SHA-256",
+            data
+        );
+
+
+    const hashArray =
+        Array.from(
+            new Uint8Array(
+                hashBuffer
+            )
+        );
+
+
+    return hashArray
+        .map(
+            byte =>
+                byte
+                .toString(16)
+                .padStart(2,"0")
+        )
+        .join("");
+}
+
+
+/* =========================================
+   LOGIN
+========================================= */
+
+async function loginUser(){
+
+    const username =
+        document
+        .getElementById(
+            "username"
+        )
+        .value
+        .trim();
+
+
+    const password =
+        document
+        .getElementById(
+            "password"
+        )
+        .value;
+
+
+    if(
+        !username ||
+        !password
+    ){
+
+        showMessage(
+            "Enter username and password."
+        );
+
+        return;
+    }
+
+
+    const stored =
+        localStorage.getItem(
+            AUTH_USER_KEY
+        );
+
+
+    if(!stored){
+
+        showMessage(
+            "No account found. Please create an account first."
+        );
+
+        return;
+    }
+
+
+    let account;
+
+
+    try{
+
+        account =
+            JSON.parse(
+                stored
+            );
+
+    }catch(error){
+
+        showMessage(
+            "Account data is invalid."
+        );
+
+        return;
+    }
+
+
+    try{
+
+        const enteredHash =
+            await hashPassword(
+                password
+            );
+
+
+        if(
+            username !==
+            account.username ||
+            enteredHash !==
+            account.passwordHash
+        ){
+
+            showMessage(
+                "Incorrect username or password."
+            );
+
+            return;
+        }
+
+
+        /*
+          Login session.
+
+          sessionStorage means:
+          browser/app session close hone
+          ke baad login dobara required.
+        */
+
+        sessionStorage.setItem(
+            AUTH_SESSION_KEY,
+            JSON.stringify({
+                loggedIn:true,
+                username:
+                    account.username,
+                loginAt:
+                    new Date()
+                    .toISOString()
+            })
+        );
+
+
+        /*
+          Dashboard.
+        */
+
+/* =========================================
+   MPIN REDIRECT
+========================================= */
+
+const MPIN_KEY =
+    "selfAttendanceMpin";
+
+const RESET_MPIN_KEY =
+    "selfAttendanceResetMpin";
+
+
+const existingMpin =
+    localStorage.getItem(
+        MPIN_KEY
+    );
+
+
+const resetMpin =
+    sessionStorage.getItem(
+        RESET_MPIN_KEY
+    );
+
+
+/*
+  Forgot MPIN se password login hua hai.
+  Purana MPIN remove karke naya setup.
+*/
+
+if(
+    resetMpin === "true"
+){
+
+    localStorage.removeItem(
+        MPIN_KEY
+    );
+
+    sessionStorage.removeItem(
+        RESET_MPIN_KEY
+    );
+
+    location.replace(
+        "./setup-mpin.html"
+    );
+
+    return;
+}
+
+
+/*
+  First login:
+  MPIN abhi bana nahi hai.
+*/
+
+if(!existingMpin){
+
+    location.replace(
+        "./setup-mpin.html"
+    );
+
+    return;
+}
+
+
+/*
+  MPIN already configured.
+  Password login successful hai,
+  isliye Dashboard open kar sakte hain.
+*/
+
+location.replace(
+    "./index.html"
+);
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "Login failed."
+        );
+    }
+}
+
+
+/* =========================================
+   ALREADY LOGGED IN
+========================================= */
+
+function checkExistingSession(){
+
+    const session =
+        sessionStorage.getItem(
+            AUTH_SESSION_KEY
+        );
+
+
+    if(!session){
+        return;
+    }
+
+
+    try{
+
+        const data =
+            JSON.parse(
+                session
+            );
+
+
+        if(data.loggedIn){
+
+            location.replace(
+                "./index.html"
+            );
+        }
+
+    }catch(error){
+
+        sessionStorage.removeItem(
+            AUTH_SESSION_KEY
+        );
+    }
+}
+
+
+/* =========================================
+   ENTER KEY
+========================================= */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key ===
+            "Enter"
+        ){
+
+            loginUser();
+        }
+    }
+);
+
+
+checkExistingSession();
+
+</script>
+
+</body>
+</html>
