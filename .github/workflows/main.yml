@@ -1,4 +1,4 @@
-name: Build ABSS Android APK
+name: Build Self HRMS Android APK
 
 on:
   workflow_dispatch:
