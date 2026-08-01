@@ -1,0 +1,42 @@
+name: Build ABSS Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Copy web files to Android assets
+        run: |
+          mkdir -p app/src/main/assets
+          cp -f *.html app/src/main/assets/ || true
+          cp -f *.css app/src/main/assets/ || true
+          cp -f *.js app/src/main/assets/ || true
+          cp -f *.json app/src/main/assets/ || true
+          cp -f *.png app/src/main/assets/ || true
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Debug APK
+        run: gradle :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ABSS-Self-Attendance-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
