@@ -244,7 +244,7 @@ Backup is stored as a JSON file.
 
 <button
 class="action-btn restore-btn"
-onclick="document.getElementById('restoreFile').click()">
+onclick="selectBackupFile()">
 ⬆ Select Backup File
 </button>
 
@@ -445,24 +445,6 @@ async function downloadBackup(){
         time +
         ".json";
 
-    // Installed Android app: use native bridge.
-    if(
-        typeof Android !== "undefined" &&
-        typeof Android.shareBackup === "function"
-    ){
-        Android.shareBackup(
-            json,
-            fileName
-        );
-
-        bEl("backupFileInfo").textContent =
-            "Backup ready to save/share: " + fileName;
-
-        renderAutoBackups();
-        return;
-    }
-
-    // Browser/PWA fallback.
     const file =
         new File(
             [json],
@@ -477,7 +459,7 @@ async function downloadBackup(){
     ){
         try{
             await navigator.share({
-                title:"Self HRMS Backup",
+                title:"Self Attendance Backup",
                 text:"Save this backup file to Files or Google Drive.",
                 files:[file]
             });
@@ -496,55 +478,12 @@ async function downloadBackup(){
         }
     }
 
-    // Standard browser download fallback.
-    try{
-        const blob =
-            new Blob(
-                [json],
-                {type:"application/json"}
-            );
+    bEl("backupFileInfo").textContent =
+        "This browser cannot export backup files safely.";
 
-        const url =
-            URL.createObjectURL(blob);
-
-        const link =
-            document.createElement("a");
-
-        link.href =
-            url;
-
-        link.download =
-            fileName;
-
-        document.body.appendChild(
-            link
-        );
-
-        link.click();
-
-        link.remove();
-
-        setTimeout(
-            () => URL.revokeObjectURL(url),
-            1000
-        );
-
-        bEl("backupFileInfo").textContent =
-            "Backup downloaded: " + fileName;
-
-        renderAutoBackups();
-
-    }catch(error){
-
-        console.error(error);
-
-        bEl("backupFileInfo").textContent =
-            "Backup export failed.";
-
-        alert(
-            "Backup file could not be exported on this device."
-        );
-    }
+    alert(
+        "Acode browser cannot safely download this backup file. Open the app in Chrome / installed PWA and use this button there."
+    );
 }
 
 
@@ -592,8 +531,6 @@ async function saveBackupToDrive(){
         time +
         ".json";
 
-    // Installed Android app:
-    // MainActivity creates the JSON file and opens Android Share Sheet.
     if(
         typeof Android !== "undefined" &&
         typeof Android.shareBackup === "function"
@@ -610,7 +547,6 @@ async function saveBackupToDrive(){
         return;
     }
 
-    // Browser/PWA fallback.
     const file =
         new File(
             [json],
@@ -737,6 +673,204 @@ function validateBackup(data){
 }
 
 
+
+/* ==========================================
+   SELECT BACKUP FILE
+   Android APK opens the system picker.
+   Browser falls back to the existing file input.
+========================================== */
+
+function selectBackupFile(){
+
+    if(
+        typeof Android !== "undefined" &&
+        typeof Android.selectBackupFile === "function"
+    ){
+        Android.selectBackupFile();
+        return;
+    }
+
+    document.getElementById(
+        "restoreFile"
+    ).click();
+}
+
+
+/* ==========================================
+   RESTORE BACKUP DATA
+   Shared by browser file input and Android picker.
+========================================== */
+
+function restoreBackupData(data){
+
+    const validation =
+        validateBackup(
+            data
+        );
+
+    if(
+        !validation.valid
+    ){
+        alert(
+            validation.message
+        );
+        return false;
+    }
+
+    const profileTotal =
+        data.profiles.length;
+
+    let attendanceTotal = 0;
+    let salaryTotal = 0;
+
+    data.profiles
+    .forEach(profile => {
+
+        attendanceTotal +=
+            Object.keys(
+                profile.attendance ||
+                {}
+            ).length;
+
+        salaryTotal +=
+            Object.keys(
+                profile.salaries ||
+                {}
+            ).length;
+    });
+
+    const yes =
+        confirm(
+            "Restore this backup?\n\n" +
+            "Profiles: " +
+            profileTotal +
+            "\n" +
+            "Attendance Records: " +
+            attendanceTotal +
+            "\n" +
+            "Salary Records: " +
+            salaryTotal +
+            "\n\n" +
+            "Current app data will be replaced."
+        );
+
+    if(!yes){
+        return false;
+    }
+
+    createAutoBackup(
+        "Before File Restore"
+    );
+
+    saveProfiles(
+        data.profiles
+    );
+
+    const activeExists =
+        data.profiles
+        .some(
+            profile =>
+                profile.id ===
+                data.activeProfileId
+        );
+
+    if(
+        data.activeProfileId &&
+        activeExists
+    ){
+        localStorage.setItem(
+            ACTIVE_PROFILE_KEY,
+            data.activeProfileId
+        );
+    }else{
+        localStorage.setItem(
+            ACTIVE_PROFILE_KEY,
+            data.profiles[0].id
+        );
+    }
+
+    if(
+        data.selectedSalaryMonth
+    ){
+        localStorage.setItem(
+            "selectedSalaryMonth",
+            data.selectedSalaryMonth
+        );
+    }else{
+        localStorage.removeItem(
+            "selectedSalaryMonth"
+        );
+    }
+
+    localStorage.removeItem(
+        "selectedSalaryProfileId"
+    );
+
+    createAutoBackup(
+        "File Restore Completed"
+    );
+
+    alert(
+        "Backup restored successfully."
+    );
+
+    location.href =
+        "index.html";
+
+    return true;
+}
+
+
+/* ==========================================
+   ANDROID RESTORE BRIDGE
+   MainActivity passes Base64 encoded JSON here.
+========================================== */
+
+window.restoreBackupFromAndroid =
+function(base64Data){
+
+    try{
+
+        const binary =
+            atob(
+                base64Data
+            );
+
+        const bytes =
+            Uint8Array.from(
+                binary,
+                char =>
+                    char.charCodeAt(0)
+            );
+
+        const jsonText =
+            new TextDecoder(
+                "utf-8"
+            ).decode(
+                bytes
+            );
+
+        const data =
+            JSON.parse(
+                jsonText
+            );
+
+        restoreBackupData(
+            data
+        );
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+        alert(
+            "Backup file could not be read. Please select a valid JSON backup file."
+        );
+    }
+};
+
 /* ==========================================
    RESTORE FILE
 ========================================== */
@@ -746,19 +880,15 @@ function restoreFromFile(event){
     const input =
         event.target;
 
-
     const file =
         input.files?.[0];
-
 
     if(!file){
         return;
     }
 
-
     const reader =
         new FileReader();
-
 
     reader.onload =
     function(){
@@ -770,192 +900,23 @@ function restoreFromFile(event){
                     reader.result
                 );
 
-
-            const validation =
-                validateBackup(
-                    data
-                );
-
-
-            if(
-                !validation.valid
-            ){
-
-                alert(
-                    validation.message
-                );
-
-                input.value = "";
-
-                return;
-            }
-
-
-            const profileTotal =
-                data.profiles.length;
-
-
-            let attendanceTotal = 0;
-
-            let salaryTotal = 0;
-
-
-            data.profiles
-            .forEach(profile => {
-
-                attendanceTotal +=
-                    Object.keys(
-                        profile.attendance ||
-                        {}
-                    ).length;
-
-
-                salaryTotal +=
-                    Object.keys(
-                        profile.salaries ||
-                        {}
-                    ).length;
-            });
-
-
-            const yes =
-                confirm(
-                    "Restore this backup?\n\n" +
-
-                    "Profiles: " +
-                    profileTotal +
-                    "\n" +
-
-                    "Attendance Records: " +
-                    attendanceTotal +
-                    "\n" +
-
-                    "Salary Records: " +
-                    salaryTotal +
-                    "\n\n" +
-
-                    "Current app data will be replaced."
-                );
-
-
-            if(!yes){
-
-                input.value = "";
-
-                return;
-            }
-
-
-            /*
-              IMPORTANT:
-              Existing current data ka
-              safety backup first.
-            */
-
-            createAutoBackup(
-                "Before File Restore"
+            restoreBackupData(
+                data
             );
-
-
-            /*
-              Restore profiles.
-            */
-
-            saveProfiles(
-                data.profiles
-            );
-
-
-            /*
-              Restore Active Profile.
-            */
-
-            const activeExists =
-                data.profiles
-                .some(
-                    profile =>
-                        profile.id ===
-                        data.activeProfileId
-                );
-
-
-            if(
-                data.activeProfileId &&
-                activeExists
-            ){
-
-                localStorage.setItem(
-                    ACTIVE_PROFILE_KEY,
-                    data.activeProfileId
-                );
-
-            }else{
-
-                localStorage.setItem(
-                    ACTIVE_PROFILE_KEY,
-                    data.profiles[0].id
-                );
-            }
-
-
-            /*
-              Selected salary month.
-            */
-
-            if(
-                data.selectedSalaryMonth
-            ){
-
-                localStorage.setItem(
-                    "selectedSalaryMonth",
-                    data.selectedSalaryMonth
-                );
-
-            }else{
-
-                localStorage.removeItem(
-                    "selectedSalaryMonth"
-                );
-            }
-
-
-            /*
-              Salary profile selection
-              reset because old selected ID
-              may not exist.
-            */
-
-            localStorage.removeItem(
-                "selectedSalaryProfileId"
-            );
-
-
-            createAutoBackup(
-                "File Restore Completed"
-            );
-
-
-            alert(
-                "Backup restored successfully."
-            );
-
-
-            location.href =
-                "index.html";
-
 
         }catch(error){
 
-            console.error(error);
+            console.error(
+                error
+            );
 
             alert(
                 "Backup file could not be read. Please select a valid JSON backup file."
             );
-
-            input.value = "";
         }
-    };
 
+        input.value = "";
+    };
 
     reader.onerror =
     function(){
@@ -966,7 +927,6 @@ function restoreFromFile(event){
 
         input.value = "";
     };
-
 
     reader.readAsText(
         file
