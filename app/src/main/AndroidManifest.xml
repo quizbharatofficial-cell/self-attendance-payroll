@@ -5,11 +5,12 @@
     <!-- Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Live Attendance Foreground Service -->
+    <!-- Foreground Service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <!-- Android 13+ Notification Permission -->
+    <!-- Android 13+ Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
 
     <application
         android:allowBackup="true"
@@ -19,35 +20,52 @@
         android:theme="@style/Theme.SelfAttendance"
         android:usesCleartextTraffic="false">
 
-        <!-- Main App -->
+
+        <!-- ============================= -->
+        <!-- MAIN ACTIVITY -->
+        <!-- ============================= -->
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+
+                <action
+                    android:name="android.intent.action.MAIN" />
+
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
+
             </intent-filter>
 
         </activity>
 
 
-        <!-- Live Attendance Notification Service -->
+        <!-- ============================= -->
+        <!-- LIVE ATTENDANCE SERVICE -->
+        <!-- ============================= -->
+
         <service
             android:name=".AttendanceService"
             android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="specialUse" />
+            android:exported="false" />
 
 
-        <!-- Attendance Home Screen Widget -->
+        <!-- ============================= -->
+        <!-- HOME SCREEN WIDGET -->
+        <!-- ============================= -->
+
         <receiver
             android:name=".AttendanceWidget"
             android:enabled="true"
             android:exported="false">
 
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+
+                <action
+                    android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+
             </intent-filter>
 
             <meta-data
@@ -55,6 +73,24 @@
                 android:resource="@xml/attendance_widget_info" />
 
         </receiver>
+
+
+        <!-- ============================= -->
+        <!-- BACKUP / GOOGLE DRIVE SHARE -->
+        <!-- ============================= -->
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+
+        </provider>
+
 
     </application>
 
