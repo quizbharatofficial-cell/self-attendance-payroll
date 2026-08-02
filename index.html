@@ -447,6 +447,49 @@ href="./style.css">
     font-weight:bold;
 }
 
+
+/* ==============================
+   NATIVE APP UPDATE
+============================== */
+
+.native-update-card{
+    background:white;
+    padding:16px;
+    border-radius:13px;
+    margin-bottom:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,.07);
+}
+
+.native-update-card h3{
+    margin:0 0 6px;
+    font-size:14px;
+}
+
+.native-update-card p{
+    margin:0 0 12px;
+    color:#777;
+    font-size:10px;
+}
+
+.native-update-card button{
+    width:100%;
+    border:0;
+    background:#1565c0;
+    color:white;
+    padding:12px;
+    border-radius:9px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.native-update-card .app-version{
+    display:block;
+    margin-top:9px;
+    text-align:center;
+    color:#777;
+    font-size:9px;
+}
+
 </style>
 
 </head>
@@ -920,6 +963,35 @@ All Profiles • Attendance • Salary
 
 </section>
 
+
+
+<!-- ==============================
+     NATIVE APP UPDATE
+============================== -->
+
+<section class="native-update-card">
+
+<h3>
+🔄 Self HRMS Update
+</h3>
+
+<p>
+Check GitHub for the latest Android version and install it without uninstalling Self HRMS.
+</p>
+
+<button
+    type="button"
+    onclick="checkNativeAppUpdate()">
+Check for Update
+</button>
+
+<span
+    id="nativeAppVersion"
+    class="app-version">
+Current Version: --
+</span>
+
+</section>
 
 </main>
 
@@ -1552,6 +1624,107 @@ if(
 
 
 
+
+/* ========================================
+   NATIVE ANDROID APP UPDATE
+======================================== */
+
+function isSelfHrmsAndroidApp(){
+
+    return (
+        typeof Android !== "undefined" &&
+        Android !== null
+    );
+}
+
+
+function checkNativeAppUpdate(){
+
+    if(
+        !isSelfHrmsAndroidApp() ||
+        typeof Android.checkForUpdate !==
+        "function"
+    ){
+
+        alert(
+            "App update is available only inside the Self HRMS Android app."
+        );
+
+        return;
+    }
+
+
+    try{
+
+        Android.checkForUpdate();
+
+    }catch(error){
+
+        console.error(
+            "Native update error:",
+            error
+        );
+
+        alert(
+            "Could not start update check."
+        );
+    }
+}
+
+
+function loadNativeAppVersion(){
+
+    const versionBox =
+        document.getElementById(
+            "nativeAppVersion"
+        );
+
+
+    if(!versionBox){
+        return;
+    }
+
+
+    if(
+        !isSelfHrmsAndroidApp() ||
+        typeof Android.getAppVersion !==
+        "function"
+    ){
+
+        versionBox.textContent =
+            "Web / PWA Version";
+
+        return;
+    }
+
+
+    try{
+
+        const version =
+            Android.getAppVersion();
+
+
+        versionBox.textContent =
+            "Current Version: " +
+            (
+                version ||
+                "--"
+            );
+
+    }catch(error){
+
+        console.error(
+            "Version read error:",
+            error
+        );
+
+
+        versionBox.textContent =
+            "Current Version: --";
+    }
+}
+
+
 /* ========================================
    START
 ======================================== */
@@ -1565,6 +1738,8 @@ document.addEventListener(
         updateShiftIndicator();
 
         updateConnectionStatus();
+
+        loadNativeAppVersion();
 
     }
 );
