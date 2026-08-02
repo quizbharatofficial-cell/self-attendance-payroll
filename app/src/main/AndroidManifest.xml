@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
-        android:label="Self Attendance"
+        android:label="Self HRMS"
+        android:icon="@drawable/icon_512"
+        android:roundIcon="@drawable/icon_512"
         android:theme="@style/Theme.SelfAttendance"
         android:usesCleartextTraffic="false">
 
