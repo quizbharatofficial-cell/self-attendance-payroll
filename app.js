@@ -1548,7 +1548,7 @@ function punchIn() {
 
 
     updateDashboard();
-
+syncAttendanceToAndroidWidget();
 
     alert(
         (
