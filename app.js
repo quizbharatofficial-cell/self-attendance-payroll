@@ -2897,3 +2897,525 @@ document.addEventListener(
 
     }
 );
+/* =========================================================
+   SELF HRMS - ANDROID WIDGET SYNC
+========================================================= */
+
+function isAndroidApp() {
+    return (
+        typeof Android !== "undefined" &&
+        Android !== null
+    );
+}
+
+
+/* =========================================================
+   APP -> ANDROID WIDGET
+========================================================= */
+
+function syncAttendanceToAndroidWidget() {
+
+    if (!isAndroidApp()) {
+        return;
+    }
+
+    if (
+        typeof Android.updateWidgetPunch !==
+        "function"
+    ) {
+        return;
+    }
+
+    try {
+
+        const active =
+            findActivePunch();
+
+        /*
+         * No active attendance.
+         */
+        if (
+            !active ||
+            !active.record ||
+            !active.record.punchIn
+        ) {
+
+            Android.updateWidgetPunch(
+                0,
+                0
+            );
+
+            return;
+        }
+
+
+        const punchIn =
+            new Date(
+                active.record.punchIn
+            ).getTime();
+
+
+        const punchOut =
+            active.record.punchOut
+                ? new Date(
+                    active.record.punchOut
+                ).getTime()
+                : 0;
+
+
+        if (
+            !Number.isFinite(punchIn) ||
+            punchIn <= 0
+        ) {
+            return;
+        }
+
+
+        Android.updateWidgetPunch(
+            punchIn,
+            Number.isFinite(punchOut)
+                ? punchOut
+                : 0
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "App -> Widget sync error:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   ANDROID WIDGET -> APP
+========================================================= */
+
+window.receiveWidgetAttendance =
+function(
+    widgetPunchIn,
+    widgetPunchOut
+) {
+
+    try {
+
+        widgetPunchIn =
+            Number(widgetPunchIn) || 0;
+
+        widgetPunchOut =
+            Number(widgetPunchOut) || 0;
+
+
+        const profile =
+            getActiveProfile();
+
+
+        if (!profile) {
+
+            console.log(
+                "Widget sync: Active profile not found."
+            );
+
+            return;
+        }
+
+
+        /*
+         * -----------------------------------------------------
+         * WIDGET EMPTY
+         *
+         * If app already has active attendance,
+         * push app attendance into widget.
+         * -----------------------------------------------------
+         */
+
+        if (widgetPunchIn <= 0) {
+
+            const active =
+                findActivePunch();
+
+
+            if (active) {
+
+                syncAttendanceToAndroidWidget();
+            }
+
+            return;
+        }
+
+
+        const widgetInDate =
+            new Date(
+                widgetPunchIn
+            );
+
+
+        if (
+            Number.isNaN(
+                widgetInDate.getTime()
+            )
+        ) {
+            return;
+        }
+
+
+        let active =
+            findActivePunch();
+
+
+        /*
+         * -----------------------------------------------------
+         * WIDGET PUNCH IN -> CREATE APP ATTENDANCE
+         * -----------------------------------------------------
+         */
+
+        if (!active) {
+
+            const records =
+                profile.attendance || {};
+
+
+            const dateKey =
+                getDateKey(
+                    widgetInDate
+                );
+
+
+            /*
+             * Existing completed attendance
+             * must not be overwritten.
+             */
+            if (
+                records[dateKey] &&
+                records[dateKey].punchOut
+            ) {
+
+                console.log(
+                    "Attendance already completed for " +
+                    dateKey
+                );
+
+
+                if (
+                    isAndroidApp() &&
+                    typeof Android.clearWidgetPunch ===
+                    "function"
+                ) {
+
+                    Android.clearWidgetPunch();
+                }
+
+                return;
+            }
+
+
+            const shift =
+                profile.defaultShift ||
+                "day";
+
+
+            records[dateKey] = {
+
+                date:
+                    dateKey,
+
+                status:
+                    "present",
+
+                shift:
+                    shift,
+
+                punchIn:
+                    widgetInDate.toISOString(),
+
+                punchOut:
+                    null,
+
+                workingMinutes:
+                    0,
+
+                overtimeMinutes:
+                    0,
+
+                manual:
+                    false
+            };
+
+
+            profile.attendance =
+                records;
+
+
+            saveActiveProfile(
+                profile
+            );
+
+
+            if (
+                typeof createAutoBackup ===
+                "function"
+            ) {
+
+                createAutoBackup(
+                    "Widget Punch In"
+                );
+            }
+
+
+            active = {
+
+                date:
+                    dateKey,
+
+                record:
+                    records[dateKey]
+            };
+        }
+
+
+        /*
+         * -----------------------------------------------------
+         * WIDGET PUNCH OUT -> COMPLETE APP ATTENDANCE
+         * -----------------------------------------------------
+         */
+
+        if (
+            widgetPunchOut > 0 &&
+            active &&
+            active.record &&
+            !active.record.punchOut
+        ) {
+
+            const records =
+                profile.attendance || {};
+
+
+            const record =
+                records[
+                    active.date
+                ];
+
+
+            if (!record) {
+                return;
+            }
+
+
+            const punchInDate =
+                new Date(
+                    record.punchIn
+                );
+
+
+            const punchOutDate =
+                new Date(
+                    widgetPunchOut
+                );
+
+
+            if (
+                Number.isNaN(
+                    punchInDate.getTime()
+                ) ||
+                Number.isNaN(
+                    punchOutDate.getTime()
+                )
+            ) {
+                return;
+            }
+
+
+            let workingMinutes =
+                Math.floor(
+                    (
+                        punchOutDate.getTime() -
+                        punchInDate.getTime()
+                    ) / 60000
+                );
+
+
+            workingMinutes =
+                Math.max(
+                    0,
+                    workingMinutes
+                );
+
+
+            const shift =
+                record.shift ||
+                "day";
+
+
+            let dutyHours = 8;
+
+
+            if (
+                typeof getDutyHours ===
+                "function"
+            ) {
+
+                dutyHours =
+                    Number(
+                        getDutyHours(
+                            shift
+                        )
+                    ) || 8;
+            }
+
+
+            const overtimeMinutes =
+                Math.max(
+                    0,
+                    workingMinutes -
+                    (
+                        dutyHours *
+                        60
+                    )
+                );
+
+
+            record.punchOut =
+                punchOutDate.toISOString();
+
+
+            record.workingMinutes =
+                workingMinutes;
+
+
+            record.overtimeMinutes =
+                overtimeMinutes;
+
+
+            record.status =
+                record.status ||
+                "present";
+
+
+            record.shift =
+                shift;
+
+
+            records[
+                active.date
+            ] = record;
+
+
+            profile.attendance =
+                records;
+
+
+            saveActiveProfile(
+                profile
+            );
+
+
+            if (
+                typeof createAutoBackup ===
+                "function"
+            ) {
+
+                createAutoBackup(
+                    "Widget Punch Out"
+                );
+            }
+
+
+            /*
+             * Widget attendance has safely
+             * been copied to app.
+             */
+            if (
+                isAndroidApp() &&
+                typeof Android.clearWidgetPunch ===
+                "function"
+            ) {
+
+                Android.clearWidgetPunch();
+            }
+        }
+
+
+        /*
+         * Refresh dashboard.
+         */
+        if (
+            typeof updateDashboard ===
+            "function"
+        ) {
+
+            updateDashboard();
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Widget -> App sync error:",
+            error
+        );
+    }
+};
+
+
+/* =========================================================
+   INITIAL SYNC
+========================================================= */
+
+function initializeAndroidWidgetSync() {
+
+    if (!isAndroidApp()) {
+        return;
+    }
+
+
+    setTimeout(
+        function() {
+
+            syncAttendanceToAndroidWidget();
+
+        },
+        700
+    );
+}
+
+
+/*
+ * Page load.
+ */
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeAndroidWidgetSync
+    );
+
+} else {
+
+    initializeAndroidWidgetSync();
+}
+
+
+/*
+ * App becomes visible again.
+ */
+document.addEventListener(
+    "visibilitychange",
+    function() {
+
+        if (
+            document.visibilityState ===
+            "visible"
+        ) {
+
+            setTimeout(
+                syncAttendanceToAndroidWidget,
+                300
+            );
+        }
+    }
+);
