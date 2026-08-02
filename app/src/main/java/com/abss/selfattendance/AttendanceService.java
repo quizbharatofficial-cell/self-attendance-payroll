@@ -29,38 +29,84 @@ public class AttendanceService extends Service {
     private static final String CHANNEL_ID =
             "self_hrms_attendance";
 
-    private static final int NOTIFICATION_ID = 1001;
+    private static final int NOTIFICATION_ID =
+            1001;
 
-    private final Handler handler =
-            new Handler(Looper.getMainLooper());
+    private Handler handler;
+
+    private boolean foregroundStarted =
+            false;
+
+
+    /*
+     * =========================================================
+     * TIMER
+     * =========================================================
+     */
 
     private final Runnable timerRunnable =
             new Runnable() {
+
                 @Override
                 public void run() {
 
+                    if (!isAttendanceActive()) {
+
+                        stopAttendanceService();
+                        return;
+                    }
+
+
                     updateNotification();
 
-                    // Also refresh widget working time.
+
+                    /*
+                     * Refresh widget so its displayed
+                     * working duration also gets updated.
+                     */
                     AttendanceWidget.refreshAllWidgets(
                             AttendanceService.this
                     );
 
-                    handler.postDelayed(
-                            this,
-                            1000
-                    );
+
+                    if (handler != null) {
+
+                        handler.postDelayed(
+                                this,
+                                1000
+                        );
+                    }
                 }
             };
 
 
+    /*
+     * =========================================================
+     * SERVICE CREATED
+     * =========================================================
+     */
+
     @Override
     public void onCreate() {
+
         super.onCreate();
+
+
+        handler =
+                new Handler(
+                        Looper.getMainLooper()
+                );
+
 
         createNotificationChannel();
     }
 
+
+    /*
+     * =========================================================
+     * SERVICE START
+     * =========================================================
+     */
 
     @Override
     public int onStartCommand(
@@ -69,29 +115,100 @@ public class AttendanceService extends Service {
             int startId
     ) {
 
-        String action =
-                intent != null
-                        ? intent.getAction()
-                        : null;
-
-
         /*
-         * PUNCH OUT from notification/service.
+         * IMPORTANT:
+         *
+         * If Android launched us using
+         * startForegroundService(), promote this
+         * service to foreground immediately.
+         *
+         * Do this BEFORE checking attendance state.
          */
-        if (ACTION_STOP.equals(action)) {
+        try {
 
-            completePunchOut();
-
-            handler.removeCallbacks(
-                    timerRunnable
+            startForeground(
+                    NOTIFICATION_ID,
+                    buildNotification()
             );
 
-            stopForeground(true);
+            foregroundStarted =
+                    true;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
             stopSelf();
 
             return START_NOT_STICKY;
         }
 
+
+        String action =
+                intent != null
+                        ? intent.getAction()
+                        : ACTION_START;
+
+
+        /*
+         * =====================================================
+         * STOP ACTION
+         * =====================================================
+         */
+
+        if (ACTION_STOP.equals(action)) {
+
+            completePunchOut();
+
+            stopAttendanceService();
+
+            return START_NOT_STICKY;
+        }
+
+
+        /*
+         * =====================================================
+         * NO ACTIVE ATTENDANCE
+         * =====================================================
+         */
+
+        if (!isAttendanceActive()) {
+
+            stopAttendanceService();
+
+            return START_NOT_STICKY;
+        }
+
+
+        /*
+         * =====================================================
+         * START / RESTART TIMER
+         * =====================================================
+         */
+
+        if (handler != null) {
+
+            handler.removeCallbacks(
+                    timerRunnable
+            );
+
+            handler.post(
+                    timerRunnable
+            );
+        }
+
+
+        return START_STICKY;
+    }
+
+
+    /*
+     * =========================================================
+     * CHECK ACTIVE ATTENDANCE
+     * =========================================================
+     */
+
+    private boolean isAttendanceActive() {
 
         SharedPreferences prefs =
                 getSharedPreferences(
@@ -99,11 +216,13 @@ public class AttendanceService extends Service {
                         MODE_PRIVATE
                 );
 
+
         long punchIn =
                 prefs.getLong(
                         AttendanceWidget.KEY_PUNCH_IN,
                         0
                 );
+
 
         long punchOut =
                 prefs.getLong(
@@ -112,44 +231,17 @@ public class AttendanceService extends Service {
                 );
 
 
-        /*
-         * Nothing active, so service does not need
-         * to keep running.
-         */
-        if (punchIn <= 0 || punchOut > 0) {
-
-            stopSelf();
-            return START_NOT_STICKY;
-        }
-
-
-        /*
-         * Android requires foreground service to
-         * display its notification immediately.
-         */
-        startForeground(
-                NOTIFICATION_ID,
-                buildNotification()
-        );
-
-
-        handler.removeCallbacks(
-                timerRunnable
-        );
-
-        handler.post(
-                timerRunnable
-        );
-
-
-        return START_STICKY;
+        return punchIn > 0 &&
+                punchOut == 0;
     }
 
 
     /*
-     * Save Punch OUT when user taps the
-     * notification PUNCH OUT action.
+     * =========================================================
+     * COMPLETE PUNCH OUT
+     * =========================================================
      */
+
     private void completePunchOut() {
 
         SharedPreferences prefs =
@@ -158,11 +250,13 @@ public class AttendanceService extends Service {
                         MODE_PRIVATE
                 );
 
+
         long punchIn =
                 prefs.getLong(
                         AttendanceWidget.KEY_PUNCH_IN,
                         0
                 );
+
 
         long punchOut =
                 prefs.getLong(
@@ -171,7 +265,10 @@ public class AttendanceService extends Service {
                 );
 
 
-        if (punchIn > 0 && punchOut == 0) {
+        if (
+                punchIn > 0 &&
+                punchOut == 0
+        ) {
 
             prefs.edit()
                     .putLong(
@@ -188,40 +285,17 @@ public class AttendanceService extends Service {
     }
 
 
+    /*
+     * =========================================================
+     * UPDATE LIVE NOTIFICATION
+     * =========================================================
+     */
+
     private void updateNotification() {
 
-        SharedPreferences prefs =
-                getSharedPreferences(
-                        AttendanceWidget.PREFS,
-                        MODE_PRIVATE
-                );
+        if (!isAttendanceActive()) {
 
-        long punchIn =
-                prefs.getLong(
-                        AttendanceWidget.KEY_PUNCH_IN,
-                        0
-                );
-
-        long punchOut =
-                prefs.getLong(
-                        AttendanceWidget.KEY_PUNCH_OUT,
-                        0
-                );
-
-
-        /*
-         * Attendance was completed elsewhere,
-         * for example from the widget.
-         */
-        if (punchIn <= 0 || punchOut > 0) {
-
-            handler.removeCallbacks(
-                    timerRunnable
-            );
-
-            stopForeground(true);
-            stopSelf();
-
+            stopAttendanceService();
             return;
         }
 
@@ -235,13 +309,26 @@ public class AttendanceService extends Service {
 
         if (manager != null) {
 
-            manager.notify(
-                    NOTIFICATION_ID,
-                    buildNotification()
-            );
+            try {
+
+                manager.notify(
+                        NOTIFICATION_ID,
+                        buildNotification()
+                );
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }
         }
     }
 
+
+    /*
+     * =========================================================
+     * BUILD NOTIFICATION
+     * =========================================================
+     */
 
     private Notification buildNotification() {
 
@@ -251,6 +338,7 @@ public class AttendanceService extends Service {
                         MODE_PRIVATE
                 );
 
+
         long punchIn =
                 prefs.getLong(
                         AttendanceWidget.KEY_PUNCH_IN,
@@ -259,41 +347,52 @@ public class AttendanceService extends Service {
 
 
         /*
-         * Punch IN display time.
+         * Punch In time.
          */
-        SimpleDateFormat format =
+        SimpleDateFormat timeFormat =
                 new SimpleDateFormat(
                         "hh:mm a",
                         Locale.getDefault()
                 );
 
+
         String punchInText =
                 punchIn > 0
-                        ? format.format(new Date(punchIn))
+                        ? timeFormat.format(
+                                new Date(punchIn)
+                        )
                         : "--:--";
 
 
         /*
-         * Working duration.
+         * Calculate live working duration.
          */
-        long difference =
-                punchIn > 0
-                        ? Math.max(
-                                0,
-                                System.currentTimeMillis()
-                                        - punchIn
-                        )
-                        : 0;
+        long difference = 0;
+
+
+        if (punchIn > 0) {
+
+            difference =
+                    Math.max(
+                            0,
+                            System.currentTimeMillis()
+                                    - punchIn
+                    );
+        }
 
 
         long totalSeconds =
                 difference / 1000;
 
+
         long hours =
                 totalSeconds / 3600;
 
+
         long minutes =
-                (totalSeconds % 3600) / 60;
+                (totalSeconds % 3600)
+                        / 60;
+
 
         long seconds =
                 totalSeconds % 60;
@@ -310,13 +409,17 @@ public class AttendanceService extends Service {
 
 
         /*
-         * Open app.
+         * =====================================================
+         * OPEN APP
+         * =====================================================
          */
+
         Intent openIntent =
                 new Intent(
                         this,
                         MainActivity.class
                 );
+
 
         openIntent.setFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK |
@@ -335,21 +438,29 @@ public class AttendanceService extends Service {
 
 
         /*
-         * Notification Punch OUT action.
+         * =====================================================
+         * NOTIFICATION PUNCH OUT
+         * =====================================================
+         *
+         * Send Punch Out to AttendanceWidget.
+         * The widget receiver saves Punch Out,
+         * stops this service and refreshes widget.
          */
+
         Intent punchOutIntent =
                 new Intent(
                         this,
-                        AttendanceService.class
+                        AttendanceWidget.class
                 );
 
+
         punchOutIntent.setAction(
-                ACTION_STOP
+                AttendanceWidget.ACTION_PUNCH_OUT
         );
 
 
         PendingIntent punchOutPendingIntent =
-                PendingIntent.getService(
+                PendingIntent.getBroadcast(
                         this,
                         202,
                         punchOutIntent,
@@ -361,53 +472,91 @@ public class AttendanceService extends Service {
         String content =
                 "Punch In: "
                         + punchInText
-                        + "  •  Working: "
+                        + " • Working: "
                         + workingTime;
 
+
+        /*
+         * =====================================================
+         * NOTIFICATION
+         * =====================================================
+         */
 
         return new NotificationCompat.Builder(
                 this,
                 CHANNEL_ID
         )
+
+                .setSmallIcon(
+                        R.drawable.icon_512
+                )
+
                 .setContentTitle(
                         "SELF HRMS • ● Working"
                 )
-                .setContentText(content)
+
+                .setContentText(
+                        content
+                )
+
                 .setStyle(
-                        new NotificationCompat.BigTextStyle()
+                        new NotificationCompat
+                                .BigTextStyle()
                                 .bigText(
-                                        "● Working\n"
-                                                + "Punch In: "
+                                        "● Working"
+                                                + "\nPunch In: "
                                                 + punchInText
                                                 + "\nWorking Time: "
                                                 + workingTime
                                 )
                 )
-                .setSmallIcon(
-                        R.drawable.icon_512
-                )
+
                 .setContentIntent(
                         openPendingIntent
                 )
-                .setOngoing(true)
-                .setOnlyAlertOnce(true)
-                .setSilent(true)
+
+                .setOngoing(
+                        true
+                )
+
+                .setOnlyAlertOnce(
+                        true
+                )
+
+                .setSilent(
+                        true
+                )
+
                 .setPriority(
                         NotificationCompat.PRIORITY_LOW
                 )
+
+                .setCategory(
+                        NotificationCompat.CATEGORY_SERVICE
+                )
+
                 .addAction(
                         0,
                         "PUNCH OUT",
                         punchOutPendingIntent
                 )
+
                 .build();
     }
 
 
+    /*
+     * =========================================================
+     * CREATE NOTIFICATION CHANNEL
+     * =========================================================
+     */
+
     private void createNotificationChannel() {
 
-        if (Build.VERSION.SDK_INT
-                >= Build.VERSION_CODES.O) {
+        if (
+                Build.VERSION.SDK_INT
+                        >= Build.VERSION_CODES.O
+        ) {
 
             NotificationChannel channel =
                     new NotificationChannel(
@@ -416,9 +565,11 @@ public class AttendanceService extends Service {
                             NotificationManager.IMPORTANCE_LOW
                     );
 
+
             channel.setDescription(
                     "Shows active SELF HRMS attendance"
             );
+
 
             channel.setSound(
                     null,
@@ -431,7 +582,9 @@ public class AttendanceService extends Service {
                             NotificationManager.class
                     );
 
+
             if (manager != null) {
+
                 manager.createNotificationChannel(
                         channel
                 );
@@ -440,21 +593,82 @@ public class AttendanceService extends Service {
     }
 
 
+    /*
+     * =========================================================
+     * STOP SERVICE SAFELY
+     * =========================================================
+     */
+
+    private void stopAttendanceService() {
+
+        if (handler != null) {
+
+            handler.removeCallbacks(
+                    timerRunnable
+            );
+        }
+
+
+        if (foregroundStarted) {
+
+            if (
+                    Build.VERSION.SDK_INT
+                            >= Build.VERSION_CODES.N
+            ) {
+
+                stopForeground(
+                        STOP_FOREGROUND_REMOVE
+                );
+
+            } else {
+
+                stopForeground(
+                        true
+                );
+            }
+
+
+            foregroundStarted =
+                    false;
+        }
+
+
+        stopSelf();
+    }
+
+
+    /*
+     * =========================================================
+     * SERVICE DESTROYED
+     * =========================================================
+     */
+
     @Override
     public void onDestroy() {
 
-        handler.removeCallbacks(
-                timerRunnable
-        );
+        if (handler != null) {
+
+            handler.removeCallbacks(
+                    timerRunnable
+            );
+        }
+
 
         super.onDestroy();
     }
 
 
+    /*
+     * =========================================================
+     * BIND
+     * =========================================================
+     */
+
     @Override
     public IBinder onBind(
             Intent intent
     ) {
+
         return null;
     }
-              }
+}
