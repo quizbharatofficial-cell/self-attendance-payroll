@@ -2,155 +2,56 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- ===================================================== -->
-    <!-- INTERNET -->
-    <!-- Required for checking and downloading Self HRMS update -->
-    <!-- ===================================================== -->
+    <!-- Internet: GitHub update checking / APK download -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-permission
-        android:name="android.permission.INTERNET" />
+    <!-- Android 13+ notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-
-    <!-- ===================================================== -->
-    <!-- FOREGROUND SERVICE -->
-    <!-- Used by live attendance notification -->
-    <!-- ===================================================== -->
-
-    <uses-permission
-        android:name="android.permission.FOREGROUND_SERVICE" />
-
-
-    <!-- ===================================================== -->
-    <!-- ANDROID 13+ NOTIFICATIONS -->
-    <!-- ===================================================== -->
-
-    <uses-permission
-        android:name="android.permission.POST_NOTIFICATIONS" />
-
-
-    <!-- ===================================================== -->
-    <!-- INSTALL APP UPDATE -->
-    <!--
-         Required so Self HRMS can request Android to install
-         a downloaded APK update.
-
-         Android will still ask the user for permission before
-         installation. Installation is NOT silent.
-    -->
-    <!-- ===================================================== -->
-
-    <uses-permission
-        android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Allow Self HRMS to open downloaded APK for update -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
 
     <application
-
         android:allowBackup="true"
-
         android:label="Self HRMS"
-
-        android:icon="@drawable/icon_512"
-
-        android:roundIcon="@drawable/icon_512"
-
         android:theme="@style/Theme.SelfAttendance"
+        android:usesCleartextTraffic="false"
+        android:supportsRtl="true">
 
-        android:usesCleartextTraffic="false">
-
-
-        <!-- ================================================= -->
-        <!-- MAIN ACTIVITY -->
-        <!-- ================================================= -->
-
+        <!-- Main Activity -->
         <activity
-
             android:name=".MainActivity"
-
             android:exported="true">
 
             <intent-filter>
 
-                <action
-                    android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN" />
 
-                <category
-                    android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
 
             </intent-filter>
 
         </activity>
 
 
-        <!-- ================================================= -->
-        <!-- LIVE ATTENDANCE FOREGROUND SERVICE -->
-        <!-- ================================================= -->
-
-        <service
-
-            android:name=".AttendanceService"
-
-            android:enabled="true"
-
-            android:exported="false" />
-
-
-        <!-- ================================================= -->
-        <!-- HOME SCREEN ATTENDANCE WIDGET -->
-        <!-- ================================================= -->
-
-        <receiver
-
-            android:name=".AttendanceWidget"
-
-            android:enabled="true"
-
-            android:exported="false">
-
-            <intent-filter>
-
-                <action
-                    android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-
-            </intent-filter>
-
-
-            <meta-data
-
-                android:name="android.appwidget.provider"
-
-                android:resource="@xml/attendance_widget_info" />
-
-        </receiver>
-
-
-        <!-- ================================================= -->
-        <!-- FILE PROVIDER -->
         <!--
-             Already used by Backup / Google Drive.
-
-             We will also use this provider later to safely
-             open the downloaded APK with Android installer.
+            FileProvider
+            Required for:
+            1. Self HRMS APK update installation
+            2. Backup JSON sharing
         -->
-        <!-- ================================================= -->
-
         <provider
-
             android:name="androidx.core.content.FileProvider"
-
             android:authorities="${applicationId}.fileprovider"
-
             android:exported="false"
-
             android:grantUriPermissions="true">
 
             <meta-data
-
                 android:name="android.support.FILE_PROVIDER_PATHS"
-
                 android:resource="@xml/file_paths" />
 
         </provider>
-
 
     </application>
 
