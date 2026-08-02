@@ -2,7 +2,14 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Live Attendance Foreground Service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Android 13+ Notification Permission -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -25,9 +32,18 @@
         </activity>
 
 
-        <!-- Self HRMS Attendance Widget -->
+        <!-- Live Attendance Notification Service -->
+        <service
+            android:name=".AttendanceService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse" />
+
+
+        <!-- Attendance Home Screen Widget -->
         <receiver
             android:name=".AttendanceWidget"
+            android:enabled="true"
             android:exported="false">
 
             <intent-filter>
@@ -39,20 +55,6 @@
                 android:resource="@xml/attendance_widget_info" />
 
         </receiver>
-
-
-        <!-- FileProvider for Backup JSON Sharing -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-
-        </provider>
 
     </application>
 
