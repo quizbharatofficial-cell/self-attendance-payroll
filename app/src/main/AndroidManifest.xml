@@ -12,17 +12,34 @@
         android:theme="@style/Theme.SelfAttendance"
         android:usesCleartextTraffic="false">
 
+        <!-- Main App -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
         </activity>
+
+
+        <!-- Self HRMS Attendance Widget -->
+        <receiver
+            android:name=".AttendanceWidget"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/attendance_widget_info" />
+
+        </receiver>
+
 
         <!-- FileProvider for Backup JSON Sharing -->
         <provider
