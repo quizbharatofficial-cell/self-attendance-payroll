@@ -1,6 +1,7 @@
 package com.abss.selfattendance;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
@@ -16,22 +18,34 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
+
+    private static final String GITHUB_LATEST_RELEASE_API =
+            "https://api.github.com/repos/quizbharatofficial-cell/self-attendance-payroll/releases/latest";
+
+    private static final String UPDATE_APK_NAME =
+            "Self_HRMS_Update.apk";
 
     private static final int BACKUP_FILE_PICKER = 1001;
 
@@ -367,6 +381,22 @@ public class MainActivity extends AppCompatActivity {
 
 
             refreshWidgets();
+        }
+
+        /*
+         * =====================================================
+         * IN-APP UPDATE
+         * =====================================================
+         */
+
+        @JavascriptInterface
+        public void checkForUpdate() {
+            checkForAppUpdate();
+        }
+
+        @JavascriptInterface
+        public String getAppVersion() {
+            return getInstalledVersionName();
         }
     }
 
@@ -918,6 +948,726 @@ public class MainActivity extends AppCompatActivity {
                                 null
                         )
         );
+    }
+
+
+    /*
+     * =========================================================
+     * SELF HRMS IN-APP UPDATE
+     * =========================================================
+     */
+
+    private String getInstalledVersionName() {
+        try {
+            return getPackageManager()
+                    .getPackageInfo(getPackageName(), 0)
+                    .versionName;
+        } catch (Exception e) {
+            return "0.0.0";
+        }
+    }
+
+
+    private void checkForAppUpdate() {
+
+        runOnUiThread(
+                () -> Toast.makeText(
+                        MainActivity.this,
+                        "Checking for update...",
+                        Toast.LENGTH_SHORT
+                ).show()
+        );
+
+        new Thread(() -> {
+
+            HttpURLConnection connection = null;
+
+            try {
+
+                URL url =
+                        new URL(
+                                GITHUB_LATEST_RELEASE_API
+                        );
+
+                connection =
+                        (HttpURLConnection)
+                                url.openConnection();
+
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(15000);
+                connection.setReadTimeout(15000);
+
+                connection.setRequestProperty(
+                        "Accept",
+                        "application/vnd.github+json"
+                );
+
+                connection.setRequestProperty(
+                        "User-Agent",
+                        "Self-HRMS-Android"
+                );
+
+
+                int responseCode =
+                        connection.getResponseCode();
+
+
+                if (responseCode !=
+                        HttpURLConnection.HTTP_OK) {
+
+                    throw new Exception(
+                            "GitHub response: "
+                                    + responseCode
+                    );
+                }
+
+
+                String response;
+
+                try (
+                        InputStream inputStream =
+                                connection.getInputStream();
+
+                        BufferedReader reader =
+                                new BufferedReader(
+                                        new InputStreamReader(
+                                                inputStream,
+                                                StandardCharsets.UTF_8
+                                        )
+                                )
+                ) {
+
+                    StringBuilder builder =
+                            new StringBuilder();
+
+                    String line;
+
+                    while (
+                            (line = reader.readLine())
+                                    != null
+                    ) {
+                        builder.append(line);
+                    }
+
+                    response =
+                            builder.toString();
+                }
+
+
+                JSONObject release =
+                        new JSONObject(response);
+
+
+                String latestTag =
+                        release.optString(
+                                "tag_name",
+                                ""
+                        );
+
+
+                String latestVersion =
+                        latestTag
+                                .trim()
+                                .replaceFirst(
+                                        "^[vV]",
+                                        ""
+                                );
+
+
+                String currentVersion =
+                        getInstalledVersionName();
+
+
+                JSONArray assets =
+                        release.optJSONArray(
+                                "assets"
+                        );
+
+
+                String apkUrl =
+                        null;
+
+
+                if (assets != null) {
+
+                    for (
+                            int i = 0;
+                            i < assets.length();
+                            i++
+                    ) {
+
+                        JSONObject asset =
+                                assets.getJSONObject(i);
+
+
+                        String name =
+                                asset.optString(
+                                        "name",
+                                        ""
+                                );
+
+
+                        if (
+                                name.toLowerCase()
+                                        .endsWith(".apk")
+                        ) {
+
+                            apkUrl =
+                                    asset.optString(
+                                            "browser_download_url",
+                                            null
+                                    );
+
+                            if (
+                                    name.toLowerCase()
+                                            .contains("release") ||
+                                    name.equalsIgnoreCase(
+                                            "Self-HRMS.apk"
+                                    )
+                            ) {
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
+                if (
+                        latestVersion.isEmpty()
+                ) {
+
+                    throw new Exception(
+                            "Latest version not found."
+                    );
+                }
+
+
+                final String finalLatestVersion =
+                        latestVersion;
+
+                final String finalCurrentVersion =
+                        currentVersion;
+
+                final String finalApkUrl =
+                        apkUrl;
+
+
+                runOnUiThread(() -> {
+
+                    if (
+                            compareVersions(
+                                    finalLatestVersion,
+                                    finalCurrentVersion
+                            ) <= 0
+                    ) {
+
+                        new AlertDialog.Builder(
+                                MainActivity.this
+                        )
+                                .setTitle(
+                                        "Self HRMS"
+                                )
+                                .setMessage(
+                                        "You already have the latest version.\n\n"
+                                                + "Current version: "
+                                                + finalCurrentVersion
+                                )
+                                .setPositiveButton(
+                                        "OK",
+                                        null
+                                )
+                                .show();
+
+                        return;
+                    }
+
+
+                    if (
+                            finalApkUrl == null ||
+                            finalApkUrl.trim()
+                                    .isEmpty()
+                    ) {
+
+                        new AlertDialog.Builder(
+                                MainActivity.this
+                        )
+                                .setTitle(
+                                        "Update Available"
+                                )
+                                .setMessage(
+                                        "Version "
+                                                + finalLatestVersion
+                                                + " is available, but no APK file was found in the GitHub release."
+                                )
+                                .setPositiveButton(
+                                        "OK",
+                                        null
+                                )
+                                .show();
+
+                        return;
+                    }
+
+
+                    new AlertDialog.Builder(
+                            MainActivity.this
+                    )
+                            .setTitle(
+                                    "Update Available"
+                            )
+                            .setMessage(
+                                    "Current version: "
+                                            + finalCurrentVersion
+                                            + "\nNew version: "
+                                            + finalLatestVersion
+                                            + "\n\nDownload and install the update?"
+                            )
+                            .setNegativeButton(
+                                    "Later",
+                                    null
+                            )
+                            .setPositiveButton(
+                                    "Update",
+                                    (dialog, which) ->
+                                            downloadUpdateApk(
+                                                    finalApkUrl,
+                                                    finalLatestVersion
+                                            )
+                            )
+                            .show();
+                });
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+                final String message =
+                        e.getMessage() == null
+                                ? "Could not check for update."
+                                : e.getMessage();
+
+
+                runOnUiThread(
+                        () ->
+                                new AlertDialog.Builder(
+                                        MainActivity.this
+                                )
+                                        .setTitle(
+                                                "Update Check Failed"
+                                        )
+                                        .setMessage(
+                                                message
+                                        )
+                                        .setPositiveButton(
+                                                "OK",
+                                                null
+                                        )
+                                        .show()
+                );
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+        }).start();
+    }
+
+
+    private int compareVersions(
+            String first,
+            String second
+    ) {
+
+        String[] a =
+                first.split("\\.");
+
+        String[] b =
+                second.split("\\.");
+
+
+        int length =
+                Math.max(
+                        a.length,
+                        b.length
+                );
+
+
+        for (
+                int i = 0;
+                i < length;
+                i++
+        ) {
+
+            int x =
+                    i < a.length
+                            ? parseVersionPart(
+                                    a[i]
+                            )
+                            : 0;
+
+            int y =
+                    i < b.length
+                            ? parseVersionPart(
+                                    b[i]
+                            )
+                            : 0;
+
+
+            if (x < y) {
+                return -1;
+            }
+
+            if (x > y) {
+                return 1;
+            }
+        }
+
+
+        return 0;
+    }
+
+
+    private int parseVersionPart(
+            String value
+    ) {
+
+        try {
+
+            String cleaned =
+                    value.replaceAll(
+                            "[^0-9].*$",
+                            ""
+                    );
+
+
+            if (cleaned.isEmpty()) {
+                return 0;
+            }
+
+
+            return Integer.parseInt(
+                    cleaned
+            );
+
+        } catch (Exception e) {
+
+            return 0;
+        }
+    }
+
+
+    private void downloadUpdateApk(
+            String apkUrl,
+            String latestVersion
+    ) {
+
+        runOnUiThread(
+                () ->
+                        Toast.makeText(
+                                MainActivity.this,
+                                "Downloading Self HRMS "
+                                        + latestVersion
+                                        + "...",
+                                Toast.LENGTH_LONG
+                        ).show()
+        );
+
+
+        new Thread(() -> {
+
+            HttpURLConnection connection =
+                    null;
+
+
+            try {
+
+                File updateDirectory =
+                        new File(
+                                getCacheDir(),
+                                "updates"
+                        );
+
+
+                if (
+                        !updateDirectory.exists() &&
+                        !updateDirectory.mkdirs()
+                ) {
+
+                    throw new Exception(
+                            "Update folder could not be created."
+                    );
+                }
+
+
+                File apkFile =
+                        new File(
+                                updateDirectory,
+                                UPDATE_APK_NAME
+                        );
+
+
+                if (
+                        apkFile.exists() &&
+                        !apkFile.delete()
+                ) {
+
+                    throw new Exception(
+                            "Old update file could not be removed."
+                    );
+                }
+
+
+                URL url =
+                        new URL(
+                                apkUrl
+                        );
+
+
+                connection =
+                        (HttpURLConnection)
+                                url.openConnection();
+
+
+                connection.setConnectTimeout(
+                        20000
+                );
+
+                connection.setReadTimeout(
+                        30000
+                );
+
+                connection.setRequestProperty(
+                        "User-Agent",
+                        "Self-HRMS-Android"
+                );
+
+
+                connection.connect();
+
+
+                int responseCode =
+                        connection.getResponseCode();
+
+
+                if (
+                        responseCode < 200 ||
+                        responseCode >= 300
+                ) {
+
+                    throw new Exception(
+                            "APK download failed: "
+                                    + responseCode
+                    );
+                }
+
+
+                try (
+                        InputStream inputStream =
+                                connection.getInputStream();
+
+                        FileOutputStream outputStream =
+                                new FileOutputStream(
+                                        apkFile
+                                )
+                ) {
+
+                    byte[] buffer =
+                            new byte[8192];
+
+
+                    int count;
+
+
+                    while (
+                            (count =
+                                    inputStream.read(
+                                            buffer
+                                    ))
+                                    != -1
+                    ) {
+
+                        outputStream.write(
+                                buffer,
+                                0,
+                                count
+                        );
+                    }
+
+
+                    outputStream.flush();
+                }
+
+
+                if (
+                        !apkFile.exists() ||
+                        apkFile.length() <= 0
+                ) {
+
+                    throw new Exception(
+                            "Downloaded APK is empty."
+                    );
+                }
+
+
+                runOnUiThread(
+                        () ->
+                                requestInstallApk(
+                                        apkFile
+                                )
+                );
+
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+
+                final String message =
+                        e.getMessage() == null
+                                ? "Update download failed."
+                                : e.getMessage();
+
+
+                runOnUiThread(
+                        () ->
+                                new AlertDialog.Builder(
+                                        MainActivity.this
+                                )
+                                        .setTitle(
+                                                "Download Failed"
+                                        )
+                                        .setMessage(
+                                                message
+                                        )
+                                        .setPositiveButton(
+                                                "OK",
+                                                null
+                                        )
+                                        .show()
+                );
+
+
+            } finally {
+
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+
+        }).start();
+    }
+
+
+    private void requestInstallApk(
+            File apkFile
+    ) {
+
+        try {
+
+            if (
+                    Build.VERSION.SDK_INT
+                            >= Build.VERSION_CODES.O &&
+                    !getPackageManager()
+                            .canRequestPackageInstalls()
+            ) {
+
+                new AlertDialog.Builder(
+                        this
+                )
+                        .setTitle(
+                                "Allow App Updates"
+                        )
+                        .setMessage(
+                                "Android needs permission to install Self HRMS updates. Enable \"Allow from this source\", then return to Self HRMS and press Check for Update again."
+                        )
+                        .setNegativeButton(
+                                "Cancel",
+                                null
+                        )
+                        .setPositiveButton(
+                                "Open Settings",
+                                (dialog, which) -> {
+
+                                    Intent settingsIntent =
+                                            new Intent(
+                                                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                                                    Uri.parse(
+                                                            "package:"
+                                                                    + getPackageName()
+                                                    )
+                                            );
+
+
+                                    startActivity(
+                                            settingsIntent
+                                    );
+                                }
+                        )
+                        .show();
+
+
+                return;
+            }
+
+
+            Uri apkUri =
+                    FileProvider.getUriForFile(
+                            this,
+                            getPackageName()
+                                    + ".fileprovider",
+                            apkFile
+                    );
+
+
+            Intent installIntent =
+                    new Intent(
+                            Intent.ACTION_VIEW
+                    );
+
+
+            installIntent.setDataAndType(
+                    apkUri,
+                    "application/vnd.android.package-archive"
+            );
+
+
+            installIntent.addFlags(
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                            Intent.FLAG_ACTIVITY_NEW_TASK
+            );
+
+
+            startActivity(
+                    installIntent
+            );
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+
+            new AlertDialog.Builder(
+                    this
+            )
+                    .setTitle(
+                            "Install Failed"
+                    )
+                    .setMessage(
+                            e.getMessage() == null
+                                    ? "Android installer could not be opened."
+                                    : e.getMessage()
+                    )
+                    .setPositiveButton(
+                            "OK",
+                            null
+                    )
+                    .show();
+        }
     }
 
 
