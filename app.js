@@ -1784,7 +1784,7 @@ function punchOut() {
 
 
     updateDashboard();
-
+syncAttendanceToAndroidWidget();
 
     alert(
         getShiftName(shift) +
