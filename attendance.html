@@ -1984,6 +1984,220 @@ window.addEventListener(
 );
 
 
+
+/* =====================================================
+   ANDROID HOME SCREEN WIDGET SYNC
+===================================================== */
+
+function widgetDateKey(timestamp){
+    const d = new Date(timestamp);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+}
+
+function syncAttendanceStateToWidget(){
+    if(
+        typeof Android === "undefined" ||
+        typeof Android.updateWidgetPunch !== "function"
+    ){
+        return;
+    }
+
+    const profile = getActiveProfile();
+
+    if(!profile){
+        Android.updateWidgetPunch(0,0);
+        return;
+    }
+
+    const records = profile.attendance || {};
+    let activeRecord = null;
+
+    Object.keys(records)
+    .sort()
+    .reverse()
+    .some(date => {
+        const record = records[date];
+
+        if(record && record.punchIn && !record.punchOut){
+            activeRecord = record;
+            return true;
+        }
+
+        return false;
+    });
+
+    if(activeRecord){
+        const punchInMs =
+            new Date(activeRecord.punchIn).getTime();
+
+        Android.updateWidgetPunch(
+            Number.isFinite(punchInMs) ? punchInMs : 0,
+            0
+        );
+    }else{
+        Android.updateWidgetPunch(0,0);
+    }
+}
+
+window.receiveWidgetAttendance =
+function(punchInMs,punchOutMs){
+
+    punchInMs = Number(punchInMs || 0);
+    punchOutMs = Number(punchOutMs || 0);
+
+    if(punchInMs <= 0){
+        return;
+    }
+
+    const profile = getActiveProfile();
+
+    if(!profile){
+        return;
+    }
+
+    const date = widgetDateKey(punchInMs);
+    const records = profile.attendance || {};
+    const existing = records[date];
+
+    if(
+        existing &&
+        existing.punchOut &&
+        Number(new Date(existing.punchIn).getTime()) !== punchInMs
+    ){
+        return;
+    }
+
+    const shift =
+        existing?.shift ||
+        profile.defaultShift ||
+        "day";
+
+    const punchInDate = new Date(punchInMs);
+
+    if(isNaN(punchInDate.getTime())){
+        return;
+    }
+
+    let punchOutDate = null;
+    let workingMinutes = 0;
+    let overtimeMinutes = 0;
+
+    if(punchOutMs > 0){
+        punchOutDate = new Date(punchOutMs);
+
+        if(
+            isNaN(punchOutDate.getTime()) ||
+            punchOutDate.getTime() < punchInDate.getTime()
+        ){
+            return;
+        }
+
+        workingMinutes =
+            Math.max(
+                0,
+                Math.floor(
+                    (punchOutDate.getTime() - punchInDate.getTime()) / 60000
+                )
+            );
+
+        const dutyHours =
+            Number(getDutyHours(shift) || 0);
+
+        overtimeMinutes =
+            Math.max(
+                0,
+                workingMinutes - (dutyHours * 60)
+            );
+    }
+
+    if(typeof createAutoBackup === "function"){
+        createAutoBackup(
+            punchOutMs > 0
+                ? "Before Widget Punch Out"
+                : "Before Widget Punch In"
+        );
+    }
+
+    records[date] = {
+        ...(existing || {}),
+        date:date,
+        status:existing?.status || "present",
+        shift:shift,
+        punchIn:punchInDate.toISOString(),
+        punchOut:punchOutDate ? punchOutDate.toISOString() : null,
+        workingMinutes:workingMinutes,
+        overtimeMinutes:overtimeMinutes,
+        manual:false,
+        source:"widget",
+        updatedAt:new Date().toISOString()
+    };
+
+    profile.attendance = records;
+
+    const saved = saveActiveProfile(profile);
+
+    if(saved === false){
+        return;
+    }
+
+    if(typeof createAutoBackup === "function"){
+        createAutoBackup(
+            punchOutMs > 0
+                ? "Widget Punch Out Saved - " + date
+                : "Widget Punch In Saved - " + date
+        );
+    }
+
+    renderAttendance();
+
+    if(typeof updateDashboard === "function"){
+        updateDashboard();
+    }
+
+    if(
+        punchOutMs > 0 &&
+        typeof Android !== "undefined" &&
+        typeof Android.clearWidgetPunch === "function"
+    ){
+        Android.clearWidgetPunch();
+    }else{
+        syncAttendanceStateToWidget();
+    }
+};
+
+function pullWidgetAttendance(){
+    if(
+        typeof Android === "undefined" ||
+        typeof Android.getWidgetPunchIn !== "function" ||
+        typeof Android.getWidgetPunchOut !== "function"
+    ){
+        return;
+    }
+
+    try{
+        const punchIn =
+            Number(Android.getWidgetPunchIn() || 0);
+
+        const punchOut =
+            Number(Android.getWidgetPunchOut() || 0);
+
+        if(punchIn > 0){
+            window.receiveWidgetAttendance(
+                punchIn,
+                punchOut
+            );
+        }else{
+            syncAttendanceStateToWidget();
+        }
+    }catch(error){
+        console.error("Widget sync failed:", error);
+    }
+}
+
+
 /* =====================================================
    START ATTENDANCE PAGE
 ===================================================== */
@@ -2003,6 +2217,8 @@ function startAttendancePage(){
     statusChanged();
 
     renderAttendance();
+
+    pullWidgetAttendance();
 }
 
 
