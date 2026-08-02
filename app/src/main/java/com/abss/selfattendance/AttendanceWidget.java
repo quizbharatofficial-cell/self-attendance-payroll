@@ -48,10 +48,7 @@ public class AttendanceWidget extends AppWidgetProvider {
             );
         }
 
-        /*
-         * If attendance is already running,
-         * make sure foreground service is running too.
-         */
+
         SharedPreferences prefs =
                 context.getSharedPreferences(
                         PREFS,
@@ -70,8 +67,16 @@ public class AttendanceWidget extends AppWidgetProvider {
                         0
                 );
 
+
+        /*
+         * Start service only when attendance
+         * is actually active.
+         */
         if (punchIn > 0 && punchOut == 0) {
-            startAttendanceService(context);
+
+            startAttendanceService(
+                    context
+            );
         }
     }
 
@@ -82,14 +87,20 @@ public class AttendanceWidget extends AppWidgetProvider {
             Intent intent
     ) {
 
-        super.onReceive(context, intent);
+        super.onReceive(
+                context,
+                intent
+        );
+
 
         if (intent == null) {
             return;
         }
 
+
         String action =
                 intent.getAction();
+
 
         SharedPreferences prefs =
                 context.getSharedPreferences(
@@ -99,9 +110,9 @@ public class AttendanceWidget extends AppWidgetProvider {
 
 
         /*
-         * ==========================
+         * =====================================================
          * PUNCH IN
-         * ==========================
+         * =====================================================
          */
         if (ACTION_PUNCH_IN.equals(action)) {
 
@@ -111,41 +122,47 @@ public class AttendanceWidget extends AppWidgetProvider {
                             0
                     );
 
+
             long currentPunchOut =
                     prefs.getLong(
                             KEY_PUNCH_OUT,
                             0
                     );
 
+
             /*
-             * Start a new attendance session when:
-             *
-             * 1. No Punch IN exists
-             * OR
-             * 2. Previous session was completed.
+             * New attendance session.
              */
-            if (currentPunch == 0 || currentPunchOut > 0) {
+            if (
+                    currentPunch == 0 ||
+                    currentPunchOut > 0
+            ) {
 
                 prefs.edit()
                         .putLong(
                                 KEY_PUNCH_IN,
                                 System.currentTimeMillis()
                         )
-                        .remove(KEY_PUNCH_OUT)
+                        .remove(
+                                KEY_PUNCH_OUT
+                        )
                         .apply();
             }
 
+
             /*
-             * Start live attendance notification.
+             * Start live notification.
              */
-            startAttendanceService(context);
+            startAttendanceService(
+                    context
+            );
         }
 
 
         /*
-         * ==========================
+         * =====================================================
          * PUNCH OUT
-         * ==========================
+         * =====================================================
          */
         else if (ACTION_PUNCH_OUT.equals(action)) {
 
@@ -155,17 +172,18 @@ public class AttendanceWidget extends AppWidgetProvider {
                             0
                     );
 
+
             long punchOut =
                     prefs.getLong(
                             KEY_PUNCH_OUT,
                             0
                     );
 
-            /*
-             * Only Punch OUT if an active
-             * attendance session exists.
-             */
-            if (punchIn > 0 && punchOut == 0) {
+
+            if (
+                    punchIn > 0 &&
+                    punchOut == 0
+            ) {
 
                 prefs.edit()
                         .putLong(
@@ -175,28 +193,70 @@ public class AttendanceWidget extends AppWidgetProvider {
                         .apply();
             }
 
+
             /*
-             * Stop live notification service.
+             * IMPORTANT:
+             *
+             * Do NOT use startForegroundService()
+             * just to stop the service.
              */
-            stopAttendanceService(context);
+            stopAttendanceService(
+                    context
+            );
         }
 
 
-        /*
-         * Refresh all home-screen widgets.
-         */
-        refreshAllWidgets(context);
+        refreshAllWidgets(
+                context
+        );
     }
 
 
     /*
-     * ========================================
+     * =========================================================
      * START LIVE ATTENDANCE SERVICE
-     * ========================================
+     * =========================================================
      */
+
     public static void startAttendanceService(
             Context context
     ) {
+
+        SharedPreferences prefs =
+                context.getSharedPreferences(
+                        PREFS,
+                        Context.MODE_PRIVATE
+                );
+
+
+        long punchIn =
+                prefs.getLong(
+                        KEY_PUNCH_IN,
+                        0
+                );
+
+
+        long punchOut =
+                prefs.getLong(
+                        KEY_PUNCH_OUT,
+                        0
+                );
+
+
+        /*
+         * Safety check.
+         *
+         * Never start foreground service unless
+         * attendance is active.
+         */
+        if (
+                punchIn <= 0 ||
+                punchOut > 0
+        ) {
+
+            return;
+        }
+
 
         Intent serviceIntent =
                 new Intent(
@@ -204,30 +264,43 @@ public class AttendanceWidget extends AppWidgetProvider {
                         AttendanceService.class
                 );
 
+
         serviceIntent.setAction(
                 AttendanceService.ACTION_START
         );
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-            context.startForegroundService(
-                    serviceIntent
-            );
+        try {
 
-        } else {
+            if (
+                    Build.VERSION.SDK_INT
+                            >= Build.VERSION_CODES.O
+            ) {
 
-            context.startService(
-                    serviceIntent
-            );
+                context.startForegroundService(
+                        serviceIntent
+                );
+
+            } else {
+
+                context.startService(
+                        serviceIntent
+                );
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
         }
     }
 
 
     /*
-     * ========================================
+     * =========================================================
      * STOP LIVE ATTENDANCE SERVICE
-     * ========================================
+     * =========================================================
      */
+
     public static void stopAttendanceService(
             Context context
     ) {
@@ -238,35 +311,33 @@ public class AttendanceWidget extends AppWidgetProvider {
                         AttendanceService.class
                 );
 
-        serviceIntent.setAction(
-                AttendanceService.ACTION_STOP
-        );
 
         /*
-         * Start the service with STOP action.
-         * AttendanceService will stop itself
-         * after refreshing the final state.
+         * IMPORTANT FIX:
+         *
+         * We are stopping an existing service,
+         * therefore startForegroundService()
+         * must NOT be called here.
          */
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        try {
 
-            context.startForegroundService(
+            context.stopService(
                     serviceIntent
             );
 
-        } else {
+        } catch (Exception e) {
 
-            context.startService(
-                    serviceIntent
-            );
+            e.printStackTrace();
         }
     }
 
 
     /*
-     * ========================================
+     * =========================================================
      * REFRESH ALL WIDGETS
-     * ========================================
+     * =========================================================
      */
+
     public static void refreshAllWidgets(
             Context context
     ) {
@@ -276,16 +347,19 @@ public class AttendanceWidget extends AppWidgetProvider {
                         context
                 );
 
+
         ComponentName component =
                 new ComponentName(
                         context,
                         AttendanceWidget.class
                 );
 
+
         int[] widgetIds =
                 manager.getAppWidgetIds(
                         component
                 );
+
 
         for (int widgetId : widgetIds) {
 
@@ -299,10 +373,11 @@ public class AttendanceWidget extends AppWidgetProvider {
 
 
     /*
-     * ========================================
-     * UPDATE WIDGET
-     * ========================================
+     * =========================================================
+     * UPDATE ONE WIDGET
+     * =========================================================
      */
+
     public static void updateWidget(
             Context context,
             AppWidgetManager manager,
@@ -315,11 +390,13 @@ public class AttendanceWidget extends AppWidgetProvider {
                         Context.MODE_PRIVATE
                 );
 
+
         long punchIn =
                 prefs.getLong(
                         KEY_PUNCH_IN,
                         0
                 );
+
 
         long punchOut =
                 prefs.getLong(
@@ -336,19 +413,22 @@ public class AttendanceWidget extends AppWidgetProvider {
 
 
         /*
-         * ==========================
+         * =====================================================
          * PUNCH IN BUTTON
-         * ==========================
+         * =====================================================
          */
+
         Intent inIntent =
                 new Intent(
                         context,
                         AttendanceWidget.class
                 );
 
+
         inIntent.setAction(
                 ACTION_PUNCH_IN
         );
+
 
         PendingIntent inPendingIntent =
                 PendingIntent.getBroadcast(
@@ -359,6 +439,7 @@ public class AttendanceWidget extends AppWidgetProvider {
                                 PendingIntent.FLAG_IMMUTABLE
                 );
 
+
         views.setOnClickPendingIntent(
                 R.id.widgetPunchIn,
                 inPendingIntent
@@ -366,19 +447,22 @@ public class AttendanceWidget extends AppWidgetProvider {
 
 
         /*
-         * ==========================
+         * =====================================================
          * PUNCH OUT BUTTON
-         * ==========================
+         * =====================================================
          */
+
         Intent outIntent =
                 new Intent(
                         context,
                         AttendanceWidget.class
                 );
 
+
         outIntent.setAction(
                 ACTION_PUNCH_OUT
         );
+
 
         PendingIntent outPendingIntent =
                 PendingIntent.getBroadcast(
@@ -389,6 +473,7 @@ public class AttendanceWidget extends AppWidgetProvider {
                                 PendingIntent.FLAG_IMMUTABLE
                 );
 
+
         views.setOnClickPendingIntent(
                 R.id.widgetPunchOut,
                 outPendingIntent
@@ -396,20 +481,23 @@ public class AttendanceWidget extends AppWidgetProvider {
 
 
         /*
-         * ==========================
+         * =====================================================
          * OPEN SELF HRMS
-         * ==========================
+         * =====================================================
          */
+
         Intent appIntent =
                 new Intent(
                         context,
                         MainActivity.class
                 );
 
+
         appIntent.setFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK |
                         Intent.FLAG_ACTIVITY_CLEAR_TOP
         );
+
 
         PendingIntent appPendingIntent =
                 PendingIntent.getActivity(
@@ -419,6 +507,7 @@ public class AttendanceWidget extends AppWidgetProvider {
                         PendingIntent.FLAG_UPDATE_CURRENT |
                                 PendingIntent.FLAG_IMMUTABLE
                 );
+
 
         views.setOnClickPendingIntent(
                 R.id.widgetTitle,
@@ -434,10 +523,11 @@ public class AttendanceWidget extends AppWidgetProvider {
 
 
         /*
-         * ==========================
+         * =====================================================
          * NOT PUNCHED IN
-         * ==========================
+         * =====================================================
          */
+
         if (punchIn == 0) {
 
             views.setTextViewText(
@@ -445,29 +535,34 @@ public class AttendanceWidget extends AppWidgetProvider {
                     "Not Punched In"
             );
 
+
             views.setTextViewText(
                     R.id.widgetPunchTime,
                     "IN: --:--"
             );
 
+
             views.setTextViewText(
                     R.id.widgetWorkingTime,
                     "00:00:00"
             );
-        }
 
 
-        /*
-         * ==========================
-         * PUNCHED IN
-         * ==========================
-         */
-        else {
+        } else {
+
+            /*
+             * =================================================
+             * PUNCHED IN
+             * =================================================
+             */
 
             String inTime =
                     timeFormat.format(
-                            new Date(punchIn)
+                            new Date(
+                                    punchIn
+                            )
                     );
+
 
             views.setTextViewText(
                     R.id.widgetPunchTime,
@@ -477,19 +572,24 @@ public class AttendanceWidget extends AppWidgetProvider {
 
             long endTime;
 
+
             if (punchOut > 0) {
 
-                endTime = punchOut;
+                endTime =
+                        punchOut;
+
 
                 views.setTextViewText(
                         R.id.widgetStatus,
                         "Punch Completed"
                 );
 
+
             } else {
 
                 endTime =
                         System.currentTimeMillis();
+
 
                 views.setTextViewText(
                         R.id.widgetStatus,
@@ -498,6 +598,9 @@ public class AttendanceWidget extends AppWidgetProvider {
             }
 
 
+            /*
+             * Working duration.
+             */
             long difference =
                     Math.max(
                             0,
@@ -508,11 +611,15 @@ public class AttendanceWidget extends AppWidgetProvider {
             long totalSeconds =
                     difference / 1000;
 
+
             long hours =
                     totalSeconds / 3600;
 
+
             long minutes =
-                    (totalSeconds % 3600) / 60;
+                    (totalSeconds % 3600)
+                            / 60;
+
 
             long seconds =
                     totalSeconds % 60;
