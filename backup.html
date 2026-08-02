@@ -445,6 +445,24 @@ async function downloadBackup(){
         time +
         ".json";
 
+    // Installed Android app: use native bridge.
+    if(
+        typeof Android !== "undefined" &&
+        typeof Android.shareBackup === "function"
+    ){
+        Android.shareBackup(
+            json,
+            fileName
+        );
+
+        bEl("backupFileInfo").textContent =
+            "Backup ready to save/share: " + fileName;
+
+        renderAutoBackups();
+        return;
+    }
+
+    // Browser/PWA fallback.
     const file =
         new File(
             [json],
@@ -459,7 +477,7 @@ async function downloadBackup(){
     ){
         try{
             await navigator.share({
-                title:"Self Attendance Backup",
+                title:"Self HRMS Backup",
                 text:"Save this backup file to Files or Google Drive.",
                 files:[file]
             });
@@ -478,12 +496,55 @@ async function downloadBackup(){
         }
     }
 
-    bEl("backupFileInfo").textContent =
-        "This browser cannot export backup files safely.";
+    // Standard browser download fallback.
+    try{
+        const blob =
+            new Blob(
+                [json],
+                {type:"application/json"}
+            );
 
-    alert(
-        "Acode browser cannot safely download this backup file. Open the app in Chrome / installed PWA and use this button there."
-    );
+        const url =
+            URL.createObjectURL(blob);
+
+        const link =
+            document.createElement("a");
+
+        link.href =
+            url;
+
+        link.download =
+            fileName;
+
+        document.body.appendChild(
+            link
+        );
+
+        link.click();
+
+        link.remove();
+
+        setTimeout(
+            () => URL.revokeObjectURL(url),
+            1000
+        );
+
+        bEl("backupFileInfo").textContent =
+            "Backup downloaded: " + fileName;
+
+        renderAutoBackups();
+
+    }catch(error){
+
+        console.error(error);
+
+        bEl("backupFileInfo").textContent =
+            "Backup export failed.";
+
+        alert(
+            "Backup file could not be exported on this device."
+        );
+    }
 }
 
 
@@ -531,6 +592,25 @@ async function saveBackupToDrive(){
         time +
         ".json";
 
+    // Installed Android app:
+    // MainActivity creates the JSON file and opens Android Share Sheet.
+    if(
+        typeof Android !== "undefined" &&
+        typeof Android.shareBackup === "function"
+    ){
+        Android.shareBackup(
+            json,
+            fileName
+        );
+
+        bEl("backupFileInfo").textContent =
+            "Choose Google Drive in the Android share menu: " + fileName;
+
+        renderAutoBackups();
+        return;
+    }
+
+    // Browser/PWA fallback.
     const file =
         new File(
             [json],
@@ -545,7 +625,7 @@ async function saveBackupToDrive(){
     ){
         try{
             await navigator.share({
-                title:"Self Attendance Backup",
+                title:"Self HRMS Backup",
                 text:"Choose Google Drive to save this backup.",
                 files:[file]
             });
@@ -565,10 +645,10 @@ async function saveBackupToDrive(){
     }
 
     bEl("backupFileInfo").textContent =
-        "Google Drive sharing is not supported in this browser.";
+        "Native sharing is not available in this browser.";
 
     alert(
-        "Acode browser does not support safe file sharing here. Open the app in Chrome / installed PWA, then choose Google Drive from the Share menu."
+        "Open Self HRMS Android app to save this backup through the Android share menu, or use Download Complete Backup."
     );
 }
 
