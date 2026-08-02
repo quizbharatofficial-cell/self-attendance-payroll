@@ -8,13 +8,27 @@ android {
 
     defaultConfig {
         applicationId "com.abss.selfattendance"
-
         minSdk 23
         targetSdk 36
-
-        // Current Self HRMS release
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("self-hrms-release.jks")
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+        }
     }
 }
 
