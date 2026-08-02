@@ -1058,6 +1058,26 @@ public class MainActivity extends AppCompatActivity {
                         new JSONObject(response);
 
 
+                /*
+                 * GitHub Release Notes / What's New
+                 */
+                String releaseNotes =
+                        release.optString(
+                                "body",
+                                ""
+                        );
+
+                if (
+                        releaseNotes == null ||
+                        releaseNotes.trim().isEmpty()
+                ) {
+
+                    releaseNotes =
+                            "• Performance improvements\n"
+                                    + "• Bug fixes";
+                }
+
+
                 String latestTag =
                         release.optString(
                                 "tag_name",
@@ -1151,6 +1171,9 @@ public class MainActivity extends AppCompatActivity {
                 final String finalApkUrl =
                         apkUrl;
 
+                final String finalReleaseNotes =
+                        releaseNotes;
+
 
                 runOnUiThread(() -> {
 
@@ -1220,6 +1243,8 @@ public class MainActivity extends AppCompatActivity {
                                             + finalCurrentVersion
                                             + "\nNew version: "
                                             + finalLatestVersion
+                                            + "\n\nWhat's New:\n"
+                                            + finalReleaseNotes
                                             + "\n\nDownload and install the update?"
                             )
                             .setNegativeButton(
