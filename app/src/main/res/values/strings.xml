@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Self HRMS</string>
+
+    <string name="widget_description">
+        Self HRMS Punch In, Punch Out and working time
+    </string>
+
+</resources>
