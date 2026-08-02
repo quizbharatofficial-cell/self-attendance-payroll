@@ -1,9 +1,12 @@
 package com.abss.selfattendance;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
@@ -15,6 +18,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import java.io.BufferedReader;
@@ -29,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
 
     private static final int BACKUP_FILE_PICKER = 1001;
+
+    private static final int NOTIFICATION_PERMISSION_REQUEST = 2001;
 
     private static final String WIDGET_PREFS =
             "SelfHRMSWidget";
@@ -45,9 +52,16 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
+        /*
+         * Android 13+ notification permission
+         */
+        requestNotificationPermission();
+
+
         webView = new WebView(this);
 
         setContentView(webView);
+
 
         WebSettings settings =
                 webView.getSettings();
@@ -73,9 +87,8 @@ public class MainActivity extends AppCompatActivity {
                         );
 
                         /*
-                         * Whenever a page finishes loading,
-                         * tell JavaScript that widget data
-                         * may be available.
+                         * Send pending Widget attendance
+                         * to the WebView.
                          */
                         sendWidgetDataToWebView();
                     }
@@ -97,6 +110,39 @@ public class MainActivity extends AppCompatActivity {
 
     /*
      * =========================================================
+     * NOTIFICATION PERMISSION
+     * =========================================================
+     */
+
+    private void requestNotificationPermission() {
+
+        if (
+                Build.VERSION.SDK_INT
+                        >= Build.VERSION_CODES.TIRAMISU
+        ) {
+
+            if (
+                    ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.POST_NOTIFICATIONS
+                    )
+                            != PackageManager.PERMISSION_GRANTED
+            ) {
+
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{
+                                Manifest.permission.POST_NOTIFICATIONS
+                        },
+                        NOTIFICATION_PERMISSION_REQUEST
+                );
+            }
+        }
+    }
+
+
+    /*
+     * =========================================================
      * JAVASCRIPT INTERFACE
      * =========================================================
      */
@@ -105,8 +151,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         /*
+         * =========================
          * PDF PRINT
+         * =========================
          */
+
         @JavascriptInterface
         public void printPage() {
 
@@ -117,8 +166,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         /*
+         * =========================
          * BACKUP SHARE
+         * =========================
          */
+
         @JavascriptInterface
         public void shareBackup(
                 String jsonData,
@@ -135,8 +187,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         /*
-         * BACKUP RESTORE FILE PICKER
+         * =========================
+         * BACKUP RESTORE
+         * =========================
          */
+
         @JavascriptInterface
         public void selectBackupFile() {
 
@@ -148,14 +203,8 @@ public class MainActivity extends AppCompatActivity {
 
         /*
          * =====================================================
-         * WIDGET DATA
+         * GET WIDGET PUNCH IN
          * =====================================================
-         *
-         * JavaScript can call:
-         *
-         * Android.getWidgetPunchIn()
-         * Android.getWidgetPunchOut()
-         *
          */
 
         @JavascriptInterface
@@ -174,6 +223,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        /*
+         * =====================================================
+         * GET WIDGET PUNCH OUT
+         * =====================================================
+         */
+
         @JavascriptInterface
         public long getWidgetPunchOut() {
 
@@ -191,10 +246,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         /*
-         * JavaScript calls this after the widget
-         * punch has been successfully copied into
-         * the attendance record.
+         * =====================================================
+         * CLEAR COMPLETED WIDGET PUNCH
+         * =====================================================
          */
+
         @JavascriptInterface
         public void clearWidgetPunch() {
 
@@ -204,19 +260,32 @@ public class MainActivity extends AppCompatActivity {
                             MODE_PRIVATE
                     );
 
+
             prefs.edit()
                     .remove(KEY_PUNCH_IN)
                     .remove(KEY_PUNCH_OUT)
                     .apply();
+
+
+            /*
+             * Attendance is completed,
+             * stop live notification.
+             */
+            AttendanceWidget.stopAttendanceService(
+                    MainActivity.this
+            );
+
 
             refreshWidgets();
         }
 
 
         /*
-         * Allows WebView attendance to push its
-         * current punch state back to the widget.
+         * =====================================================
+         * UPDATE WIDGET FROM WEB ATTENDANCE
+         * =====================================================
          */
+
         @JavascriptInterface
         public void updateWidgetPunch(
                 long punchIn,
@@ -229,10 +298,14 @@ public class MainActivity extends AppCompatActivity {
                             MODE_PRIVATE
                     );
 
+
             SharedPreferences.Editor editor =
                     prefs.edit();
 
 
+            /*
+             * Save Punch IN
+             */
             if (punchIn > 0) {
 
                 editor.putLong(
@@ -248,6 +321,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
+            /*
+             * Save Punch OUT
+             */
             if (punchOut > 0) {
 
                 editor.putLong(
@@ -264,6 +340,31 @@ public class MainActivity extends AppCompatActivity {
 
 
             editor.apply();
+
+
+            /*
+             * Active attendance:
+             * Start live notification service.
+             */
+            if (
+                    punchIn > 0 &&
+                    punchOut == 0
+            ) {
+
+                AttendanceWidget.startAttendanceService(
+                        MainActivity.this
+                );
+
+            } else {
+
+                /*
+                 * Attendance completed / cleared.
+                 */
+                AttendanceWidget.stopAttendanceService(
+                        MainActivity.this
+                );
+            }
+
 
             refreshWidgets();
         }
@@ -284,11 +385,13 @@ public class MainActivity extends AppCompatActivity {
                         MODE_PRIVATE
                 );
 
+
         long punchIn =
                 prefs.getLong(
                         KEY_PUNCH_IN,
                         0
                 );
+
 
         long punchOut =
                 prefs.getLong(
@@ -300,18 +403,18 @@ public class MainActivity extends AppCompatActivity {
         String javascript =
                 "(function(){" +
 
-                "if(typeof window.receiveWidgetAttendance===" +
-                "'function'){" +
+                        "if(typeof window.receiveWidgetAttendance===" +
+                        "'function'){" +
 
-                "window.receiveWidgetAttendance(" +
-                punchIn +
-                "," +
-                punchOut +
-                ");" +
+                        "window.receiveWidgetAttendance(" +
+                        punchIn +
+                        "," +
+                        punchOut +
+                        ");" +
 
-                "}" +
+                        "}" +
 
-                "})()";
+                        "})()";
 
 
         runOnUiThread(
@@ -411,23 +514,36 @@ public class MainActivity extends AppCompatActivity {
 
         try {
 
-            if (fileName == null ||
-                    fileName.trim().isEmpty()) {
+            /*
+             * Default backup filename.
+             */
+            if (
+                    fileName == null ||
+                    fileName.trim().isEmpty()
+            ) {
 
                 fileName =
                         "Self_HRMS_Backup.json";
             }
 
 
-            if (!fileName
-                    .toLowerCase()
-                    .endsWith(".json")) {
+            /*
+             * Make sure extension is JSON.
+             */
+            if (
+                    !fileName
+                            .toLowerCase()
+                            .endsWith(".json")
+            ) {
 
                 fileName =
                         fileName + ".json";
             }
 
 
+            /*
+             * Remove unsafe path characters.
+             */
             fileName =
                     fileName
                             .replace("/", "_")
@@ -441,8 +557,10 @@ public class MainActivity extends AppCompatActivity {
                     );
 
 
-            if (!backupDirectory.exists() &&
-                    !backupDirectory.mkdirs()) {
+            if (
+                    !backupDirectory.exists() &&
+                    !backupDirectory.mkdirs()
+            ) {
 
                 throw new Exception(
                         "Backup folder could not be created."
@@ -523,6 +641,7 @@ public class MainActivity extends AppCompatActivity {
 
             e.printStackTrace();
 
+
             showRestoreError(
                     e.getMessage() == null
                             ? "Backup share failed."
@@ -578,6 +697,7 @@ public class MainActivity extends AppCompatActivity {
 
             e.printStackTrace();
 
+
             showRestoreError(
                     "Backup file picker could not be opened."
             );
@@ -628,8 +748,10 @@ public class MainActivity extends AppCompatActivity {
                     );
 
 
-            if (json == null ||
-                    json.trim().isEmpty()) {
+            if (
+                    json == null ||
+                    json.trim().isEmpty()
+            ) {
 
                 showRestoreError(
                         "Selected backup file is empty."
@@ -647,6 +769,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
 
             e.printStackTrace();
+
 
             showRestoreError(
                     "Backup file could not be opened."
@@ -738,20 +861,20 @@ public class MainActivity extends AppCompatActivity {
         String javascript =
                 "(function(){" +
 
-                "if(typeof window.restoreBackupFromAndroid===" +
-                "'function'){" +
+                        "if(typeof window.restoreBackupFromAndroid===" +
+                        "'function'){" +
 
-                "window.restoreBackupFromAndroid('" +
-                encoded +
-                "');" +
+                        "window.restoreBackupFromAndroid('" +
+                        encoded +
+                        "');" +
 
-                "}else{" +
+                        "}else{" +
 
-                "alert('Restore function is not available.');" +
+                        "alert('Restore function is not available.');" +
 
-                "}" +
+                        "}" +
 
-                "})()";
+                        "})()";
 
 
         runOnUiThread(
@@ -788,9 +911,9 @@ public class MainActivity extends AppCompatActivity {
                         webView.evaluateJavascript(
 
                                 "alert(decodeURIComponent(" +
-                                "escape(atob('" +
-                                encoded +
-                                "'))));",
+                                        "escape(atob('" +
+                                        encoded +
+                                        "'))));",
 
                                 null
                         )
@@ -807,7 +930,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        if (webView.canGoBack()) {
+        if (
+                webView != null &&
+                webView.canGoBack()
+        ) {
 
             webView.goBack();
 
