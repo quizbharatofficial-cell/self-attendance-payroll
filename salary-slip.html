@@ -331,7 +331,7 @@ onclick="goBackToSalary()">
 
 <button
 class="pdf-btn"
-onclick="window.print()">
+onclick="printSalarySlip()">
 
 Save / Print PDF
 
@@ -1580,6 +1580,27 @@ function goBackToSalary(){
 
     location.href =
         "salary.html";
+}
+
+
+/* ==========================================
+   PRINT / SAVE PDF
+========================================== */
+
+function printSalarySlip(){
+
+    // Android app: MainActivity JavaScript interface
+    if(
+        typeof Android !== "undefined" &&
+        Android &&
+        typeof Android.printPage === "function"
+    ){
+        Android.printPage();
+        return;
+    }
+
+    // Normal browser fallback
+    window.print();
 }
 
 
