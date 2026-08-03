@@ -378,7 +378,7 @@ class="slip">
 <div class="header">
 
 <h1>
-SELF ATTENDANCE PAYROLL
+SELF HRMS
 </h1>
 
 <h2>
@@ -424,13 +424,17 @@ EMPLOYEE DETAILS
 <table class="info-table">
 
 <tr>
-
-<td>Name</td>
+<td>Employee Name</td>
 <td id="employeeName">-</td>
+<td>Employee No.</td>
+<td id="employeeNo">-</td>
+</tr>
 
+<tr>
 <td>Employee ID</td>
 <td id="employeeId">-</td>
-
+<td>Father / Husband</td>
+<td id="fatherHusbandName">-</td>
 </tr>
 
 
@@ -457,13 +461,17 @@ EMPLOYEE DETAILS
 
 
 <tr>
+<td>Aadhaar No.</td>
+<td id="aadhaarNumber">-</td>
+<td>PF No.</td>
+<td id="pfNumber">-</td>
+</tr>
 
+<tr>
 <td>Bank</td>
 <td id="bankName">-</td>
-
 <td>Account No.</td>
 <td id="accountNumber">-</td>
-
 </tr>
 
 
@@ -795,6 +803,11 @@ NET SALARY
 
 </div>
 
+<div style="border:1px solid #777;border-top:0;padding:8px;font-size:10px;">
+<strong>Net Pay in Words:</strong>
+<span id="netPayWords">Rupees Zero Only</span>
+</div>
+
 
 <div
 id="generatedAt"
@@ -809,7 +822,7 @@ This is a computer generated salary slip.
 
 <br>
 
-Generated from Self Attendance & Payroll records.
+Generated from Self HRMS payroll records.
 
 </div>
 
@@ -970,6 +983,59 @@ function showSlipError(message){
 }
 
 
+
+function firstValue(...values){
+    for(const value of values){
+        if(value !== undefined && value !== null && value !== ""){
+            return value;
+        }
+    }
+    return "";
+}
+
+function maskNumber(value, visible = 4){
+    const raw = String(value || "").replace(/\s+/g, "");
+    if(!raw) return "-";
+    if(raw.length <= visible) return raw;
+    return "X".repeat(raw.length - visible) + raw.slice(-visible);
+}
+
+function numberToIndianWords(value){
+    let n = Math.round(Number(value || 0));
+    if(n === 0) return "Rupees Zero Only";
+    if(n < 0) return "Rupees Zero Only";
+
+    const ones = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten",
+        "Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+    const tens = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+
+    function belowThousand(x){
+        let out = [];
+        if(x >= 100){
+            out.push(ones[Math.floor(x/100)] + " Hundred");
+            x %= 100;
+        }
+        if(x >= 20){
+            out.push(tens[Math.floor(x/10)]);
+            x %= 10;
+        }
+        if(x > 0) out.push(ones[x]);
+        return out.join(" ");
+    }
+
+    let parts = [];
+    const crore = Math.floor(n / 10000000); n %= 10000000;
+    const lakh = Math.floor(n / 100000); n %= 100000;
+    const thousand = Math.floor(n / 1000); n %= 1000;
+
+    if(crore) parts.push(belowThousand(crore) + " Crore");
+    if(lakh) parts.push(belowThousand(lakh) + " Lakh");
+    if(thousand) parts.push(belowThousand(thousand) + " Thousand");
+    if(n) parts.push(belowThousand(n));
+
+    return "Rupees " + parts.join(" ") + " Only";
+}
+
 /* ==========================================
    LOAD SLIP
 ========================================== */
@@ -1102,6 +1168,27 @@ function loadSalarySlip(){
 
 
     setSlipText(
+        "employeeNo",
+        safe(firstValue(salary.employeeNo, profile.employeeNo))
+    );
+
+    setSlipText(
+        "fatherHusbandName",
+        safe(firstValue(salary.fatherHusbandName, profile.fatherHusbandName))
+    );
+
+    setSlipText(
+        "aadhaarNumber",
+        maskNumber(firstValue(salary.aadhaarNumber, profile.aadhaarNumber), 4)
+    );
+
+    setSlipText(
+        "pfNumber",
+        safe(firstValue(salary.pfNumber, profile.pfNumber))
+    );
+
+
+    setSlipText(
         "employeeId",
         safe(
             salary.employeeId ??
@@ -1157,9 +1244,10 @@ function loadSalarySlip(){
 
     setSlipText(
         "accountNumber",
-        safe(
+        maskNumber(
             salary.accountNumber ??
-            profile.accountNumber
+            profile.accountNumber,
+            4
         )
     );
 
@@ -1258,6 +1346,16 @@ function loadSalarySlip(){
         salary.otHours ??
         0
     );
+
+
+    setSlipText("elDays", firstValue(salary.elDays, salary.earnedLeave, 0));
+    setSlipText("clDays", firstValue(salary.clDays, salary.casualLeave, 0));
+    setSlipText("slDays", firstValue(salary.slDays, salary.sickLeave, 0));
+    setSlipText("holidays", firstValue(salary.holidays, salary.holidayDays, 0));
+    setSlipText("workingDays", firstValue(salary.workingDays, salary.payableDays, 0));
+    setSlipText("arrearDays", firstValue(salary.arrearDays, 0));
+    setSlipText("otDays", firstValue(salary.otDays, 0));
+    setSlipText("saturdayDays", firstValue(salary.saturdayDays, 0));
 
 
     /* ======================================
@@ -1486,6 +1584,12 @@ function loadSalarySlip(){
     );
 
 
+    setSlipText("hraAmount", plainMoney(firstValue(salary.hraAmount, salary.hra, 0)));
+    setSlipText("attendanceAward", plainMoney(firstValue(salary.attendanceAward, salary.incentive, 0)));
+    setSlipText("lwfAmount", plainMoney(firstValue(salary.lwfAmount, salary.lwf, 0)));
+    setSlipText("otherDeductionAmount", plainMoney(firstValue(salary.otherDeductionAmount, 0)));
+
+
     /* ======================================
        TOTAL
     ====================================== */
@@ -1514,6 +1618,11 @@ function loadSalarySlip(){
         money(
             salary.netSalary
         )
+    );
+
+    setSlipText(
+        "netPayWords",
+        numberToIndianWords(salary.netSalary)
     );
 
 
