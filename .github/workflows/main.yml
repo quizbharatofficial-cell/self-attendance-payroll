@@ -49,11 +49,11 @@ jobs:
       - name: Rename Release APK
         run: |
           cp app/build/outputs/apk/release/app-release.apk \
-             app/build/outputs/apk/release/Self-HRMS-v1.0.3.apk
+             app/build/outputs/apk/release/Self-HRMS-v1.0.4.apk
 
       - name: Upload Signed Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: Self-HRMS-v1.0.3
-          path: app/build/outputs/apk/release/Self-HRMS-v1.0.3.apk
+          name: Self-HRMS-v1.0.4
+          path: app/build/outputs/apk/release/Self-HRMS-v1.0.4.apk
           retention-days: 30
