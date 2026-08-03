@@ -248,6 +248,27 @@ placeholder="Employee Name">
 <div class="two-column">
 
 <div>
+<label>Employee No.</label>
+<input
+id="employeeNo"
+type="text"
+placeholder="Employee No.">
+</div>
+
+<div>
+<label>Father / Husband Name</label>
+<input
+id="fatherHusbandName"
+type="text"
+placeholder="Father / Husband Name">
+</div>
+
+</div>
+
+
+<div class="two-column">
+
+<div>
 <label>Employee ID</label>
 
 <input
@@ -472,6 +493,29 @@ Bank / Statutory Details
 </h3>
 
 
+<div class="two-column">
+
+<div>
+<label>Aadhaar Number</label>
+<input
+id="aadhaarNumber"
+type="text"
+inputmode="numeric"
+maxlength="12"
+placeholder="Aadhaar Number">
+</div>
+
+<div>
+<label>PF Number</label>
+<input
+id="pfNumber"
+type="text"
+placeholder="PF Number">
+</div>
+
+</div>
+
+
 <label>Bank Name</label>
 
 <input
@@ -683,6 +727,14 @@ function loadCurrentProfile(){
         profile.employeeName || "";
 
 
+    field("employeeNo").value =
+        profile.employeeNo || "";
+
+
+    field("fatherHusbandName").value =
+        profile.fatherHusbandName || "";
+
+
     field("employeeId").value =
         profile.employeeId || "";
 
@@ -765,7 +817,15 @@ function loadCurrentProfile(){
         0;
 
 
-    /* BANK */
+    /* BANK / STATUTORY */
+
+    field("aadhaarNumber").value =
+        profile.aadhaarNumber || "";
+
+
+    field("pfNumber").value =
+        profile.pfNumber || "";
+
 
     field("bankName").value =
         profile.bankName || "";
@@ -970,6 +1030,18 @@ function saveProfileForm(){
         );
 
 
+    profile.employeeNo =
+        textValue(
+            "employeeNo"
+        );
+
+
+    profile.fatherHusbandName =
+        textValue(
+            "fatherHusbandName"
+        );
+
+
     profile.employeeId =
         textValue(
             "employeeId"
@@ -1091,7 +1163,19 @@ function saveProfileForm(){
         );
 
 
-    /* BANK */
+    /* BANK / STATUTORY */
+
+    profile.aadhaarNumber =
+        textValue(
+            "aadhaarNumber"
+        ).replace(/\D/g, "");
+
+
+    profile.pfNumber =
+        textValue(
+            "pfNumber"
+        ).toUpperCase();
+
 
     profile.bankName =
         textValue(
