@@ -12,12 +12,14 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
 
-    <application
-        android:allowBackup="true"
-        android:label="Self HRMS"
-        android:theme="@style/Theme.SelfAttendance"
-        android:usesCleartextTraffic="false"
-        android:supportsRtl="true">
+<application
+    android:allowBackup="true"
+    android:label="Self HRMS"
+    android:icon="@mipmap/ic_launcher"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:theme="@style/Theme.SelfAttendance"
+    android:usesCleartextTraffic="false"
+    android:supportsRtl="true">
 
         <!-- Main Activity -->
         <activity
