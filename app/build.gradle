@@ -12,9 +12,9 @@ android {
         minSdk 23
         targetSdk 36
 
-        // Self HRMS v1.0.3
-        versionCode 4
-        versionName "1.0.3"
+        // Self HRMS v1.0.4
+        versionCode 5
+        versionName "1.0.4"
     }
 
     signingConfigs {
