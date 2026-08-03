@@ -441,6 +441,18 @@ Salary calculation sirf upar dikh rahe Active Profile ke Attendance aur Salary S
 
 <h3>Monthly Adjustment</h3>
 
+<label>HRA / Other Allowance ₹</label>
+<input type="number" id="hraAmount" value="0" min="0" step="0.01" oninput="calculateSalary()">
+
+<label>Attendance Award / Incentive ₹</label>
+<input type="number" id="attendanceAward" value="0" min="0" step="0.01" oninput="calculateSalary()">
+
+<label>Arrear Days</label>
+<input type="number" id="arrearDays" value="0" min="0" step="0.5" oninput="calculateSalary()">
+
+<label>LWF Deduction ₹</label>
+<input type="number" id="lwfAmount" value="0" min="0" step="0.01" oninput="calculateSalary()">
+
 <label>Bonus / Extra Allowance ₹</label>
 
 <input
@@ -593,6 +605,11 @@ function loadSavedAdjustments(){
 
     if(saved){
 
+        sEl("hraAmount").value = Number(saved.hraAmount || 0);
+        sEl("attendanceAward").value = Number(saved.attendanceAward || 0);
+        sEl("arrearDays").value = Number(saved.arrearDays || 0);
+        sEl("lwfAmount").value = Number(saved.lwfAmount || 0);
+
         sEl("bonus").value =
             Number(
                 saved.bonus || 0
@@ -615,6 +632,10 @@ function loadSavedAdjustments(){
 
     }else{
 
+        sEl("hraAmount").value = 0;
+        sEl("attendanceAward").value = 0;
+        sEl("arrearDays").value = 0;
+        sEl("lwfAmount").value = 0;
         sEl("bonus").value = 0;
 
         sEl("advance").value = 0;
@@ -747,6 +768,9 @@ function calculateSalary(){
     let workingMinutes = 0;
 
     let overtimeMinutes = 0;
+    let otDays = 0;
+    let saturdayDays = 0;
+    let holidays = 0;
 
 
     Object.keys(
@@ -843,11 +867,23 @@ function calculateSalary(){
             );
 
 
-        overtimeMinutes +=
-            Number(
-                record.overtimeMinutes ||
-                0
-            );
+        const recordOtMinutes = Number(record.overtimeMinutes || 0);
+        overtimeMinutes += recordOtMinutes;
+
+        if(recordOtMinutes > 0){
+            otDays++;
+        }
+
+        if((status === "present" || status === "half-day")){
+            const d = new Date(date + "T00:00:00");
+            if(d.getDay() === 6){
+                saturdayDays++;
+            }
+        }
+
+        if(status === "holiday"){
+            holidays++;
+        }
     });
 
 
@@ -916,6 +952,12 @@ function calculateSalary(){
         nightAllowanceRate;
 
 
+    const hraAmount = numberInput("hraAmount");
+    const attendanceAward = numberInput("attendanceAward");
+    const arrearDays = numberInput("arrearDays");
+    const lwfAmount = numberInput("lwfAmount");
+    const arrearAmount = perDaySalary * arrearDays;
+
     const bonus =
         numberInput(
             "bonus"
@@ -932,6 +974,9 @@ function calculateSalary(){
         earnedSalary +
         overtimeAmount +
         nightAllowanceAmount +
+        hraAmount +
+        attendanceAward +
+        arrearAmount +
         bonus;
 
 
@@ -986,6 +1031,7 @@ function calculateSalary(){
         salaryPfDeduction +
         salaryEsicDeduction +
         canteenAmount +
+        lwfAmount +
         salaryOtherDeduction;
 
     const extraDeduction =
@@ -1230,6 +1276,11 @@ function calculateSalary(){
             profile.employeeId ||
             "",
 
+        employeeNo: profile.employeeNo || "",
+        fatherHusbandName: profile.fatherHusbandName || "",
+        aadhaarNumber: profile.aadhaarNumber || "",
+        pfNumber: profile.pfNumber || "",
+
         month:month,
 
 
@@ -1267,6 +1318,14 @@ function calculateSalary(){
                 payableDays
                 .toFixed(1)
             ),
+
+        workingDays: Number((present + (halfDay * 0.5)).toFixed(1)),
+        elDays: 0,
+        clDays: 0,
+        slDays: 0,
+        holidays: holidays,
+        otDays: otDays,
+        saturdayDays: saturdayDays,
 
 
         /* SHIFTS */
@@ -1324,6 +1383,11 @@ function calculateSalary(){
         earnedSalary:
             earnedSalary,
 
+        hraAmount: hraAmount,
+        attendanceAward: attendanceAward,
+        arrearDays: arrearDays,
+        arrearAmount: arrearAmount,
+
         bonus:
             bonus,
 
@@ -1368,6 +1432,8 @@ function calculateSalary(){
 
 
         /* OTHER */
+
+        lwfAmount: lwfAmount,
 
         advance:
             advance,
