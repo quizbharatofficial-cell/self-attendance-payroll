@@ -381,6 +381,8 @@ function createEmptyProfile(name = "Profile 1") {
 
         profileName: name,
         employeeName: "",
+        employeeNo: "",
+        fatherHusbandName: "",
         employeeId: "",
         designation: "",
         department: "",
@@ -405,12 +407,17 @@ function createEmptyProfile(name = "Profile 1") {
         otRate: 0,
 
         pfPercent: 12,
-
         esicPercent: 0.75,
+
+        pfDeductionMode: "salary",
+        esicDeductionMode: "salary",
 
         canteenPerDay: 0,
 
-        /* BANK */
+        /* BANK / STATUTORY */
+
+        aadhaarNumber: "",
+        pfNumber: "",
 
         bankName: "",
 
@@ -436,8 +443,9 @@ function createEmptyProfile(name = "Profile 1") {
         updatedAt:
             new Date().toISOString()
     };
+}
 
-  /* =====================================================
+/* =====================================================
    OLD DATA MIGRATION
 
    Current single-profile data ko automatically
