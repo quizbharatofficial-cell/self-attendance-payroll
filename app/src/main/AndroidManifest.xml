@@ -15,8 +15,8 @@
 <application
     android:allowBackup="true"
     android:label="Self HRMS"
-    android:icon="@mipmap/ic_launcher"
-    android:roundIcon="@mipmap/ic_launcher_round"
+    android:icon="@drawable/icon_512"
+    android:roundIcon="@drawable/icon_512"
     android:theme="@style/Theme.SelfAttendance"
     android:usesCleartextTraffic="false"
     android:supportsRtl="true">
