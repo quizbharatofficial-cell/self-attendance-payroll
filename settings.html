@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Settings - SELF HRMS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+<div>
+<h1>SELF HRMS</h1>
+<p>System Settings</p>
+</div>
+</header>
+
+<main class="container">
+
+<div class="page-heading">
+<h2>Settings</h2>
+<p>Company, attendance and payroll configuration</p>
+</div>
+
+<div class="actions-bar">
+<a href="index.html" class="btn btn-secondary">← Dashboard</a>
+</div>
+
+<form id="settingsForm">
+
+<section class="form-card">
+<h3 class="section-title">Company Settings</h3>
+
+<div class="form-grid">
+
+<div class="field">
+<label>Company Name</label>
+<input id="companyName">
+</div>
+
+<div class="field">
+<label>Contact</label>
+<input id="companyContact">
+</div>
+
+<div class="field">
+<label>Email</label>
+<input type="email" id="companyEmail">
+</div>
+
+<div class="field">
+<label>Address</label>
+<input id="companyAddress">
+</div>
+
+<div class="field">
+<label>Company Logo</label>
+<input type="file" id="companyLogo" accept="image/*">
+</div>
+
+<div class="field">
+<label>Current Logo</label>
+<div id="logoPreview" class="logo-preview">No Logo</div>
+</div>
+
+</div>
+</section>
+
+<section class="form-card">
+
+<h3 class="section-title">Attendance Settings</h3>
+
+<div class="form-grid">
+
+<div class="field">
+<label>Shift Start</label>
+<input type="time" id="shiftStart">
+</div>
+
+<div class="field">
+<label>Shift End</label>
+<input type="time" id="shiftEnd">
+</div>
+
+<div class="field">
+<label>Shift Hours</label>
+<input type="number" min="0" step="0.01" id="shiftHours">
+</div>
+
+<div class="field">
+<label>Default Break (Minutes)</label>
+<input type="number" min="0" step="1" id="breakMinutes">
+</div>
+
+<div class="field">
+<label>Late After (Minutes)</label>
+<input type="number" min="0" step="1" id="lateMinutes">
+</div>
+
+<div class="field">
+<label>Half-Day Below Hours</label>
+<input type="number" min="0" step="0.01" id="halfDayHours">
+</div>
+
+<div class="field">
+<label>Weekly Off</label>
+<select id="weeklyOff">
+<option value="">Select</option>
+<option value="0">Sunday</option>
+<option value="1">Monday</option>
+<option value="2">Tuesday</option>
+<option value="3">Wednesday</option>
+<option value="4">Thursday</option>
+<option value="5">Friday</option>
+<option value="6">Saturday</option>
+</select>
+</div>
+
+</div>
+</section>
+
+<section class="form-card">
+
+<h3 class="section-title">Salary & Payroll Settings</h3>
+
+<div class="form-grid">
+
+<div class="field">
+<label>Salary Divisor *</label>
+<input type="number" min="0.01" step="0.01" id="salaryDivisor" required>
+</div>
+
+<div class="field">
+<label>Payroll Shift Hours *</label>
+<input type="number" min="0.01" step="0.01" id="payrollShiftHours" required>
+</div>
+
+<div class="field">
+<label>OT Multiplier *</label>
+<input type="number" min="0" step="0.01" id="otMultiplier" required>
+</div>
+
+<div class="field">
+<label>PF Rate (%)</label>
+<input type="number" min="0" step="0.01" id="pfRate">
+</div>
+
+<div class="field">
+<label>ESI Rate (%)</label>
+<input type="number" min="0" step="0.01" id="esiRate">
+</div>
+
+<div class="field">
+<label>LWF Amount</label>
+<input type="number" min="0" step="0.01" id="lwfAmount">
+</div>
+
+<div class="field">
+<label>Attendance Award</label>
+<input type="number" min="0" step="0.01" id="attendanceAward">
+</div>
+
+<div class="field">
+<label>Canteen Rule</label>
+<select id="canteenRule">
+<option value="None">None</option>
+<option value="Fixed">Fixed</option>
+<option value="PerDay">Per Day</option>
+</select>
+</div>
+
+<div class="field">
+<label>Canteen Amount / Rate</label>
+<input type="number" min="0" step="0.01" id="canteenAmount">
+</div>
+
+<div class="field">
+<label>Rounding</label>
+<select id="roundingRule">
+<option value="None">No Rounding</option>
+<option value="Nearest1">Nearest ₹1</option>
+<option value="Nearest10">Nearest ₹10</option>
+</select>
+</div>
+
+</div>
+</section>
+
+<section class="form-card">
+
+<h3 class="section-title">Payable Day Rules</h3>
+
+<div class="form-grid">
+
+<div class="field">
+<label>Present (P)</label>
+<input type="number" min="0" step="0.5" id="payableP">
+</div>
+
+<div class="field">
+<label>Absent (A)</label>
+<input type="number" min="0" step="0.5" id="payableA">
+</div>
+
+<div class="field">
+<label>Half Day (HD)</label>
+<input type="number" min="0" step="0.5" id="payableHD">
+</div>
+
+<div class="field">
+<label>EL</label>
+<input type="number" min="0" step="0.5" id="payableEL">
+</div>
+
+<div class="field">
+<label>CL</label>
+<input type="number" min="0" step="0.5" id="payableCL">
+</div>
+
+<div class="field">
+<label>SL</label>
+<input type="number" min="0" step="0.5" id="payableSL">
+</div>
+
+<div class="field">
+<label>Weekly Off</label>
+<input type="number" min="0" step="0.5" id="payableWO">
+</div>
+
+<div class="field">
+<label>Paid Holiday</label>
+<input type="number" min="0" step="0.5" id="payableHoliday">
+</div>
+
+</div>
+
+<div class="form-actions">
+<button class="btn btn-primary" type="submit">
+Save Settings
+</button>
+</div>
+
+</section>
+
+</form>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/settings.js"></script>
+
+</body>
+</html>

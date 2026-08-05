@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shift Master - SELF HRMS</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Shift Master</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Shift Master</h2>
+    <p>Create and manage employee work shifts</p>
+  </div>
+
+  <div class="actions-bar">
+    <a href="../index.html" class="btn btn-secondary">
+      ← Dashboard
+    </a>
+  </div>
+
+  <section class="form-card">
+
+    <form id="shiftForm">
+
+      <input type="hidden" id="recordId">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Shift Code *</label>
+          <input
+            type="text"
+            id="shiftCode"
+            placeholder="Enter shift code"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>Shift Name *</label>
+          <input
+            type="text"
+            id="shiftName"
+            placeholder="Enter shift name"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>Start Time *</label>
+          <input
+            type="time"
+            id="startTime"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>End Time *</label>
+          <input
+            type="time"
+            id="endTime"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>Break Minutes</label>
+          <input
+            type="number"
+            id="breakMinutes"
+            min="0"
+            step="1"
+            value="0"
+          >
+        </div>
+
+        <div class="field">
+          <label>Working Hours</label>
+          <input
+            type="text"
+            id="workingHours"
+            readonly
+          >
+        </div>
+
+        <div class="field">
+          <label>Grace In Minutes</label>
+          <input
+            type="number"
+            id="graceIn"
+            min="0"
+            step="1"
+            value="0"
+          >
+        </div>
+
+        <div class="field">
+          <label>Grace Out Minutes</label>
+          <input
+            type="number"
+            id="graceOut"
+            min="0"
+            step="1"
+            value="0"
+          >
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <select id="status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="field">
+        <label>Description</label>
+        <textarea
+          id="description"
+          rows="3"
+          placeholder="Optional shift description"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="saveBtn"
+        >
+          Save Shift
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="cancelBtn"
+        >
+          Clear
+        </button>
+
+      </div>
+
+      <p id="message"></p>
+
+    </form>
+
+  </section>
+
+  <section class="table-card">
+
+    <div class="table-header">
+
+      <h3>Shift List</h3>
+
+      <input
+        type="search"
+        id="shiftSearch"
+        placeholder="Search shift..."
+      >
+
+    </div>
+
+    <div class="table-responsive">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Shift</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Break</th>
+            <th>Working Hours</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="shiftTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="../js/modules/shift.js"></script>
+
+</body>
+</html>

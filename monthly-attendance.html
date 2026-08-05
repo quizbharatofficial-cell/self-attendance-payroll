@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monthly Attendance - SELF HRMS</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Monthly Attendance Summary</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Monthly Attendance</h2>
+    <p>Employee attendance and payable-day summary</p>
+  </div>
+
+  <div class="actions-bar">
+    <a href="index.html" class="btn btn-secondary">
+      ← Dashboard
+    </a>
+  </div>
+
+  <section class="form-card">
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Month *</label>
+        <input type="month" id="summaryMonth">
+      </div>
+
+      <div class="field">
+        <label>Employee</label>
+        <select id="summaryEmployee">
+          <option value="">All Employees</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>&nbsp;</label>
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="generateSummary">
+          Generate Summary
+        </button>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="table-card">
+
+    <div class="table-header">
+      <h3>Monthly Summary</h3>
+
+      <input
+        type="search"
+        id="summarySearch"
+        placeholder="Search employee..."
+      >
+    </div>
+
+    <div class="table-responsive">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Calendar</th>
+            <th>Working</th>
+            <th>P</th>
+            <th>A</th>
+            <th>HD</th>
+            <th>EL</th>
+            <th>CL</th>
+            <th>SL</th>
+            <th>WO</th>
+            <th>Holiday</th>
+            <th>Payable</th>
+            <th>Work Hrs</th>
+            <th>OT Hrs</th>
+          </tr>
+        </thead>
+
+        <tbody id="summaryTable"></tbody>
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/monthly.js"></script>
+
+</body>
+</html>

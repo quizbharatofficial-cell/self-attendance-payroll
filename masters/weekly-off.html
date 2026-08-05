@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Weekly Off Master - SELF HRMS</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Weekly Off Master</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Weekly Off Master</h2>
+    <p>Configure weekly off rules for attendance and payroll</p>
+  </div>
+
+  <div class="actions-bar">
+
+    <a
+      href="../index.html"
+      class="btn btn-secondary"
+    >
+      ← Dashboard
+    </a>
+
+  </div>
+
+
+  <section class="form-card">
+
+    <form id="weeklyOffForm">
+
+      <input
+        type="hidden"
+        id="recordId"
+      >
+
+
+      <div class="form-grid">
+
+        <div class="field">
+
+          <label>
+            Rule Code *
+          </label>
+
+          <input
+            type="text"
+            id="ruleCode"
+            placeholder="Enter rule code"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Rule Name *
+          </label>
+
+          <input
+            type="text"
+            id="ruleName"
+            placeholder="Enter rule name"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Apply To *
+          </label>
+
+          <select id="applyTo" required>
+
+            <option value="All">
+              All Employees
+            </option>
+
+            <option value="Branch">
+              Branch
+            </option>
+
+            <option value="Employee">
+              Employee
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div
+          class="field"
+          id="branchField"
+        >
+
+          <label>
+            Branch
+          </label>
+
+          <select id="branch">
+
+            <option value="">
+              Select Branch
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div
+          class="field"
+          id="employeeField"
+        >
+
+          <label>
+            Employee
+          </label>
+
+          <select id="employee">
+
+            <option value="">
+              Select Employee
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Weekly Off Day *
+          </label>
+
+          <select
+            id="weekDay"
+            required
+          >
+
+            <option value="Sunday">
+              Sunday
+            </option>
+
+            <option value="Monday">
+              Monday
+            </option>
+
+            <option value="Tuesday">
+              Tuesday
+            </option>
+
+            <option value="Wednesday">
+              Wednesday
+            </option>
+
+            <option value="Thursday">
+              Thursday
+            </option>
+
+            <option value="Friday">
+              Friday
+            </option>
+
+            <option value="Saturday">
+              Saturday
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Week Pattern
+          </label>
+
+          <select id="weekPattern">
+
+            <option value="Every">
+              Every Week
+            </option>
+
+            <option value="1">
+              1st Week
+            </option>
+
+            <option value="2">
+              2nd Week
+            </option>
+
+            <option value="3">
+              3rd Week
+            </option>
+
+            <option value="4">
+              4th Week
+            </option>
+
+            <option value="5">
+              5th Week
+            </option>
+
+            <option value="Odd">
+              Odd Weeks
+            </option>
+
+            <option value="Even">
+              Even Weeks
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Effective From *
+          </label>
+
+          <input
+            type="date"
+            id="effectiveFrom"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Effective To
+          </label>
+
+          <input
+            type="date"
+            id="effectiveTo"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Status
+          </label>
+
+          <select id="status">
+
+            <option value="Active">
+              Active
+            </option>
+
+            <option value="Inactive">
+              Inactive
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Remarks
+        </label>
+
+        <textarea
+          id="remarks"
+          rows="3"
+          placeholder="Optional remarks"
+        ></textarea>
+
+      </div>
+
+
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="saveBtn"
+        >
+          Save Weekly Off
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="cancelBtn"
+        >
+          Clear
+        </button>
+
+      </div>
+
+
+      <p id="message"></p>
+
+    </form>
+
+  </section>
+
+
+  <section class="table-card">
+
+    <div class="table-header">
+
+      <h3>Weekly Off Rules</h3>
+
+      <input
+        type="search"
+        id="weeklyOffSearch"
+        placeholder="Search weekly off..."
+      >
+
+    </div>
+
+
+    <div class="table-responsive">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Code</th>
+
+            <th>Rule</th>
+
+            <th>Apply To</th>
+
+            <th>Day</th>
+
+            <th>Pattern</th>
+
+            <th>Effective From</th>
+
+            <th>Status</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="weeklyOffTable">
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
+
+<script src="../js/modules/weekly-off.js"></script>
+
+</body>
+</html>

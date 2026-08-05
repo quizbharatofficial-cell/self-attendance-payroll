@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Salary Slip - SELF HRMS</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .payslip {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 24px;
+    }
+
+    .payslip-header {
+      text-align: center;
+      border-bottom: 2px solid #222;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .payslip-header h2,
+    .payslip-header h3,
+    .payslip-header p {
+      margin: 5px 0;
+    }
+
+    .payslip-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 25px;
+      margin-bottom: 20px;
+    }
+
+    .payslip-info div {
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .salary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .salary-table th,
+    .salary-table td {
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .salary-table th {
+      text-align: left;
+    }
+
+    .amount {
+      text-align: right;
+    }
+
+    .net-pay {
+      margin-top: 20px;
+      padding: 15px;
+      border: 2px solid #222;
+      text-align: right;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .slip-actions {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .empty-slip {
+      text-align: center;
+      padding: 30px;
+    }
+
+    @media (max-width: 600px) {
+      .payslip-info {
+        grid-template-columns: 1fr;
+      }
+
+      .payslip {
+        padding: 12px;
+      }
+    }
+
+    @media print {
+
+      body * {
+        visibility: hidden;
+      }
+
+      #payslip,
+      #payslip * {
+        visibility: visible;
+      }
+
+      #payslip {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none;
+        margin: 0;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="topbar no-print">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Salary Slip</p>
+  </div>
+</header>
+
+
+<main class="container">
+
+  <div class="page-heading no-print">
+    <h2>Salary Slip / Payslip</h2>
+    <p>View and print generated employee salary slips</p>
+  </div>
+
+
+  <div class="actions-bar no-print">
+
+    <a
+      href="../index.html"
+      class="btn btn-secondary"
+    >
+      ← Dashboard
+    </a>
+
+    <a
+      href="payroll.html"
+      class="btn btn-secondary"
+    >
+      Payroll
+    </a>
+
+  </div>
+
+
+  <section class="form-card no-print">
+
+    <div class="form-grid">
+
+      <div class="field">
+
+        <label>
+          Salary Month *
+        </label>
+
+        <input
+          type="month"
+          id="salaryMonth"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Employee *
+        </label>
+
+        <select id="employee">
+
+          <option value="">
+            Select Employee
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="form-actions">
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        id="viewBtn"
+      >
+        View Salary Slip
+      </button>
+
+    </div>
+
+    <p id="message"></p>
+
+  </section>
+
+
+  <div class="slip-actions no-print">
+
+    <button
+      type="button"
+      class="btn btn-primary"
+      id="printBtn"
+      disabled
+    >
+      Print / Save PDF
+    </button>
+
+  </div>
+
+
+  <section
+    id="payslip"
+    class="payslip"
+  >
+
+    <div
+      id="emptySlip"
+      class="empty-slip"
+    >
+      Select Salary Month and Employee to view salary slip.
+    </div>
+
+
+    <div
+      id="slipContent"
+      style="display:none;"
+    >
+
+      <div class="payslip-header">
+
+        <h2>SELF HRMS</h2>
+
+        <h3>SALARY SLIP</h3>
+
+        <p id="slipMonth">-</p>
+
+      </div>
+
+
+      <div class="payslip-info">
+
+        <div>
+          <strong>Employee Code:</strong>
+          <span id="slipEmployeeCode">-</span>
+        </div>
+
+        <div>
+          <strong>Employee Name:</strong>
+          <span id="slipEmployeeName">-</span>
+        </div>
+
+        <div>
+          <strong>Designation:</strong>
+          <span id="slipDesignation">-</span>
+        </div>
+
+        <div>
+          <strong>Department:</strong>
+          <span id="slipDepartment">-</span>
+        </div>
+
+        <div>
+          <strong>Branch:</strong>
+          <span id="slipBranch">-</span>
+        </div>
+
+        <div>
+          <strong>Date of Joining:</strong>
+          <span id="slipJoiningDate">-</span>
+        </div>
+
+        <div>
+          <strong>UAN / PF No:</strong>
+          <span id="slipUan">-</span>
+        </div>
+
+        <div>
+          <strong>ESI No:</strong>
+          <span id="slipEsi">-</span>
+        </div>
+
+        <div>
+          <strong>Bank:</strong>
+          <span id="slipBank">-</span>
+        </div>
+
+        <div>
+          <strong>Account No:</strong>
+          <span id="slipAccount">-</span>
+        </div>
+
+      </div>
+
+
+      <h3>Attendance Summary</h3>
+
+      <table class="salary-table">
+
+        <thead>
+          <tr>
+            <th>Present</th>
+            <th>Half Day</th>
+            <th>Paid Leave</th>
+            <th>Unpaid Leave</th>
+            <th>WO</th>
+            <th>Holiday</th>
+            <th>Paid Days</th>
+            <th>OT Hours</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td id="slipPresent">0</td>
+            <td id="slipHalfDay">0</td>
+            <td id="slipPaidLeave">0</td>
+            <td id="slipUnpaidLeave">0</td>
+            <td id="slipWO">0</td>
+            <td id="slipHoliday">0</td>
+            <td id="slipPaidDays">0</td>
+            <td id="slipOTHours">0</td>
+          </tr>
+        </tbody>
+
+      </table>
+
+
+      <table class="salary-table">
+
+        <thead>
+
+          <tr>
+            <th>Earnings</th>
+            <th class="amount">Amount</th>
+
+            <th>Deductions</th>
+            <th class="amount">Amount</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr>
+
+            <td>Attendance Salary</td>
+
+            <td
+              class="amount"
+              id="slipAttendanceSalary"
+            >
+              0.00
+            </td>
+
+            <td>PF</td>
+
+            <td
+              class="amount"
+              id="slipPF"
+            >
+              0.00
+            </td>
+
+          </tr>
+
+
+          <tr>
+
+            <td>Overtime</td>
+
+            <td
+              class="amount"
+              id="slipOTAmount"
+            >
+              0.00
+            </td>
+
+            <td>ESI</td>
+
+            <td
+              class="amount"
+              id="slipESI"
+            >
+              0.00
+            </td>
+
+          </tr>
+
+
+          <tr>
+
+            <td>Bonus</td>
+
+            <td
+              class="amount"
+              id="slipBonus"
+            >
+              0.00
+            </td>
+
+            <td>Advance</td>
+
+            <td
+              class="amount"
+              id="slipAdvance"
+            >
+              0.00
+            </td>
+
+          </tr>
+
+
+          <tr>
+
+            <td>Other Earnings</td>
+
+            <td
+              class="amount"
+              id="slipOtherEarnings"
+            >
+              0.00
+            </td>
+
+            <td>Other Deduction</td>
+
+            <td
+              class="amount"
+              id="slipOtherDeduction"
+            >
+              0.00
+            </td>
+
+          </tr>
+
+
+          <tr>
+
+            <th>Gross Earnings</th>
+
+            <th
+              class="amount"
+              id="slipGross"
+            >
+              0.00
+            </th>
+
+            <th>Total Deduction</th>
+
+            <th
+              class="amount"
+              id="slipTotalDeduction"
+            >
+              0.00
+            </th>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+
+      <div class="net-pay">
+
+        Net Payable:
+        ₹ <span id="slipNetSalary">0.00</span>
+
+      </div>
+
+
+      <div style="margin-top:20px;">
+
+        <strong>Payroll Status:</strong>
+        <span id="slipStatus">-</span>
+
+      </div>
+
+
+      <div style="margin-top:10px;">
+
+        <strong>Remarks:</strong>
+        <span id="slipRemarks">-</span>
+
+      </div>
+
+
+      <div
+        style="
+          margin-top:50px;
+          display:flex;
+          justify-content:space-between;
+        "
+      >
+
+        <div>
+          Employee Signature
+        </div>
+
+        <div>
+          Authorized Signature
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script src="../js/modules/payslip.js"></script>
+
+</body>
+</html>

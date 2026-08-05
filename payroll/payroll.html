@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payroll Processing - SELF HRMS</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Payroll Processing</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Payroll Processing</h2>
+    <p>Monthly salary calculation and payroll generation</p>
+  </div>
+
+  <div class="actions-bar">
+    <a href="../index.html" class="btn btn-secondary">
+      ← Dashboard
+    </a>
+  </div>
+
+  <section class="form-card">
+
+    <form id="payrollForm">
+
+      <input type="hidden" id="recordId">
+
+      <h3>Employee & Payroll Period</h3>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Payroll Month *</label>
+          <input type="month" id="payrollMonth" required>
+        </div>
+
+        <div class="field">
+          <label>Employee *</label>
+          <select id="employee" required>
+            <option value="">Select Employee</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Salary Divisor *</label>
+          <input
+            type="number"
+            id="salaryDivisor"
+            min="1"
+            step="1"
+            value="26"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>Payable Days</label>
+          <input
+            type="number"
+            id="payableDays"
+            min="0"
+            step="0.5"
+            value="0"
+          >
+        </div>
+
+      </div>
+
+
+      <h3>Salary Structure</h3>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Basic Salary</label>
+          <input
+            type="number"
+            id="basicSalary"
+            min="0"
+            step="0.01"
+            value="0"
+          >
+        </div>
+
+        <div class="field">
+          <label>HRA</label>
+          <input
+            type="number"
+            id="hra"
+            min="0"
+            step="0.01"
+            value="0"
+          >
+        </div>
+
+        <div class="field">
+          <label>Monthly Gross</label>
+          <input type="number" id="monthlyGross" readonly>
+        </div>
+
+      </div>
+
+
+      <h3>Attendance Summary</h3>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Present</label>
+          <input type="number" id="presentDays" readonly>
+        </div>
+
+        <div class="field">
+          <label>Absent</label>
+          <input type="number" id="absentDays" readonly>
+        </div>
+
+        <div class="field">
+          <label>Half Day</label>
+          <input type="number" id="halfDays" readonly>
+        </div>
+
+        <div class="field">
+          <label>Paid Leave</label>
+          <input type="number" id="paidLeave" readonly>
+        </div>
+
+        <div class="field">
+          <label>Unpaid Leave</label>
+          <input type="number" id="unpaidLeave" readonly>
+        </div>
+
+        <div class="field">
+          <label>Weekly Off</label>
+          <input type="number" id="weeklyOff" readonly>
+        </div>
+
+        <div class="field">
+          <label>Holiday</label>
+          <input type="number" id="holidayDays" readonly>
+        </div>
+
+      </div>
+
+
+      <h3>Manual Shift & Overtime</h3>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Shift Hours *</label>
+          <input
+            type="number"
+            id="shiftHours"
+            min="0.01"
+            step="0.01"
+            placeholder="Enter shift hours"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>OT Hours</label>
+          <input
+            type="number"
+            id="otHours"
+            min="0"
+            step="0.01"
+            value="0"
+          >
+        </div>
+
+        <div class="field">
+          <label>OT Multiplier</label>
+          <input
+            type="number"
+            id="otMultiplier"
+            min="0"
+            step="0.01"
+            value="1"
+          >
+        </div>
+
+        <div class="field">
+          <label>OT Rate / Hour</label>
+          <input type="number" id="otRate" readonly>
+        </div>
+
+        <div class="field">
+          <label>OT Amount</label>
+          <input type="number" id="otAmount" readonly>
+        </div>
+
+      </div>
+
+
+      <h3>Earned Salary</h3>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Earned Basic</label>
+          <input type="number" id="earnedBasic" readonly>
+        </div>
+
+        <div class="field">
+          <label>Earned HRA</label>
+          <input type="number" id="earnedHra" readonly>
+        </div>
+
+      </div>
+
+
+      <h3>Additional Earnings</h3>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Award</label>
+          <input type="number" id="award" min="0" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <label>Bonus</label>
+          <input type="number" id="bonus" min="0" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <label>Incentive</label>
+          <input type="number" id="incentive" min="0" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <label>Arrear</label>
+          <input type="number" id="arrear" min="0" step="0.01" value="0">
+        </div>
+
+        <div class="field">
+          <label>Other Earnings</label>
+          <input
+            type="number"
+            id="otherEarnings"
+            min="0"
+            step="0.01"
+            value="0"
+          >
+        </div>
+
+        <div class="field">
+          <label>Total Earnings</label>
+          <input type="number" id="totalEarnings" readonly>
+        </div>
+
+      </div>
+
+
+      <h3>Deductions</h3>
+
+      <p>
+        Auto = Salary Component Master rule |
+        Manual = Enter amount |
+        Off = No deduction
+      </p>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>PF Mode</label>
+          <select id="pfMode">
+            <option value="Auto">Auto</option>
+            <option value="Manual">Manual</option>
+            <option value="Off">Off</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>PF Deduction</label>
+          <input type="number" id="pfDeduction"
+                 min="0" step="0.01" value="0">
+          <small id="pfRule">No automatic rule configured</small>
+        </div>
+
+        <div class="field">
+          <label>ESI Mode</label>
+          <select id="esiMode">
+            <option value="Auto">Auto</option>
+            <option value="Manual">Manual</option>
+            <option value="Off">Off</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>ESI Deduction</label>
+          <input type="number" id="esiDeduction"
+                 min="0" step="0.01" value="0">
+          <small id="esiRule">No automatic rule configured</small>
+        </div>
+
+        <div class="field">
+          <label>LWF Mode</label>
+          <select id="lwfMode">
+            <option value="Auto">Auto</option>
+            <option value="Manual">Manual</option>
+            <option value="Off">Off</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>LWF Deduction</label>
+          <input type="number" id="lwfDeduction"
+                 min="0" step="0.01" value="0">
+          <small id="lwfRule">No automatic rule configured</small>
+        </div>
+
+        <div class="field">
+          <label>Canteen Mode</label>
+          <select id="canteenMode">
+            <option value="Auto">Auto</option>
+            <option value="Manual">Manual</option>
+            <option value="Off">Off</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Canteen Deduction</label>
+          <input type="number" id="canteenDeduction"
+                 min="0" step="0.01" value="0">
+          <small id="canteenRule">No automatic rule configured</small>
+        </div>
+
+        <div class="field">
+          <label>Advance Mode</label>
+          <select id="advanceMode">
+            <option value="Manual">Manual</option>
+            <option value="Auto">Auto</option>
+            <option value="Off">Off</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Advance Deduction</label>
+          <input type="number" id="advanceDeduction"
+                 min="0" step="0.01" value="0">
+          <small id="advanceRule">Manual by default</small>
+        </div>
+
+        <div class="field">
+          <label>Loan Mode</label>
+          <select id="loanMode">
+            <option value="Manual">Manual</option>
+            <option value="Auto">Auto</option>
+            <option value="Off">Off</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Loan Deduction</label>
+          <input type="number" id="loanDeduction"
+                 min="0" step="0.01" value="0">
+          <small id="loanRule">Manual by default</small>
+        </div>
+
+        <div class="field">
+          <label>Fine Mode</label>
+          <select id="fineMode">
+            <option value="Manual">Manual</option>
+            <option value="Auto">Auto</option>
+            <option value="Off">Off</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Fine Deduction</label>
+          <input type="number" id="fineDeduction"
+                 min="0" step="0.01" value="0">
+          <small id="fineRule">Manual by default</small>
+        </div>
+
+        <div class="field">
+          <label>Other Mode</label>
+          <select id="otherMode">
+            <option value="Manual">Manual</option>
+            <option value="Auto">Auto</option>
+            <option value="Off">Off</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Other Deduction</label>
+          <input type="number" id="otherDeduction"
+                 min="0" step="0.01" value="0">
+          <small id="otherRule">Manual by default</small>
+        </div>
+
+        <div class="field">
+          <label>Total Deductions</label>
+          <input type="number" id="totalDeduction" readonly>
+        </div>
+
+      </div>
+
+
+      <h3>Final Salary</h3>
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Net Salary</label>
+          <input type="number" id="netSalary" readonly>
+        </div>
+
+        <div class="field">
+          <label>Payroll Status</label>
+          <select id="payrollStatus">
+            <option value="Draft">Draft</option>
+            <option value="Generated">Generated</option>
+            <option value="Paid">Paid</option>
+          </select>
+        </div>
+
+      </div>
+
+
+      <div class="field">
+        <label>Remarks</label>
+        <textarea
+          id="remarks"
+          rows="3"
+          placeholder="Optional payroll remarks"
+        ></textarea>
+      </div>
+
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="calculateBtn"
+        >
+          Calculate
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="saveBtn"
+        >
+          Save Payroll
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="cancelBtn"
+        >
+          Clear
+        </button>
+
+      </div>
+
+      <p id="message"></p>
+
+    </form>
+
+  </section>
+
+
+  <section class="table-card">
+
+    <div class="table-header">
+      <h3>Payroll Records</h3>
+
+      <input
+        type="search"
+        id="payrollSearch"
+        placeholder="Search employee/month/status..."
+      >
+    </div>
+
+    <div class="table-responsive">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Employee</th>
+            <th>Payable Days</th>
+            <th>Gross</th>
+            <th>OT Hours</th>
+            <th>OT Amount</th>
+            <th>Earnings</th>
+            <th>Deductions</th>
+            <th>Net Salary</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="payrollTable"></tbody>
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+<script src="../js/modules/payroll.js"></script>
+<script src="../js/modules/payroll-deductions.js"></script>
+
+</body>
+</html>

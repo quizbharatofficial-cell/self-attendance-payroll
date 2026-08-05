@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Department Master - SELF HRMS</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Department Master</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Department Master</h2>
+    <p>Create and manage company departments</p>
+  </div>
+
+  <div class="actions-bar">
+    <a href="../index.html" class="btn btn-secondary">
+      ← Dashboard
+    </a>
+
+    <a href="branch.html" class="btn btn-secondary">
+      Branch Master
+    </a>
+  </div>
+
+  <section class="form-card">
+
+    <form id="departmentForm">
+
+      <input type="hidden" id="recordId">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label for="departmentCode">
+            Department Code *
+          </label>
+          <input
+            type="text"
+            id="departmentCode"
+            placeholder="Department code"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="departmentName">
+            Department Name *
+          </label>
+          <input
+            type="text"
+            id="departmentName"
+            placeholder="Department name"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="branch">
+            Branch
+          </label>
+          <select id="branch">
+            <option value="">Select Branch</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="status">
+            Status
+          </label>
+          <select id="status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="description">
+            Description
+          </label>
+          <input
+            type="text"
+            id="description"
+            placeholder="Department description"
+          >
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >
+          Save Department
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="cancelBtn"
+        >
+          Clear
+        </button>
+
+      </div>
+
+      <p id="message"></p>
+
+    </form>
+
+  </section>
+
+  <section class="table-card">
+
+    <div class="table-header">
+
+      <h3>Department List</h3>
+
+      <input
+        type="search"
+        id="departmentSearch"
+        placeholder="Search department..."
+      >
+
+    </div>
+
+    <div class="table-responsive">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Department</th>
+            <th>Branch</th>
+            <th>Status</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="departmentTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="../js/storage.js"></script>
+<script src="../js/modules/department.js"></script>
+
+</body>
+</html>

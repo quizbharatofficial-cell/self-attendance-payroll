@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Leave Type Master - SELF HRMS</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Leave Type Master</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Leave Type Master</h2>
+    <p>Configure leave types and payroll treatment</p>
+  </div>
+
+  <div class="actions-bar">
+
+    <a
+      href="../index.html"
+      class="btn btn-secondary"
+    >
+      ← Dashboard
+    </a>
+
+  </div>
+
+
+  <section class="form-card">
+
+    <form id="leaveTypeForm">
+
+      <input
+        type="hidden"
+        id="recordId"
+      >
+
+
+      <div class="form-grid">
+
+
+        <div class="field">
+
+          <label>
+            Leave Code *
+          </label>
+
+          <input
+            type="text"
+            id="leaveCode"
+            placeholder="Enter leave code"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Leave Name *
+          </label>
+
+          <input
+            type="text"
+            id="leaveName"
+            placeholder="Enter leave name"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Leave Category *
+          </label>
+
+          <select
+            id="leaveCategory"
+            required
+          >
+
+            <option value="Paid">
+              Paid Leave
+            </option>
+
+            <option value="Unpaid">
+              Unpaid Leave
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Annual Entitlement
+          </label>
+
+          <input
+            type="number"
+            id="annualEntitlement"
+            min="0"
+            step="0.5"
+            value="0"
+            placeholder="Days per year"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Maximum Days Per Request
+          </label>
+
+          <input
+            type="number"
+            id="maxDaysRequest"
+            min="0"
+            step="0.5"
+            value="0"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Minimum Days Per Request
+          </label>
+
+          <input
+            type="number"
+            id="minDaysRequest"
+            min="0.5"
+            step="0.5"
+            value="0.5"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Half Day Allowed
+          </label>
+
+          <select id="halfDayAllowed">
+
+            <option value="Yes">
+              Yes
+            </option>
+
+            <option value="No">
+              No
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Carry Forward
+          </label>
+
+          <select id="carryForward">
+
+            <option value="No">
+              No
+            </option>
+
+            <option value="Yes">
+              Yes
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Maximum Carry Forward Days
+          </label>
+
+          <input
+            type="number"
+            id="maxCarryForward"
+            min="0"
+            step="0.5"
+            value="0"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Requires Approval
+          </label>
+
+          <select id="requiresApproval">
+
+            <option value="Yes">
+              Yes
+            </option>
+
+            <option value="No">
+              No
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Status
+          </label>
+
+          <select id="status">
+
+            <option value="Active">
+              Active
+            </option>
+
+            <option value="Inactive">
+              Inactive
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Description
+        </label>
+
+        <textarea
+          id="description"
+          rows="3"
+          placeholder="Optional leave description"
+        ></textarea>
+
+      </div>
+
+
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="saveBtn"
+        >
+          Save Leave Type
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="cancelBtn"
+        >
+          Clear
+        </button>
+
+      </div>
+
+
+      <p id="message"></p>
+
+    </form>
+
+  </section>
+
+
+  <section class="table-card">
+
+    <div class="table-header">
+
+      <h3>Leave Type List</h3>
+
+      <input
+        type="search"
+        id="leaveTypeSearch"
+        placeholder="Search leave type..."
+      >
+
+    </div>
+
+
+    <div class="table-responsive">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Code</th>
+
+            <th>Leave Type</th>
+
+            <th>Category</th>
+
+            <th>Annual Days</th>
+
+            <th>Half Day</th>
+
+            <th>Carry Forward</th>
+
+            <th>Status</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="leaveTypeTable">
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
+
+<script src="../js/modules/leave-type.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Master | SELF HRMS</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header>
+  <h1>SELF HRMS</h1>
+  <p>Company Master</p>
+</header>
+
+<main>
+
+  <section class="card">
+    <h2>Company Details</h2>
+
+    <form id="companyForm">
+
+      <label>Company Name</label>
+      <input type="text" id="companyName" required>
+
+      <label>Company Code</label>
+      <input type="text" id="companyCode">
+
+      <label>Address</label>
+      <textarea id="companyAddress"></textarea>
+
+      <label>Phone Number</label>
+      <input type="tel" id="companyPhone">
+
+      <label>Email</label>
+      <input type="email" id="companyEmail">
+
+      <label>GST Number</label>
+      <input type="text" id="companyGST">
+
+      <label>PF Registration Number</label>
+      <input type="text" id="companyPF">
+
+      <label>ESI Registration Number</label>
+      <input type="text" id="companyESI">
+
+      <label>Company Logo</label>
+      <input type="file" id="companyLogo" accept="image/*">
+
+      <br><br>
+
+      <button type="submit">Save Company</button>
+
+    </form>
+
+    <p id="saveMessage"></p>
+
+  </section>
+
+</main>
+
+<script src="../js/modules/company.js"></script>
+
+</body>
+</html>

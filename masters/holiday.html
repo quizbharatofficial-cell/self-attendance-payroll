@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Holiday Master - SELF HRMS</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Holiday Master</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Holiday Master</h2>
+    <p>Create and manage company holidays</p>
+  </div>
+
+  <div class="actions-bar">
+
+    <a
+      href="../index.html"
+      class="btn btn-secondary"
+    >
+      ← Dashboard
+    </a>
+
+  </div>
+
+
+  <section class="form-card">
+
+    <form id="holidayForm">
+
+      <input
+        type="hidden"
+        id="recordId"
+      >
+
+      <div class="form-grid">
+
+
+        <div class="field">
+
+          <label>
+            Holiday Date *
+          </label>
+
+          <input
+            type="date"
+            id="holidayDate"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Holiday Name *
+          </label>
+
+          <input
+            type="text"
+            id="holidayName"
+            placeholder="Enter holiday name"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Holiday Type
+          </label>
+
+          <select id="holidayType">
+
+            <option value="National">
+              National
+            </option>
+
+            <option value="Festival">
+              Festival
+            </option>
+
+            <option value="Company">
+              Company
+            </option>
+
+            <option value="Restricted">
+              Restricted
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Branch
+          </label>
+
+          <select id="branch">
+
+            <option value="">
+              All Branches
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Status
+          </label>
+
+          <select id="status">
+
+            <option value="Active">
+              Active
+            </option>
+
+            <option value="Inactive">
+              Inactive
+            </option>
+
+          </select>
+
+        </div>
+
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Description
+        </label>
+
+        <textarea
+          id="description"
+          rows="3"
+          placeholder="Optional holiday description"
+        ></textarea>
+
+      </div>
+
+
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="saveBtn"
+        >
+          Save Holiday
+        </button>
+
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="cancelBtn"
+        >
+          Clear
+        </button>
+
+      </div>
+
+
+      <p id="message"></p>
+
+    </form>
+
+  </section>
+
+
+  <section class="table-card">
+
+    <div class="table-header">
+
+      <h3>
+        Holiday List
+      </h3>
+
+      <input
+        type="search"
+        id="holidaySearch"
+        placeholder="Search holiday..."
+      >
+
+    </div>
+
+
+    <div class="table-responsive">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Date</th>
+
+            <th>Holiday</th>
+
+            <th>Type</th>
+
+            <th>Branch</th>
+
+            <th>Status</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="holidayTable">
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
+
+<script src="../js/modules/holiday.js"></script>
+
+</body>
+</html>

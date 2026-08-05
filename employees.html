@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employees - SELF HRMS</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Employee Master</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Employees</h2>
+    <p>Add and manage employee master records</p>
+  </div>
+
+  <div class="actions-bar">
+    <a href="index.html" class="btn btn-secondary">← Dashboard</a>
+  </div>
+
+  <section class="form-card">
+
+    <form id="employeeForm">
+
+      <input type="hidden" id="recordId">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Employee ID / Code *</label>
+          <input id="employeeCode" required>
+        </div>
+
+        <div class="field">
+          <label>Employee Name *</label>
+          <input id="employeeName" required>
+        </div>
+
+        <div class="field">
+          <label>Department</label>
+          <input id="department">
+        </div>
+
+        <div class="field">
+          <label>Designation</label>
+          <input id="designation">
+        </div>
+
+        <div class="field">
+          <label>Date of Joining</label>
+          <input type="date" id="doj">
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <select id="status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Mobile</label>
+          <input type="tel" id="mobile">
+        </div>
+
+        <div class="field">
+          <label>Bank Name</label>
+          <input id="bank">
+        </div>
+
+        <div class="field">
+          <label>A/C No.</label>
+          <input id="accountNo">
+        </div>
+
+        <div class="field">
+          <label>IFSC</label>
+          <input id="ifsc">
+        </div>
+
+        <div class="field">
+          <label>UAN</label>
+          <input id="uan">
+        </div>
+
+        <div class="field">
+          <label>ESIC</label>
+          <input id="esic">
+        </div>
+
+        <div class="field">
+          <label>Basic *</label>
+          <input type="number" id="basic" min="0" step="0.01" required>
+        </div>
+
+        <div class="field">
+          <label>HRA *</label>
+          <input type="number" id="hra" min="0" step="0.01" required>
+        </div>
+
+        <div class="field">
+          <label>Gross Salary</label>
+          <input type="number" id="gross" readonly>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="saveBtn">
+          Save Employee
+        </button>
+
+        <button type="button" class="btn btn-secondary" id="cancelBtn">
+          Clear
+        </button>
+      </div>
+
+    </form>
+
+  </section>
+
+  <section class="table-card">
+
+    <div class="table-header">
+      <h3>Employee List</h3>
+
+      <input
+        type="search"
+        id="employeeSearch"
+        placeholder="Search employee..."
+      >
+    </div>
+
+    <div class="table-responsive">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Status</th>
+            <th>Basic</th>
+            <th>HRA</th>
+            <th>Gross</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="employeeTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/employees.js"></script>
+
+</body>
+</html>

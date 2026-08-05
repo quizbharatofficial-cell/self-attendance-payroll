@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Attendance Management - SELF HRMS</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Attendance Management</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Attendance Management</h2>
+    <p>Manage daily employee attendance</p>
+  </div>
+
+  <div class="actions-bar">
+    <a href="../index.html" class="btn btn-secondary">
+      ← Dashboard
+    </a>
+  </div>
+
+
+  <section class="form-card">
+
+    <form id="attendanceForm">
+
+      <input type="hidden" id="recordId">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Attendance Date *</label>
+          <input
+            type="date"
+            id="attendanceDate"
+            required
+          >
+        </div>
+
+
+        <div class="field">
+          <label>Employee *</label>
+          <select id="employee" required>
+            <option value="">Select Employee</option>
+          </select>
+        </div>
+
+
+        <div class="field">
+          <label>Attendance Status *</label>
+
+          <select id="attendanceStatus" required>
+            <option value="P">Present (P)</option>
+            <option value="A">Absent (A)</option>
+            <option value="HD">Half Day (HD)</option>
+            <option value="PL">Paid Leave (PL)</option>
+            <option value="UL">Unpaid Leave (UL)</option>
+            <option value="WO">Weekly Off (WO)</option>
+            <option value="H">Holiday (H)</option>
+          </select>
+        </div>
+
+
+        <div class="field">
+          <label>Shift</label>
+
+          <select id="shift">
+            <option value="">Select Shift</option>
+          </select>
+        </div>
+
+
+        <div class="field">
+          <label>In Time</label>
+          <input
+            type="time"
+            id="inTime"
+          >
+        </div>
+
+
+        <div class="field">
+          <label>Out Time</label>
+          <input
+            type="time"
+            id="outTime"
+          >
+        </div>
+
+
+        <div class="field">
+          <label>OT Hours (Manual)</label>
+
+          <input
+            type="number"
+            id="otHours"
+            min="0"
+            step="0.01"
+            value="0"
+            placeholder="Enter OT hours"
+          >
+        </div>
+
+
+        <div class="field">
+          <label>Late Minutes</label>
+
+          <input
+            type="number"
+            id="lateMinutes"
+            min="0"
+            step="1"
+            value="0"
+          >
+        </div>
+
+
+        <div class="field">
+          <label>Early Out Minutes</label>
+
+          <input
+            type="number"
+            id="earlyOutMinutes"
+            min="0"
+            step="1"
+            value="0"
+          >
+        </div>
+
+      </div>
+
+
+      <div class="field">
+        <label>Remarks</label>
+
+        <textarea
+          id="remarks"
+          rows="3"
+          placeholder="Optional attendance remarks"
+        ></textarea>
+      </div>
+
+
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="saveBtn"
+        >
+          Save Attendance
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="cancelBtn"
+        >
+          Clear
+        </button>
+
+      </div>
+
+      <p id="message"></p>
+
+    </form>
+
+  </section>
+
+
+  <section class="table-card">
+
+    <div class="table-header">
+
+      <h3>Attendance Records</h3>
+
+      <input
+        type="search"
+        id="attendanceSearch"
+        placeholder="Search employee/date/status..."
+      >
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Filter From</label>
+        <input type="date" id="filterFrom">
+      </div>
+
+      <div class="field">
+        <label>Filter To</label>
+        <input type="date" id="filterTo">
+      </div>
+
+      <div class="field">
+        <label>Status Filter</label>
+
+        <select id="statusFilter">
+          <option value="">All Status</option>
+          <option value="P">Present</option>
+          <option value="A">Absent</option>
+          <option value="HD">Half Day</option>
+          <option value="PL">Paid Leave</option>
+          <option value="UL">Unpaid Leave</option>
+          <option value="WO">Weekly Off</option>
+          <option value="H">Holiday</option>
+        </select>
+      </div>
+
+    </div>
+
+
+    <div class="table-responsive">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Employee</th>
+            <th>Status</th>
+            <th>Shift</th>
+            <th>In</th>
+            <th>Out</th>
+            <th>OT</th>
+            <th>Late</th>
+            <th>Early Out</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="attendanceTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<div id="toast" class="toast"></div>
+
+<script src="../js/modules/attendance.js"></script>
+
+</body>
+</html>

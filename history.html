@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Payroll History - SELF HRMS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+<div>
+<h1>SELF HRMS</h1>
+<p>Payroll History</p>
+</div>
+</header>
+
+<main class="container">
+
+<div class="page-heading">
+<h2>Payroll History</h2>
+<p>Generated salary records</p>
+</div>
+
+<div class="actions-bar">
+<a href="index.html" class="btn btn-secondary">← Dashboard</a>
+</div>
+
+<section class="table-card">
+
+<div class="table-header">
+
+<h3>Payroll Records</h3>
+
+<input type="search"
+id="historySearch"
+placeholder="Search employee/month...">
+
+</div>
+
+<div class="table-responsive">
+
+<table>
+
+<thead>
+<tr>
+<th>Month</th>
+<th>Employee</th>
+<th>Payable Days</th>
+<th>OT Hours</th>
+<th>Earnings</th>
+<th>Deduction</th>
+<th>Net Salary</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="historyTable"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/history.js"></script>
+
+</body>
+</html>

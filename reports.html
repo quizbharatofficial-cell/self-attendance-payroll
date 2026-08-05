@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reports - SELF HRMS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+<div>
+<h1>SELF HRMS</h1>
+<p>Reports</p>
+</div>
+</header>
+
+<main class="container">
+
+<div class="page-heading">
+<h2>Reports</h2>
+<p>Attendance, leave and payroll reports</p>
+</div>
+
+<div class="actions-bar">
+<a href="index.html" class="btn btn-secondary">← Dashboard</a>
+</div>
+
+<section class="form-card">
+
+<div class="form-grid">
+
+<div class="field">
+<label>Report *</label>
+<select id="reportType">
+<option value="attendance">Attendance</option>
+<option value="present">Present</option>
+<option value="absent">Absent</option>
+<option value="leave">Leave</option>
+<option value="late">Late</option>
+<option value="ot">Overtime</option>
+<option value="payroll">Payroll</option>
+<option value="salary">Salary</option>
+<option value="pf">PF</option>
+<option value="esi">ESI</option>
+<option value="lwf">LWF</option>
+<option value="canteen">Canteen</option>
+<option value="advance">Advance</option>
+<option value="salarySummary">Salary Summary</option>
+</select>
+</div>
+
+<div class="field">
+<label>From Date</label>
+<input type="date" id="fromDate">
+</div>
+
+<div class="field">
+<label>To Date</label>
+<input type="date" id="toDate">
+</div>
+
+<div class="field">
+<label>Month</label>
+<input type="month" id="reportMonth">
+</div>
+
+<div class="field">
+<label>Employee</label>
+<select id="reportEmployee">
+<option value="">All Employees</option>
+</select>
+</div>
+
+<div class="field">
+<label>Department</label>
+<select id="reportDepartment">
+<option value="">All Departments</option>
+</select>
+</div>
+
+<div class="field">
+<label>Status</label>
+<select id="reportStatus">
+<option value="">All Status</option>
+<option value="P">P</option>
+<option value="A">A</option>
+<option value="HD">HD</option>
+<option value="EL">EL</option>
+<option value="CL">CL</option>
+<option value="SL">SL</option>
+<option value="WO">WO</option>
+<option value="Holiday">Holiday</option>
+<option value="Generated">Generated</option>
+</select>
+</div>
+
+<div class="field">
+<label>&nbsp;</label>
+<button type="button"
+class="btn btn-primary"
+id="generateReport">
+Generate Report
+</button>
+</div>
+
+</div>
+
+</section>
+
+<section class="dashboard-grid report-totals">
+
+<div class="stat-card">
+<span>Records</span>
+<strong id="totalRecords">0</strong>
+</div>
+
+<div class="stat-card">
+<span>Payable Days</span>
+<strong id="totalPayable">0</strong>
+</div>
+
+<div class="stat-card">
+<span>OT Hours</span>
+<strong id="totalOT">0</strong>
+</div>
+
+<div class="stat-card">
+<span>Total Earnings</span>
+<strong id="totalEarnings">0</strong>
+</div>
+
+<div class="stat-card">
+<span>Net Salary</span>
+<strong id="totalNet">0</strong>
+</div>
+
+</section>
+
+<section class="table-card">
+
+<div class="table-header">
+<h3 id="reportTitle">Report</h3>
+
+<input type="search"
+id="reportSearch"
+placeholder="Search report...">
+</div>
+
+<div class="table-responsive">
+<table>
+<thead id="reportHead"></thead>
+<tbody id="reportBody"></tbody>
+</table>
+</div>
+
+</section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/reports.js"></script>
+
+</body>
+</html>

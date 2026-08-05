@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Branch Master - SELF HRMS</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>SELF HRMS</h1>
+    <p>Branch Master</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-heading">
+    <h2>Branch Master</h2>
+    <p>Add and manage company branches</p>
+  </div>
+
+  <div class="actions-bar">
+    <a href="../index.html" class="btn btn-secondary">
+      ← Dashboard
+    </a>
+
+    <a href="company.html" class="btn btn-secondary">
+      Company Master
+    </a>
+  </div>
+
+  <section class="form-card">
+
+    <form id="branchForm">
+
+      <input type="hidden" id="recordId">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Branch Code *</label>
+          <input
+            type="text"
+            id="branchCode"
+            placeholder="Enter branch code"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>Branch Name *</label>
+          <input
+            type="text"
+            id="branchName"
+            placeholder="Enter branch name"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label>Contact Person</label>
+          <input
+            type="text"
+            id="contactPerson"
+            placeholder="Enter contact person"
+          >
+        </div>
+
+        <div class="field">
+          <label>Phone Number</label>
+          <input
+            type="tel"
+            id="branchPhone"
+            placeholder="Enter phone number"
+          >
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input
+            type="email"
+            id="branchEmail"
+            placeholder="Enter email"
+          >
+        </div>
+
+        <div class="field">
+          <label>GST Number</label>
+          <input
+            type="text"
+            id="branchGST"
+            placeholder="Enter GST number"
+          >
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <select id="branchStatus">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>State</label>
+          <input
+            type="text"
+            id="branchState"
+            placeholder="Enter state"
+          >
+        </div>
+
+        <div class="field">
+          <label>City</label>
+          <input
+            type="text"
+            id="branchCity"
+            placeholder="Enter city"
+          >
+        </div>
+
+        <div class="field">
+          <label>PIN Code</label>
+          <input
+            type="text"
+            id="branchPin"
+            placeholder="Enter PIN code"
+          >
+        </div>
+
+      </div>
+
+      <div class="field">
+        <label>Branch Address</label>
+        <textarea
+          id="branchAddress"
+          rows="3"
+          placeholder="Enter complete branch address"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+
+        <button type="submit" class="btn btn-primary">
+          Save Branch
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="cancelBtn"
+        >
+          Clear
+        </button>
+
+      </div>
+
+    </form>
+
+  </section>
+
+
+  <section class="table-card">
+
+    <div class="table-header">
+
+      <h3>Branch List</h3>
+
+      <input
+        type="search"
+        id="branchSearch"
+        placeholder="Search branch..."
+      >
+
+    </div>
+
+    <div class="table-responsive">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Branch Name</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Phone</th>
+            <th>GST</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="branchTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="../js/modules/branch.js"></script>
+
+</body>
+</html>

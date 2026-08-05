@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Holiday - SELF HRMS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+<div>
+<h1>SELF HRMS</h1>
+<p>Holiday Management</p>
+</div>
+</header>
+
+<main class="container">
+
+<div class="page-heading">
+<h2>Holiday</h2>
+<p>Manage company holidays</p>
+</div>
+
+<div class="actions-bar">
+<a href="index.html" class="btn btn-secondary">← Dashboard</a>
+</div>
+
+<section class="form-card">
+
+<form id="holidayForm">
+
+<input type="hidden" id="holidayId">
+
+<div class="form-grid">
+
+<div class="field">
+<label>Holiday Name *</label>
+<input id="holidayName" required>
+</div>
+
+<div class="field">
+<label>Date *</label>
+<input type="date" id="holidayDate" required>
+</div>
+
+<div class="field">
+<label>Type *</label>
+<select id="holidayPaid">
+<option value="Paid">Paid</option>
+<option value="Unpaid">Unpaid</option>
+</select>
+</div>
+
+<div class="field">
+<label>Description</label>
+<input id="holidayDescription">
+</div>
+
+</div>
+
+<div class="form-actions">
+<button class="btn btn-primary" id="holidaySave">
+Save Holiday
+</button>
+
+<button type="button" class="btn btn-secondary" id="holidayClear">
+Clear
+</button>
+</div>
+
+</form>
+</section>
+
+<section class="table-card">
+
+<div class="table-header">
+<h3>Holiday List</h3>
+<input type="search" id="holidaySearch" placeholder="Search holiday...">
+</div>
+
+<div class="table-responsive">
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Name</th>
+<th>Paid/Unpaid</th>
+<th>Description</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="holidayTable"></tbody>
+</table>
+</div>
+
+</section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/holiday.js"></script>
+
+</body>
+</html>

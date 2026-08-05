@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Payroll - SELF HRMS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+<div>
+<h1>SELF HRMS</h1>
+<p>Payroll Management</p>
+</div>
+</header>
+
+<main class="container">
+
+<div class="page-heading">
+<h2>Payroll</h2>
+<p>Attendance based salary calculation</p>
+</div>
+
+<div class="actions-bar">
+<a href="index.html" class="btn btn-secondary">← Dashboard</a>
+</div>
+
+<section class="form-card">
+
+<div class="form-grid">
+
+<div class="field">
+<label>Employee *</label>
+<select id="employeeId">
+<option value="">Select Employee</option>
+</select>
+</div>
+
+<div class="field">
+<label>Month *</label>
+<input type="month" id="payrollMonth">
+</div>
+
+<div class="field">
+<label>&nbsp;</label>
+<button type="button"
+class="btn btn-primary"
+id="loadPayroll">
+Load Attendance
+</button>
+</div>
+
+</div>
+
+</section>
+
+<section class="form-card">
+
+<h3 class="section-title">Attendance & Salary</h3>
+
+<div class="form-grid">
+
+<div class="field">
+<label>Basic</label>
+<input id="basic" readonly>
+</div>
+
+<div class="field">
+<label>HRA</label>
+<input id="hra" readonly>
+</div>
+
+<div class="field">
+<label>Gross</label>
+<input id="gross" readonly>
+</div>
+
+<div class="field">
+<label>Payable Days</label>
+<input id="payableDays" readonly>
+</div>
+
+<div class="field">
+<label>Working Hours</label>
+<input id="workingHours" readonly>
+</div>
+
+<div class="field">
+<label>OT Hours</label>
+<input id="otHours" readonly>
+</div>
+
+<div class="field">
+<label>Salary Divisor</label>
+<input id="salaryDivisor" readonly>
+</div>
+
+<div class="field">
+<label>Shift Hours</label>
+<input id="shiftHours" readonly>
+</div>
+
+<div class="field">
+<label>OT Multiplier</label>
+<input id="otMultiplier" readonly>
+</div>
+
+</div>
+</section>
+
+<section class="form-card">
+
+<h3 class="section-title">Earnings</h3>
+
+<div class="form-grid">
+
+<div class="field">
+<label>Earned Basic</label>
+<input id="earnedBasic" readonly>
+</div>
+
+<div class="field">
+<label>Earned HRA</label>
+<input id="earnedHRA" readonly>
+</div>
+
+<div class="field">
+<label>OT Rate</label>
+<input id="otRate" readonly>
+</div>
+
+<div class="field">
+<label>OT Amount</label>
+<input id="otAmount" readonly>
+</div>
+
+<div class="field">
+<label>Attendance Award</label>
+<input type="number" min="0" step="0.01" id="attendanceAward">
+</div>
+
+<div class="field">
+<label>Bonus</label>
+<input type="number" min="0" step="0.01" id="bonus">
+</div>
+
+<div class="field">
+<label>Incentive</label>
+<input type="number" min="0" step="0.01" id="incentive">
+</div>
+
+<div class="field">
+<label>Arrear</label>
+<input type="number" min="0" step="0.01" id="arrear">
+</div>
+
+<div class="field">
+<label>Other Earning</label>
+<input type="number" min="0" step="0.01" id="otherEarning">
+</div>
+
+<div class="field">
+<label>Total Earnings</label>
+<input id="totalEarnings" readonly>
+</div>
+
+</div>
+</section>
+
+<section class="form-card">
+
+<h3 class="section-title">Deductions</h3>
+
+<div class="form-grid">
+
+<div class="field">
+<label>PF</label>
+<input id="pfAmount" readonly>
+</div>
+
+<div class="field">
+<label>ESI</label>
+<input id="esiAmount" readonly>
+</div>
+
+<div class="field">
+<label>LWF</label>
+<input id="lwfAmount" readonly>
+</div>
+
+<div class="field">
+<label>Canteen</label>
+<input id="canteenAmount" readonly>
+</div>
+
+<div class="field">
+<label>Advance</label>
+<input type="number" min="0" step="0.01" id="advance">
+</div>
+
+<div class="field">
+<label>Loan</label>
+<input type="number" min="0" step="0.01" id="loan">
+</div>
+
+<div class="field">
+<label>Fine</label>
+<input type="number" min="0" step="0.01" id="fine">
+</div>
+
+<div class="field">
+<label>Other Deduction</label>
+<input type="number" min="0" step="0.01" id="otherDeduction">
+</div>
+
+<div class="field">
+<label>Total Deduction</label>
+<input id="totalDeduction" readonly>
+</div>
+
+<div class="field">
+<label>Net Salary</label>
+<input id="netSalary" readonly>
+</div>
+
+</div>
+
+<div class="form-actions">
+
+<button type="button"
+class="btn btn-primary"
+id="calculatePayroll">
+Calculate
+</button>
+
+<button type="button"
+class="btn btn-primary"
+id="savePayroll">
+Save Payroll
+</button>
+
+<button type="button"
+class="btn btn-secondary"
+id="clearPayroll">
+Clear
+</button>
+
+</div>
+
+</section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/payroll.js"></script>
+
+</body>
+</html>

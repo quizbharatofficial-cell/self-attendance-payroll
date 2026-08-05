@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leave - SELF HRMS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+<div>
+<h1>SELF HRMS</h1>
+<p>Leave Management</p>
+</div>
+</header>
+
+<main class="container">
+
+<div class="page-heading">
+<h2>Leave Management</h2>
+<p>Apply, approve and manage employee leave</p>
+</div>
+
+<div class="actions-bar">
+<a href="index.html" class="btn btn-secondary">← Dashboard</a>
+</div>
+
+<section class="form-card">
+
+<form id="leaveForm">
+
+<input type="hidden" id="leaveId">
+
+<div class="form-grid">
+
+<div class="field">
+<label>Employee *</label>
+<select id="leaveEmployee" required>
+<option value="">Select Employee</option>
+</select>
+</div>
+
+<div class="field">
+<label>Leave Type *</label>
+<select id="leaveType" required>
+<option value="EL">Earned Leave (EL)</option>
+<option value="CL">Casual Leave (CL)</option>
+<option value="SL">Sick Leave (SL)</option>
+<option value="Unpaid">Unpaid Leave</option>
+<option value="Other">Other</option>
+</select>
+</div>
+
+<div class="field">
+<label>From *</label>
+<input type="date" id="leaveFrom" required>
+</div>
+
+<div class="field">
+<label>To *</label>
+<input type="date" id="leaveTo" required>
+</div>
+
+<div class="field">
+<label>Days</label>
+<input id="leaveDays" readonly>
+</div>
+
+<div class="field">
+<label>Status *</label>
+<select id="leaveStatus">
+<option value="Pending">Pending</option>
+<option value="Approved">Approved</option>
+<option value="Rejected">Rejected</option>
+</select>
+</div>
+
+<div class="field">
+<label>Reason</label>
+<input id="leaveReason">
+</div>
+
+</div>
+
+<div class="form-actions">
+<button type="submit" class="btn btn-primary" id="leaveSave">
+Save Leave
+</button>
+
+<button type="button" class="btn btn-secondary" id="leaveClear">
+Clear
+</button>
+</div>
+
+</form>
+</section>
+
+<section class="table-card">
+
+<div class="table-header">
+<h3>Leave Records</h3>
+<input type="search" id="leaveSearch" placeholder="Search leave...">
+</div>
+
+<div class="table-responsive">
+<table>
+<thead>
+<tr>
+<th>Employee</th>
+<th>Type</th>
+<th>From</th>
+<th>To</th>
+<th>Days</th>
+<th>Reason</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="leaveTable"></tbody>
+</table>
+</div>
+
+</section>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/leave.js"></script>
+
+</body>
+</html>
