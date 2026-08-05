@@ -3,9 +3,9 @@ plugins {
 }
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystorePropertiesFile = rootProject.file('keystore.properties')
 if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
 }
 
 android {
@@ -13,24 +13,29 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.abss.selfattendance"
-
+        applicationId 'com.abss.selfattendance'
         minSdk 23
         targetSdk 36
-
-        // Self HRMS v1.0.4
         versionCode 5
-        versionName "1.0.4"
+        versionName '1.0.4'
     }
 
     signingConfigs {
         release {
-            if (keystorePropertiesFile.exists()) {
-                storeFile rootProject.file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-                keyAlias keystoreProperties['keyAlias']
-                keyPassword keystoreProperties['keyPassword']
+            def localStore = keystoreProperties['storeFile']
+            def envStore = System.getenv('KEYSTORE_FILE')
+
+            if (localStore) {
+                storeFile rootProject.file(localStore)
+            } else if (envStore) {
+                storeFile file(envStore)
+            } else {
+                storeFile file('self-hrms-release.jks')
             }
+
+            storePassword keystoreProperties['storePassword'] ?: System.getenv('KEYSTORE_PASSWORD')
+            keyAlias keystoreProperties['keyAlias'] ?: System.getenv('KEY_ALIAS') ?: 'selfhrms'
+            keyPassword keystoreProperties['keyPassword'] ?: System.getenv('KEY_PASSWORD')
         }
     }
 
