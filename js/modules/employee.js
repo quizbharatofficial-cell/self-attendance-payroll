@@ -73,8 +73,54 @@ document.addEventListener("DOMContentLoaded", () => {
       "employees",
       JSON.stringify(data)
     );
+
+    syncSelfAttendanceProfiles(data);
   }
 
+
+  function syncSelfAttendanceProfiles(data) {
+    let profiles = [];
+    try {
+      profiles = JSON.parse(localStorage.getItem("selfPayrollProfiles")) || [];
+    } catch (error) {
+      profiles = [];
+    }
+    if (!Array.isArray(profiles)) profiles = [];
+
+    data.forEach(employee => {
+      const code = String(employee.code || "").trim();
+      if (!code) return;
+      let profile = profiles.find(item =>
+        String(item.employeeId || item.employeeNo || "").trim().toLowerCase() === code.toLowerCase()
+      );
+      if (!profile) {
+        profile = {
+          id: "profile_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+          attendance: {}, salaries: {}, createdAt: new Date().toISOString()
+        };
+        profiles.push(profile);
+      }
+      Object.assign(profile, {
+        profileName: employee.name || code,
+        employeeName: employee.name || "",
+        employeeId: code,
+        employeeNo: code,
+        fatherHusbandName: employee.fatherSpouseName || "",
+        designation: employee.designation || "",
+        department: employee.department || "",
+        doj: employee.joiningDate || "",
+        location: employee.branch || "",
+        monthlySalary: Number(employee.monthlySalary) || 0,
+        bankName: employee.bankName || "",
+        accountNumber: employee.accountNumber || "",
+        ifsc: employee.ifsc || "",
+        uan: employee.uan || "",
+        esicNumber: employee.esiNumber || "",
+        updatedAt: new Date().toISOString()
+      });
+    });
+    localStorage.setItem("selfPayrollProfiles", JSON.stringify(profiles));
+  }
 
   function generateId() {
     if (

@@ -2696,6 +2696,65 @@ function restoreAutoBackup(
     }
 }
   /* =====================================================
+   HRMS EMPLOYEE MASTER -> SELF ATTENDANCE SYNC
+   Employee Master is the source of employee identity.
+   Existing attendance/salary data is preserved.
+===================================================== */
+
+function syncHrmsEmployeesToProfiles() {
+    const employees = getJSON("self_hrms_employees", []);
+    if (!Array.isArray(employees) || employees.length === 0) return;
+
+    const profiles = getProfiles();
+    let changed = false;
+
+    employees.forEach(employee => {
+        const employeeCode = String(employee.code || "").trim();
+        if (!employeeCode) return;
+
+        let profile = profiles.find(item =>
+            String(item.employeeId || item.employeeNo || "").trim().toLowerCase() === employeeCode.toLowerCase()
+        );
+
+        if (!profile) {
+            profile = createEmptyProfile(employee.name || employeeCode);
+            profile.employeeId = employeeCode;
+            profile.employeeNo = employeeCode;
+            profiles.push(profile);
+            changed = true;
+        }
+
+        const mapped = {
+            profileName: employee.name || employeeCode,
+            employeeName: employee.name || "",
+            employeeId: employeeCode,
+            employeeNo: employeeCode,
+            fatherHusbandName: employee.fatherSpouseName || "",
+            designation: employee.designation || "",
+            department: employee.department || "",
+            doj: employee.joiningDate || "",
+            location: employee.branch || "",
+            monthlySalary: Number(employee.monthlySalary) || 0,
+            bankName: employee.bankName || "",
+            accountNumber: employee.accountNumber || "",
+            ifsc: employee.ifsc || "",
+            uan: employee.uan || "",
+            esicNumber: employee.esiNumber || ""
+        };
+
+        Object.entries(mapped).forEach(([key, value]) => {
+            if (profile[key] !== value) {
+                profile[key] = value;
+                changed = true;
+            }
+        });
+        profile.updatedAt = new Date().toISOString();
+    });
+
+    if (changed) saveProfiles(profiles);
+}
+
+/* =====================================================
    APP INITIALIZATION
 ===================================================== */
 
@@ -2707,6 +2766,9 @@ function initializeApp() {
     */
 
     migrateOldData();
+
+    /* Keep Self Attendance profiles aligned with HRMS Employee Master. */
+    syncHrmsEmployeesToProfiles();
 
 
     /*
