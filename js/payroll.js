@@ -186,17 +186,20 @@ function loadPayroll() {
   loadedSummary =
     buildSummary(employeeId, month);
 
+  const employeeBasic =
+    Number(employee.basic || employee.basicSalary || employee.monthlySalary) || 0;
+
+  const employeeHRA =
+    Number(employee.hra) || 0;
+
   $("basic").value =
-    money(employee.basic);
+    money(employeeBasic);
 
   $("hra").value =
-    money(employee.hra);
+    money(employeeHRA);
 
   $("gross").value =
-    money(
-      Number(employee.basic || 0) +
-      Number(employee.hra || 0)
-    );
+    money(employeeBasic + employeeHRA);
 
   $("payableDays").value =
     loadedSummary.payableDays;
@@ -241,7 +244,7 @@ function calculatePayroll() {
   if (!validateSettings(settings)) return null;
 
   const basic =
-    Number(loadedEmployee.basic) || 0;
+    Number(loadedEmployee.basic || loadedEmployee.basicSalary || loadedEmployee.monthlySalary) || 0;
 
   const hra =
     Number(loadedEmployee.hra) || 0;
@@ -852,17 +855,20 @@ function loadPayroll() {
   loadedSummary =
     buildSummary(employeeId, month);
 
+  const employeeBasic =
+    Number(employee.basic || employee.basicSalary || employee.monthlySalary) || 0;
+
+  const employeeHRA =
+    Number(employee.hra) || 0;
+
   $("basic").value =
-    money(employee.basic);
+    money(employeeBasic);
 
   $("hra").value =
-    money(employee.hra);
+    money(employeeHRA);
 
   $("gross").value =
-    money(
-      Number(employee.basic || 0) +
-      Number(employee.hra || 0)
-    );
+    money(employeeBasic + employeeHRA);
 
   $("payableDays").value =
     loadedSummary.payableDays;
@@ -907,7 +913,7 @@ function calculatePayroll() {
   if (!validateSettings(settings)) return null;
 
   const basic =
-    Number(loadedEmployee.basic) || 0;
+    Number(loadedEmployee.basic || loadedEmployee.basicSalary || loadedEmployee.monthlySalary) || 0;
 
   const hra =
     Number(loadedEmployee.hra) || 0;

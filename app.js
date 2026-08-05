@@ -1551,6 +1551,7 @@ function punchIn() {
         profile
     );
 
+    syncProfileAttendanceToHrms(profile);
 
     createAutoBackup(
         getShiftName(shift) +
@@ -1785,6 +1786,7 @@ function punchOut() {
         profile
     );
 
+    syncProfileAttendanceToHrms(profile);
 
     createAutoBackup(
         getShiftName(shift) +
@@ -2755,6 +2757,98 @@ function syncHrmsEmployeesToProfiles() {
 }
 
 /* =====================================================
+   SELF ATTENDANCE -> HRMS ATTENDANCE BRIDGE
+   Self Attendance remains the punch UI. HRMS attendance
+   is the single source used by Monthly Attendance/Payroll.
+===================================================== */
+
+function selfAttendanceStatusToHrms(status) {
+    const value = String(status || "").trim().toLowerCase();
+    const map = {
+        "present": "P",
+        "half-day": "HD",
+        "paid-leave": "EL",
+        "unpaid-leave": "A",
+        "weekly-off": "WO",
+        "holiday": "HOLIDAY",
+        "absent": "A"
+    };
+    return map[value] || "P";
+}
+
+function isoToLocalTime(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return String(date.getHours()).padStart(2, "0") + ":" +
+        String(date.getMinutes()).padStart(2, "0");
+}
+
+function syncProfileAttendanceToHrms(profile) {
+    if (!profile) return;
+
+    const employees = getJSON("self_hrms_employees", []);
+    if (!Array.isArray(employees)) return;
+
+    const code = String(profile.employeeId || profile.employeeNo || "").trim();
+    if (!code) return;
+
+    const employee = employees.find(item =>
+        String(item.code || "").trim().toLowerCase() === code.toLowerCase()
+    );
+    if (!employee || !employee.id) return;
+
+    const source = profile.attendance || {};
+    const hrms = getJSON("self_hrms_attendance", []);
+    const records = Array.isArray(hrms) ? hrms : [];
+    let changed = false;
+
+    Object.keys(source).forEach(dateKey => {
+        const item = source[dateKey];
+        if (!item || !dateKey) return;
+
+        const workingHours = Math.max(0, Number(item.workingMinutes) || 0) / 60;
+        const otHours = Math.max(0, Number(item.overtimeMinutes) || 0) / 60;
+        const shiftHours = Number(getDutyHours(item.shift || profile.defaultShift || "day")) || 0;
+        const existingIndex = records.findIndex(row =>
+            String(row.employeeId) === String(employee.id) && row.date === dateKey
+        );
+        const existing = existingIndex >= 0 ? records[existingIndex] : {};
+
+        const next = {
+            ...existing,
+            id: existing.id || ("ATT_SYNC_" + employee.id + "_" + dateKey),
+            employeeId: employee.id,
+            date: dateKey,
+            shift: item.shift || profile.defaultShift || "day",
+            shiftHours: shiftHours,
+            inTime: isoToLocalTime(item.punchIn),
+            outTime: isoToLocalTime(item.punchOut),
+            breakMinutes: 0,
+            workingHours: Number(workingHours.toFixed(2)),
+            otHours: Number(otHours.toFixed(2)),
+            status: selfAttendanceStatusToHrms(item.status),
+            remarks: existing.remarks || "Self Attendance sync",
+            late: existing.late || false,
+            source: "self-attendance",
+            updatedAt: new Date().toISOString()
+        };
+
+        if (existingIndex >= 0) records[existingIndex] = next;
+        else records.push(next);
+        changed = true;
+    });
+
+    if (changed) {
+        localStorage.setItem("self_hrms_attendance", JSON.stringify(records));
+    }
+}
+
+function syncAllSelfAttendanceToHrms() {
+    getProfiles().forEach(syncProfileAttendanceToHrms);
+}
+
+/* =====================================================
    APP INITIALIZATION
 ===================================================== */
 
@@ -2769,6 +2863,9 @@ function initializeApp() {
 
     /* Keep Self Attendance profiles aligned with HRMS Employee Master. */
     syncHrmsEmployeesToProfiles();
+
+    /* Import existing Self Attendance records into HRMS attendance. */
+    syncAllSelfAttendanceToHrms();
 
 
     /*
