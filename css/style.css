@@ -551,3 +551,10 @@ th {
   }
 
 }
+
+/* Production navigation polish */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.topbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.topbar-action{display:inline-block;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.16);color:#fff;text-decoration:none;font-size:12px;font-weight:700}
+.topbar-action:focus,.module-card:focus{outline:3px solid rgba(255,255,255,.55);outline-offset:2px}
+@media (max-width:560px){.topbar{align-items:flex-start}.topbar-actions{justify-content:flex-end}.topbar-action{padding:7px 9px;font-size:11px}}

@@ -3,16 +3,12 @@
   "name": "SELF HRMS - Attendance & Payroll",
   "short_name": "SELF HRMS",
   "description": "SELF HRMS with employee masters, self attendance, payroll, reports and salary slips",
-
-  "start_url": "./index.html",
+  "start_url": "./login.html",
   "scope": "./",
-
   "display": "standalone",
   "orientation": "portrait",
-
   "background_color": "#f4f6f8",
   "theme_color": "#1565c0",
-
   "icons": [
     {
       "src": "./icon-192.png",

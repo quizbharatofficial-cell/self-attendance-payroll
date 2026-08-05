@@ -2,8 +2,7 @@
    SELF ATTENDANCE PWA SERVICE WORKER
 ===================================================== */
 
-const CACHE_NAME =
-    "self-hrms-unified-v2-auth-v2";
+const CACHE_NAME = "self-hrms-production-v1";
 
 
 /* =====================================================
@@ -11,45 +10,44 @@ const CACHE_NAME =
 ===================================================== */
 
 const APP_FILES = [
-
     "./",
-
+    "./login.html",
+    "./signup.html",
+    "./setup-mpin.html",
+    "./mpin.html",
     "./index.html",
     "./self-attendance-home.html",
-    "./css/style.css",
-    "./js/storage.js",
-  "./js/auth-guard.js",
-    "./js/dashboard.js",
-    "./employees.html",
+    "./account.html",
+    "./backup.html",
+    "./profile.html",
     "./monthly-attendance.html",
     "./leave.html",
     "./holiday.html",
-    "./payroll.html",
+    "./history.html",
     "./reports.html",
     "./settings.html",
-
-    "./login.html",
-    "./signup.html",
-  "./mpin.html",
-"./setup-mpin.html",
-  "./account.html",
-
-    "./attendance.html",
-    "./profile.html",
-
-    "./salary.html",
-    "./salary-slip.html",
-
-    "./backup.html",
-
+    "./masters/branch.html",
+    "./masters/department.html",
+    "./masters/designation.html",
+    "./masters/shift.html",
+    "./masters/salary-component.html",
+    "./masters/employee.html",
+    "./masters/company.html",
+    "./masters/holiday.html",
+    "./masters/leave-type.html",
+    "./masters/weekly-off.html",
+    "./attendance/attendance.html",
+    "./payroll/payroll.html",
+    "./payroll/payslip.html",
+    "./css/style.css",
     "./style.css",
     "./app.js",
-
+    "./js/auth-guard.js",
+    "./js/storage.js",
+    "./js/dashboard.js",
     "./manifest.json",
-
     "./icon-192.png",
     "./icon-512.png"
-
 ];
 
 
