@@ -3,7 +3,7 @@
 ===================================================== */
 
 const CACHE_NAME =
-    "self-hrms-unified-v2";
+    "self-hrms-unified-v2-auth-v2";
 
 
 /* =====================================================
@@ -18,6 +18,7 @@ const APP_FILES = [
     "./self-attendance-home.html",
     "./css/style.css",
     "./js/storage.js",
+  "./js/auth-guard.js",
     "./js/dashboard.js",
     "./employees.html",
     "./monthly-attendance.html",
