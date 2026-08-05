@@ -1,5 +1,13 @@
-
-# Android signing secrets
+.gradle/
+build/
+app/build/
 *.jks
 *.keystore
 keystore.properties
+local.properties
+
+# Local Android signing files
+self-hrms-release.jks
+keystore.properties
+local.properties
+*.jks

@@ -1,60 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- Internet: GitHub update checking / APK download -->
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- Android 13+ notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- Allow Self HRMS to open downloaded APK for update -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
+    <application
+        android:allowBackup="true"
+        android:label="Self HRMS"
+        android:icon="@drawable/icon_512"
+        android:roundIcon="@drawable/icon_512"
+        android:theme="@style/Theme.SelfAttendance"
+        android:usesCleartextTraffic="false"
+        android:supportsRtl="true">
 
-<application
-    android:allowBackup="true"
-    android:label="Self HRMS"
-    android:icon="@drawable/icon_512"
-    android:roundIcon="@drawable/icon_512"
-    android:theme="@style/Theme.SelfAttendance"
-    android:usesCleartextTraffic="false"
-    android:supportsRtl="true">
-
-        <!-- Main Activity -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
             </intent-filter>
-
         </activity>
 
+        <service
+            android:name=".AttendanceService"
+            android:enabled="true"
+            android:exported="false" />
 
-        <!--
-            FileProvider
-            Required for:
-            1. Self HRMS APK update installation
-            2. Backup JSON sharing
-        -->
+        <receiver
+            android:name=".AttendanceWidget"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.abss.selfattendance.PUNCH_IN" />
+                <action android:name="com.abss.selfattendance.PUNCH_OUT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/attendance_widget_info" />
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
-
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-
         </provider>
-
     </application>
-
 </manifest>

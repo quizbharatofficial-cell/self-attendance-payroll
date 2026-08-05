@@ -2,27 +2,38 @@ plugins {
     id 'com.android.application'
 }
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+
 android {
     namespace 'com.abss.selfattendance'
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.abss.selfattendance"
-
+        applicationId 'com.abss.selfattendance'
         minSdk 23
         targetSdk 36
-
-        // Self HRMS v1.0.4
         versionCode 5
-        versionName "1.0.4"
+        versionName '1.0.4'
     }
 
     signingConfigs {
         release {
-            storeFile file("self-hrms-release.jks")
-            storePassword System.getenv("KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
+            def localStore = keystoreProperties['storeFile']
+            def envStore = System.getenv('KEYSTORE_FILE')
+            if (localStore) {
+                storeFile rootProject.file(localStore)
+            } else if (envStore) {
+                storeFile file(envStore)
+            } else {
+                storeFile file('self-hrms-release.jks')
+            }
+            storePassword keystoreProperties['storePassword'] ?: System.getenv('KEYSTORE_PASSWORD')
+            keyAlias keystoreProperties['keyAlias'] ?: System.getenv('KEY_ALIAS') ?: 'selfhrms'
+            keyPassword keystoreProperties['keyPassword'] ?: System.getenv('KEY_PASSWORD')
         }
     }
 
@@ -35,13 +46,16 @@ android {
     }
 }
 
-configurations.configureEach {
-    resolutionStrategy {
-        force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
-        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
-        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+tasks.register('syncWebAssets', Sync) {
+    into layout.projectDirectory.dir('src/main/assets')
+    from(rootProject.projectDir) {
+        include '*.html', '*.css', '*.js', '*.json', '*.png'
+        include 'css/**', 'js/**', 'masters/**', 'payroll/**', 'attendance/**', 'assets/**', 'data/**'
+        exclude '**/*.bak', '**/build/**', '**/.gradle/**', '**/.git/**'
     }
 }
+
+preBuild.dependsOn syncWebAssets
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.1'
